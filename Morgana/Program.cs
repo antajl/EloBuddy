@@ -21,7 +21,7 @@ namespace Morgana
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Active R;
-        public static Menu MorgMenu, ComboMenu, DrawMenu, MiscMenu, QMenu, WMenu;
+        public static Menu MorgMenu, ComboMenu, DrawMenu, MiscMenu, QMenu, WMenu, LaneClear;
         public static AIHeroClient Me = ObjectManager.Player;
         public static HitChance QHitChance;
         public static HitChance WHitChance;
@@ -31,6 +31,8 @@ namespace Morgana
         }
         private static void OnLoaded(EventArgs args)
         {
+            if (Player.Instance.ChampionName != "Morgana")
+                return;
             Bootstrap.Init(null);
             Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, (int)250f, (int)1200f, (int)80f);
             W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int)250f, (int)20f, (int)0f);
@@ -66,7 +68,7 @@ namespace Morgana
             QMenu.AddSeparator();
             QMenu.AddLabel("EB's common prediction and hitchance is still beta and sometimes it wont cast Q." + Environment.NewLine + "But it works just fine if you use Medium hitchance prediction." + Environment.NewLine + "This allows Q to cast more but also a slightly smaller bind success percentage.");
             QMenu.AddSeparator();
-            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction"));
+            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High"));
 
             WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
             WMenu.AddGroupLabel("W Settings");
@@ -74,7 +76,7 @@ namespace Morgana
             WMenu.Add("wmax", new Slider("Max Range", (int)W.Range, 0, (int)W.Range));
             WMenu.Add("wmin", new Slider("Min Range", 200, 0, (int)W.Range));
             WMenu.AddSeparator();
-            WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction"));
+            WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction / Disabled = High"));
 
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("KS");
@@ -95,6 +97,9 @@ namespace Morgana
             DrawMenu.AddSeparator();
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
 
+            LaneClear = MorgMenu.AddSubMenu("Lane Clear", "laneclear");
+            LaneClear.AddGroupLabel("Lane Clear Settings");
+            LaneClear.Add("LCW", new CheckBox("Use W"));
 
             Interrupter.OnInterruptableSpell += Interrupt;
             Game.OnTick += Tick;
@@ -141,6 +146,11 @@ namespace Morgana
                 Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
                 ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
                 ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+               Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            {
+                LaneClearA.LaneClear();
             }
         }
 

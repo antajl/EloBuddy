@@ -21,7 +21,7 @@ namespace Morgana
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Active R;
-        public static Menu MorgMenu, ComboMenu, DrawMenu, MiscMenu, QMenu, WMenu, LaneClear;
+        public static Menu MorgMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu, WMenu, LaneClear;
         public static AIHeroClient Me = ObjectManager.Player;
         public static HitChance QHitChance;
         public static HitChance WHitChance;
@@ -39,7 +39,7 @@ namespace Morgana
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
 
-            MorgMenu = MainMenu.AddMenu("Bloodimir.Morgana", "bloodimirmorgana");
+            MorgMenu = MainMenu.AddMenu("B.Morgana", "bloodimirmorgana");
             MorgMenu.AddGroupLabel("Bloodimir.Morgana");
             MorgMenu.AddSeparator();
             MorgMenu.AddLabel("An Addon made my Bloodimir/turkey");
@@ -58,8 +58,6 @@ namespace Morgana
             QMenu.AddSeparator();
             QMenu.Add("qmin", new Slider("Min Range", 200, 0, (int)Q.Range));
             QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
-            QMenu.Add("wmax", new Slider("Max Range", (int)W.Range, 0, (int)W.Range));
-            QMenu.Add("wmin", new Slider("Min Range", 200, 0, (int)W.Range));
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
             {
@@ -77,6 +75,21 @@ namespace Morgana
             WMenu.Add("wmin", new Slider("Min Range", 200, 0, (int)W.Range));
             WMenu.AddSeparator();
             WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction / Disabled = High"));
+
+            SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
+            SkinMenu.AddGroupLabel("Choose the desired skin");
+            
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 0, 0, 6));
+            var sID = new[] { "Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
+            skinchange.DisplayName = sID[skinchange.CurrentValue];
+            skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+                {
+                    sender.DisplayName = sID[changeArgs.NewValue];
+                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Chat.Print("skin-changed");
+                    }
+                };
 
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("KS");
@@ -105,7 +118,6 @@ namespace Morgana
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
         }
-
         private static void Interrupt(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
         {
             if (MiscMenu["intq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
@@ -124,7 +136,6 @@ namespace Morgana
                 }
             }
         }
-
         private static void OnDraw(EventArgs args)
         {
             if (!Me.IsDead)
@@ -152,8 +163,8 @@ namespace Morgana
             {
                 LaneClearA.LaneClear();
             }
+            SkinChange();
         }
-
         private static void AutoCast()
         {
             if (Q.IsReady())
@@ -191,7 +202,6 @@ namespace Morgana
                                 }
                     }
                 }
-
                 catch
                 {
                 }
@@ -251,9 +261,36 @@ namespace Morgana
                 }
             }
         }
+        private static void SkinChange()
+        {
+            var style = SkinMenu["sID"].DisplayName;                  
+            switch (style)
+            {
+                case "Default":
+                    Player.SetSkinId(0);
+                    break;
+                case "Exiled":
+                    Player.SetSkinId(1);
+                    break;
+                case "Sinful Succulence":
+                    Player.SetSkinId(2);
+                    break;
+                case "Blade Mistress":
+                    Player.SetSkinId(3);
+                    break;
+                case "Blackthorn":
+                    Player.SetSkinId(4);
+                    break;
+                case "Ghost Bride":
+                    Player.SetSkinId(5);
+                    break;
+                case "Victorius":
+                    Player.SetSkinId(6);
+                    break;
+            }
+        }
         private static void Combo(bool useW, bool useQ, bool useR)
         {
-
             if (useW && W.IsReady())
             {
                 var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
@@ -313,7 +350,6 @@ namespace Morgana
                     Me.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
-
                     if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
                     {
                         Chat.Print("r-combo");

@@ -302,7 +302,7 @@ namespace Morgana
                     }
                     if (W.GetPrediction(soilTarget).HitChance >= WHitChance)
                     {
-                        if (soilTarget.Distance(Me.ServerPosition) > QMenu["wmin"].Cast<Slider>().CurrentValue)
+                        if (soilTarget.Distance(Me.ServerPosition) > WMenu["wmin"].Cast<Slider>().CurrentValue)
                         {
                             W.Cast(soilTarget);
 

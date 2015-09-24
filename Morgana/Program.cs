@@ -72,7 +72,7 @@ namespace Morgana
             WMenu.AddGroupLabel("W Settings");
             WMenu.AddSeparator();
             WMenu.Add("wmax", new Slider("Max Range", (int)W.Range, 0, (int)W.Range));
-            WMenu.Add("wmin", new Slider("Min Range", 200, 0, (int)W.Range));
+            WMenu.Add("wmin", new Slider("Min Range", 124, 0, (int)W.Range));
             WMenu.AddSeparator();
             WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction / Disabled = High"));
 

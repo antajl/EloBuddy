@@ -21,9 +21,10 @@ namespace Morgana
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Active R;
-        public static Menu MorgMenu, ComboMenu, DrawMenu, MiscMenu, QMenu;
+        public static Menu MorgMenu, ComboMenu, DrawMenu, MiscMenu, QMenu, WMenu;
         public static AIHeroClient Me = ObjectManager.Player;
         public static HitChance QHitChance;
+        public static HitChance WHitChance;
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
@@ -34,7 +35,7 @@ namespace Morgana
             Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, (int)250f, (int)1200f, (int)80f);
             W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int)250f, (int)20f, (int)0f);
             E = new Spell.Targeted(SpellSlot.E, 750);
-            R = new Spell.Active(SpellSlot.R, 1000);
+            R = new Spell.Active(SpellSlot.R, 600);
 
             MorgMenu = MainMenu.AddMenu("O.Morgana", "omorgana");
             MorgMenu.AddGroupLabel("O.Morgana");
@@ -53,8 +54,10 @@ namespace Morgana
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
-            QMenu.Add("qmin", new Slider("Min Range", 195, 0, (int)Q.Range));
+            QMenu.Add("qmin", new Slider("Min Range", 200, 0, (int)Q.Range));
             QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
+            QMenu.Add("wmax", new Slider("Max Range", (int)W.Range, 0, (int)W.Range));
+            QMenu.Add("wmin", new Slider("Min Range", 200, 0, (int)W.Range));
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
             {
@@ -63,8 +66,15 @@ namespace Morgana
             QMenu.AddSeparator();
             QMenu.AddLabel("EB's common prediction and hitchance is still beta and sometimes it wont cast Q." + Environment.NewLine + "But it works just fine if you use Medium hitchance prediction." + Environment.NewLine + "This allows Q to cast more but also a slightly smaller bind success percentage.");
             QMenu.AddSeparator();
-            QMenu.Add("mediumpred", new CheckBox("Medium Hitchance Prediction"));
+            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction"));
 
+            WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
+            WMenu.AddGroupLabel("W Settings");
+            WMenu.AddSeparator();
+            WMenu.Add("wmax", new Slider("Max Range", (int)W.Range, 0, (int)W.Range));
+            WMenu.Add("wmin", new Slider("Min Range", 200, 0, (int)W.Range));
+            WMenu.AddSeparator();
+            WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction"));
 
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("KS");
@@ -76,6 +86,7 @@ namespace Morgana
             MiscMenu.Add("intq", new CheckBox("Q to Interrupt"));
             MiscMenu.Add("dashq", new CheckBox("Q on Dashing"));
             MiscMenu.Add("immoq", new CheckBox("Q on Immobile"));
+            MiscMenu.Add("immow", new CheckBox("W on Immobile"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("debug", new CheckBox("Debug", false));
 
@@ -115,19 +126,21 @@ namespace Morgana
             {
                 if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
-                    Drawing.DrawCircle(Me.Position, Q.Range, Color.White);
+                    Drawing.DrawCircle(Me.Position, Q.Range, Color.LightYellow);
                 }
             }
         }
         private static void Tick(EventArgs args)
         {
             QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
+            WHitChance = WMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             Killsteal();
             AutoCast();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
-                    ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
+                ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
             }
         }
 
@@ -154,7 +167,7 @@ namespace Morgana
                                         Chat.Print("q-dash");
                                     }
                                 }
-                        if (MiscMenu["imoq"].Cast<CheckBox>().CurrentValue &&
+                        if (MiscMenu["immoq"].Cast<CheckBox>().CurrentValue &&
                             MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
                             if (enemy.Distance(Me.ServerPosition) > MiscMenu["qmin"].Cast<Slider>().CurrentValue)
                                 if (Q.GetPrediction(enemy).HitChance == HitChance.Immobile)
@@ -168,8 +181,36 @@ namespace Morgana
                                 }
                     }
                 }
+
                 catch
                 {
+                }
+                if (W.IsReady())
+                {
+                    try
+                    {
+                        foreach (
+                            var enemy in
+                            ObjectManager.Get<AIHeroClient>()
+                            .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
+                        {
+                            if (MiscMenu["immow"].Cast<CheckBox>().CurrentValue &&
+                                MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
+                                if (enemy.Distance(Me.ServerPosition) > MiscMenu["wmin"].Cast<Slider>().CurrentValue)
+                                    if (W.GetPrediction(enemy).HitChance == HitChance.Immobile)
+                                    {
+                                        W.Cast(enemy);
+
+                                        if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                                        {
+                                            Chat.Print("w-immo");
+                                        }
+                                    }
+                        }
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
@@ -200,10 +241,34 @@ namespace Morgana
                 }
             }
         }
-        private static void Combo(bool shoulduseQ, bool shoulduseR)
+        private static void Combo(bool useW, bool useQ, bool useR)
         {
 
-            if (shoulduseQ && Q.IsReady())
+            if (useW && W.IsReady())
+            {
+                var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
+                if (soilTarget.IsValidTarget(W.Range))
+                {
+                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Chat.Print("Valid soil target found");
+                    }
+                    if (W.GetPrediction(soilTarget).HitChance >= WHitChance)
+                    {
+                        if (soilTarget.Distance(Me.ServerPosition) > QMenu["wmin"].Cast<Slider>().CurrentValue)
+                        {
+                            W.Cast(soilTarget);
+
+                            if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                            {
+                                Chat.Print("w-combo");
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (useQ && Q.IsReady())
             {
                 try
                 {
@@ -234,7 +299,7 @@ namespace Morgana
                 catch
                 {
                 }
-                if (shoulduseR && R.IsReady() &&
+                if (useR && R.IsReady() &&
                     Me.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
@@ -245,7 +310,6 @@ namespace Morgana
                     }
                 }
             }
-
         }
     }
 }

@@ -1,0 +1,10 @@
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\Morgana.exe.config
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\Morgana.exe
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\Morgana.pdb
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\EloBuddy.dll
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\SharpDX.dll
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\x86\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\x86\Debug\Morgana.exe
+C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\x86\Debug\Morgana.pdb

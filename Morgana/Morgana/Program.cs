@@ -37,10 +37,10 @@ namespace Morgana
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
 
-            MorgMenu = MainMenu.AddMenu("O.Morgana", "omorgana");
-            MorgMenu.AddGroupLabel("O.Morgana");
+            MorgMenu = MainMenu.AddMenu("Bloodimir.Morgana", "bloodimirmorgana");
+            MorgMenu.AddGroupLabel("Bloodimir.Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("An Addon made my Bloodimir");
+            MorgMenu.AddLabel("An Addon made my Bloodimir/turkey");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");

@@ -19,22 +19,18 @@ namespace BloodimirVladimir
         public static Spell.Targeted Ignite;
         public static Menu VladMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneClear, LastHit;
         public static AIHeroClient Vlad = ObjectManager.Player;
-
-        public static AIHeroClient _Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
+            public static AIHeroClient _Player
+            {
+                get { return ObjectManager.Player; }
+            }
         public static int health
         {
             get { return (int) _Player.Health; }
         }
-
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
         }
-
         private static void OnLoaded(EventArgs args)
         {
             if (Player.Instance.ChampionName != "Vladimir")
@@ -44,14 +40,12 @@ namespace BloodimirVladimir
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E, 610);
             R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, (int) 250f, (int) 1200f, (int) 150f);
-
             SpellDataInst summoner1 = _Player.Spellbook.GetSpell(SpellSlot.Summoner1);
             SpellDataInst summoner2 = _Player.Spellbook.GetSpell(SpellSlot.Summoner2);
             if (summoner1.Name == "summonerdot")
                 Ignite = new Spell.Targeted(SpellSlot.Summoner1, 599);
             else if (summoner2.Name == "summonerdot")
                 Ignite = new Spell.Targeted(SpellSlot.Summoner2, 599);
-
             VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
             VladMenu.AddGroupLabel("Bloodimir.Bloodimir");
             VladMenu.AddSeparator();

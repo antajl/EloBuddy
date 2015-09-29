@@ -19,6 +19,7 @@ namespace BloodimirVladimir
             {
                 return;
             }
+
         }
         private static AIHeroClient Vladimir { get { return ObjectManager.Player; } }
         public static float Qdmg(Obj_AI_Base target)
@@ -35,10 +36,6 @@ namespace BloodimirVladimir
         {
             return Vladimir.CalculateDamageOnUnit(target, DamageType.Magical,
                 (new float[] { 0, 168, 280, 392 }[Program.E.Level] + (0.78f * Vladimir.FlatMagicDamageMod)));
-        }
-        public static float Ignitedmg(Obj_AI_Base target)
-        {
-            return ((10 + (4 * Program._Player.Level)) * 5) - ((target.HPRegenRate / 2) * 5);
         }
     }
 }

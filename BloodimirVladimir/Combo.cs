@@ -14,12 +14,10 @@ namespace BloodimirVladimir
             R,
             Ignite
         };
-
         public static AIHeroClient Vladimir
         {
             get { return ObjectManager.Player; }
         }
-
         public static Obj_AI_Base GetEnemy(float range, GameObjectType type)
         {
             return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
@@ -31,7 +29,6 @@ namespace BloodimirVladimir
                                                                                                && !a.IsInvulnerable
                                                                                                && a.IsValidTarget(range));
         }
-
         public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
         {
             if (spell == AttackSpell.E)
@@ -84,19 +81,15 @@ namespace BloodimirVladimir
                                                                                                    a.Health <=
                                                                                                    Misc.Rdmg(a));
             }
-           if (spell == AttackSpell.Ignite)
+            var target = TargetSelector.GetTarget(Program.Ignite.Range, DamageType.True);
+            if (target == null || !target.IsValid())
+            if (Program.Ignite.IsInRange(target) && target.Health < 50 + 20 * Program._Player.Level - (target.HPRegenRate / 5 * 3) &&
+                 Program.ComboMenu["useignite"].Cast<CheckBox>().CurrentValue)
             {
-                return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).Where(a => a.IsEnemy
-                && a.Type == type
-                && a.Distance(Vladimir) <= Program.Ignite.Range
-                && !a.IsDead
-                && !a.IsInvulnerable
-                && a.IsValidTarget(Program.Ignite.Range)
-                && a.Health <= Misc.Ignitedmg(a)).FirstOrDefault();
+                Program.Ignite.Cast(target);
             }
             return null;
         }
-
         public static void VladCombo()
         {
             var QCHECK = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
@@ -172,7 +165,6 @@ namespace BloodimirVladimir
                     numEnemiesInRange = tempNumEnemies;
                 }
             }
-
             return enem;
         }
     }

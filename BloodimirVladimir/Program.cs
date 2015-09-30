@@ -7,6 +7,7 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using Microsoft.Win32;
 
 namespace BloodimirVladimir
 {
@@ -24,17 +25,10 @@ namespace BloodimirVladimir
 		{
 			get { return ObjectManager.Player; }
 		}
-
-		public static int health
-		{
-			get { return (int) _Player.Health; }
-		}
-
 		private static void Main(string[] args)
 		{
 			Loading.OnLoadingComplete += OnLoaded;
 		}
-
 		private static void OnLoaded(EventArgs args)
 		{
 			if (Player.Instance.ChampionName != "Vladimir")
@@ -47,9 +41,9 @@ namespace BloodimirVladimir
 			var summoner1 = _Player.Spellbook.GetSpell(SpellSlot.Summoner1);
 			var summoner2 = _Player.Spellbook.GetSpell(SpellSlot.Summoner2);
 			if (summoner1.Name == "summonerdot")
-				Ignite = new Spell.Targeted(SpellSlot.Summoner1, 599);
+				Ignite = new Spell.Targeted(SpellSlot.Summoner1, 600);
 			else if (summoner2.Name == "summonerdot")
-				Ignite = new Spell.Targeted(SpellSlot.Summoner2, 599);
+				Ignite = new Spell.Targeted(SpellSlot.Summoner2, 600);
 			VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
 			VladMenu.AddGroupLabel("Bloodimir.Bloodimir");
 			VladMenu.AddSeparator();
@@ -61,7 +55,6 @@ namespace BloodimirVladimir
 			ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
 			ComboMenu.Add("usecomboe", new CheckBox("Use E"));
 			ComboMenu.Add("usecombor", new CheckBox("Use R"));
-			ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
 			ComboMenu.AddSeparator();
 			ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
 
@@ -85,12 +78,11 @@ namespace BloodimirVladimir
 			MiscMenu.AddSeparator();
 			MiscMenu.Add("ksq", new CheckBox("KS with Q"));
 			MiscMenu.AddSeparator();
-			MiscMenu.Add("ksignite", new CheckBox("Ks with Ignite"));
+			MiscMenu.Add("ksignite", new CheckBox("Ks with Ignite", false));
 			MiscMenu.AddSeparator();
 			MiscMenu.Add("dodgew", new CheckBox("Use W to Dodge WIP"));
 			MiscMenu.AddSeparator();
 			MiscMenu.Add("debug", new CheckBox("Debug", false));
-			MiscMenu.Add("ehealth", new Slider("E Health Manager (%)", 50));
 
 			SkinMenu = VladMenu.AddSubMenu("Skin Changer", "skin");
 			SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -111,7 +103,6 @@ namespace BloodimirVladimir
 			Game.OnTick += Tick;
 			Drawing.OnDraw += OnDraw;
 		}
-
 		private static void OnDraw(EventArgs args)
 		{
 			if (!Vlad.IsDead)
@@ -145,22 +136,31 @@ namespace BloodimirVladimir
 			if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
 			{
 				Combo.VladCombo();
+			    Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
 			}
-			{
-				if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-				    Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
-				{
-					LaneClearA.LaneClear();
-				}
-				if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-				{
-					LastHitA.LastHitB();
-				}
-				Misc.EHslider();
-			}
-			SkinChange();
+		    {
+		        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+		            Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+		        {
+		            LaneClearA.LaneClear();
+		        }
+		        if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+		        {
+		            LastHitA.LastHitB();
+		        }
+		    }
+		    SkinChange();
 		}
-
+	    public static void Rincombo(bool useR)
+        {
+	        if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
+                if (useR && R.IsReady() &&
+                    Vlad.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+	        {
+	            var rtarget = TargetSelector.GetTarget(1500, DamageType.True);
+	            R.Cast(rtarget.ServerPosition);
+	        }
+	}
 		private static void Killsteal()
 		{
 			var enemy = TargetSelector.GetTarget(Q.Range, DamageType.Magical);

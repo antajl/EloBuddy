@@ -10,15 +10,6 @@ namespace BloodimirVladimir
 		{
 			get { return ObjectManager.Player; }
 		}
-
-		public static void EHslider()
-		{
-			var ehealth = Program.MiscMenu["ehealth"].Cast<Slider>().CurrentValue;
-			if (Program._Player.HealthPercent < ehealth)
-			{
-			}
-		}
-
 		public static float Qdmg(Obj_AI_Base target)
 		{
 			return Vladimir.CalculateDamageOnUnit(target, DamageType.Magical,

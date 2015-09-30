@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using EloBuddy;
 using EloBuddy.SDK;
-using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
@@ -25,17 +20,19 @@ namespace Morgana
         public static AIHeroClient Me = ObjectManager.Player;
         public static HitChance QHitChance;
         public static HitChance WHitChance;
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
         }
+
         private static void OnLoaded(EventArgs args)
         {
             if (Player.Instance.ChampionName != "Morgana")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, (int)250f, (int)1200f, (int)80f);
-            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int)250f, (int)20f, (int)0f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, (int) 250f, (int) 1200f, (int) 80f);
+            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int) 250f, (int) 20f, (int) 0f);
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
 
@@ -56,40 +53,44 @@ namespace Morgana
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
-            QMenu.Add("qmin", new Slider("Min Range", 200, 0, (int)Q.Range));
-            QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
+            QMenu.Add("qmin", new Slider("Min Range", 200, 0, (int) Q.Range));
+            QMenu.Add("qmax", new Slider("Max Range", (int) Q.Range, 0, (int) Q.Range));
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
             {
                 QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));
             }
             QMenu.AddSeparator();
-            QMenu.AddLabel("EB's common prediction and hitchance is still beta and sometimes it wont cast Q." + Environment.NewLine + "But it works just fine if you use Medium hitchance prediction." + Environment.NewLine + "This allows Q to cast more but also a slightly smaller bind success percentage.");
+            QMenu.AddLabel("EB's common prediction and hitchance is still beta and sometimes it wont cast Q." +
+                           Environment.NewLine + "But it works just fine if you use Medium hitchance prediction." +
+                           Environment.NewLine +
+                           "This allows Q to cast more but also a slightly smaller bind success percentage.");
             QMenu.AddSeparator();
-            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High"));
+            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
 
             WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
             WMenu.AddGroupLabel("W Settings");
             WMenu.AddSeparator();
-            WMenu.Add("wmax", new Slider("Max Range", (int)W.Range, 0, (int)W.Range));
-            WMenu.Add("wmin", new Slider("Min Range", 124, 0, (int)W.Range));
+            WMenu.Add("wmax", new Slider("Max Range", (int) W.Range, 0, (int) W.Range));
+            WMenu.Add("wmin", new Slider("Min Range", 124, 0, (int) W.Range));
             WMenu.AddSeparator();
             WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction / Disabled = High"));
 
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
-            
+
             var skinchange = SkinMenu.Add("sID", new Slider("Skin", 0, 0, 6));
-            var sID = new[] { "Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
+            var sID = new[]
+            {"Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
             skinchange.DisplayName = sID[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+            {
+                sender.DisplayName = sID[changeArgs.NewValue];
+                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
                 {
-                    sender.DisplayName = sID[changeArgs.NewValue];
-                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                    {
-                        Chat.Print("skin-changed");
-                    }
-                };
+                    Chat.Print("skin-changed");
+                }
+            };
 
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("KS");
@@ -109,33 +110,27 @@ namespace Morgana
             DrawMenu.AddGroupLabel("Drawings");
             DrawMenu.AddSeparator();
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
+            DrawMenu.Add("draww", new CheckBox("Draw W"));
 
             LaneClear = MorgMenu.AddSubMenu("Lane Clear", "laneclear");
             LaneClear.AddGroupLabel("Lane Clear Settings");
             LaneClear.Add("LCW", new CheckBox("Use W"));
 
-            Interrupter.OnInterruptableSpell += Interrupt;
+            Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
         }
-        private static void Interrupt(Obj_AI_Base sender, Interrupter.InterruptableSpellEventArgs e)
+
+        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
+            Interrupter.InterruptableSpellEventArgs args)
         {
-            if (MiscMenu["intq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            var intTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             {
-                if (sender.Distance(Me, true) <= Q.RangeSquared)
-                {
-                    var pred = Q.GetPrediction(sender);
-                    if (pred.HitChance >= HitChance.Low)
-                    {
-                        Q.Cast(pred.CastPosition);
-                        if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                        {
-                            Chat.Print("q-int");
-                        }
-                    }
-                }
+                if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
+                    Q.Cast(intTarget);
             }
         }
+
         private static void OnDraw(EventArgs args)
         {
             if (!Me.IsDead)
@@ -144,8 +139,13 @@ namespace Morgana
                 {
                     Drawing.DrawCircle(Me.Position, Q.Range, Color.LightYellow);
                 }
+                if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+                {
+                    Drawing.DrawCircle(Me.Position, W.Range, Color.LightBlue);
+                }
             }
         }
+
         private static void Tick(EventArgs args)
         {
             QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
@@ -155,16 +155,17 @@ namespace Morgana
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
-                ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
-                ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                    ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
+                    ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-               Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 LaneClearA.LaneClear();
             }
             SkinChange();
         }
+
         private static void AutoCast()
         {
             if (Q.IsReady())
@@ -211,8 +212,8 @@ namespace Morgana
                     {
                         foreach (
                             var enemy in
-                            ObjectManager.Get<AIHeroClient>()
-                            .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
+                                ObjectManager.Get<AIHeroClient>()
+                                    .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
                         {
                             if (MiscMenu["immow"].Cast<CheckBox>().CurrentValue &&
                                 MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
@@ -234,13 +235,17 @@ namespace Morgana
                 }
             }
         }
+
         private static void Killsteal()
         {
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
                 try
                 {
-                    foreach (var qtarget in HeroManager.Enemies.Where(hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                    foreach (
+                        var qtarget in
+                            HeroManager.Enemies.Where(
+                                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                     {
                         if (Me.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                         {
@@ -261,9 +266,10 @@ namespace Morgana
                 }
             }
         }
+
         private static void SkinChange()
         {
-            var style = SkinMenu["sID"].DisplayName;                  
+            var style = SkinMenu["sID"].DisplayName;
             switch (style)
             {
                 case "Default":
@@ -289,6 +295,7 @@ namespace Morgana
                     break;
             }
         }
+
         private static void Combo(bool useW, bool useQ, bool useR)
         {
             if (useW && W.IsReady())

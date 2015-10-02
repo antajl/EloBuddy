@@ -77,6 +77,7 @@ namespace Kennen
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS using Q"));
             MiscMenu.Add("ksw", new CheckBox("KS using W"));
+            MiscMenu.Add("int", new CheckBox("TRY to Interrupt spells"));
 
             SkinMenu = KennenMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -92,11 +93,25 @@ namespace Kennen
                     Chat.Print("skin-changed");
                 }
             };
-
+            Interrupter.OnInterruptableSpell += Interruptererer;
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
         }
 
+        private static void Interruptererer(Obj_AI_Base sender,
+           Interrupter.InterruptableSpellEventArgs args)
+        {
+            var intTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
+            if (intTarget.HasBuff("kennenmarkofstorm"))
+            {
+                if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["int"].Cast<CheckBox>().CurrentValue)
+                    Q.Cast(intTarget.ServerPosition);
+                if (W.IsReady() && sender.IsValidTarget(W.Range))
+                    W.Cast();
+                if (E.IsReady() && sender.IsValidTarget(E.Range))
+                    E.Cast();
+            }
+        }
         private static void OnDraw(EventArgs args)
         {
             if (!Kennen.IsDead)

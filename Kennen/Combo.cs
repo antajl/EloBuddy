@@ -29,7 +29,7 @@ namespace Kennen
             }
 
             if (WCHECK && WREADY)
-            {
+            { 
                 var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
                 if (wenemy != null)
                 {

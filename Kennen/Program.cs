@@ -110,6 +110,8 @@ namespace Kennen
                     W.Cast();
                 if (E.IsReady() && sender.IsValidTarget(E.Range))
                     E.Cast();
+                Orbwalker.DisableMovement = Kennen.HasBuff("KennenLightningRush");
+                Player.IssueOrder(GameObjectOrder.MoveTo, intTarget);
             }
         }
         private static void OnDraw(EventArgs args)

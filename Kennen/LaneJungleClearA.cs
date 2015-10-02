@@ -9,7 +9,8 @@ namespace Kennen
     {
         public enum AttackSpell
         {
-            Q
+            Q,
+            W
         };
 
         public static AIHeroClient Kennen
@@ -31,14 +32,6 @@ namespace Kennen
 
         public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
         {
-            var eminion =
-                EntityManager.GetJungleMonsters(Program.Kennen.Position.To2D(), Program.E.Range)
-                    .FirstOrDefault(
-                        m =>
-                            m.Distance(Program.Kennen) <= Program.E.Range &&
-                            m.Health <= Misc.Ecalc(m) &&
-                            m.IsValidTarget());
-
             if (spell == AttackSpell.Q)
             {
                 return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
@@ -63,19 +56,34 @@ namespace Kennen
         {
             var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
+            var WCHECK = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
+            var WREADY = Program.W.IsReady();
+
             if (QCHECK && QREADY)
             {
-                var enemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+                var enemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.Q.Cast(enemy.ServerPosition);
             }
-            if (Orbwalker.CanAutoAttack)
+            if (!WCHECK || !WREADY)
             {
-                var enemy = (AIHeroClient)GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                return;
+            }
+            var wminion = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
+            if (wminion != null)
+            {
+                if (wminion.HasBuff("kennenmarkofstorm"))
+                {
+                    Program.W.Cast();
+                }
+                if (Orbwalker.CanAutoAttack)
+                {
+                    var enemy = (AIHeroClient) GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.AIHeroClient);
 
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
+                    if (enemy != null)
+                        Orbwalker.ForcedTarget = enemy;
+                }
             }
         }
     }

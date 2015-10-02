@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Linq.Expressions;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -34,10 +35,10 @@ namespace Kennen
             if (Player.Instance.ChampionName != "Kennen")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, (int) 250f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, (int) 250f, (int)1700f, (int)50f);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
-            R = new Spell.Active(SpellSlot.R, 550);
+            R = new Spell.Active(SpellSlot.R, 565);
 
             KennenMenu = MainMenu.AddMenu("BloodimirKennen", "bloodimirkennen");
             KennenMenu.AddGroupLabel("Bloodimir.Kennen");
@@ -49,33 +50,38 @@ namespace Kennen
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
+            ComboMenu.Add("usecomboe", new CheckBox("Use E "));
+            ComboMenu.AddSeparator();
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
+            ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
 
             DrawMenu = KennenMenu.AddSubMenu("Drawings", "drawings");
             DrawMenu.AddGroupLabel("Drawings");
             DrawMenu.AddSeparator();
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
+            DrawMenu.Add("draww", new CheckBox("Draw W"));
 
             LaneJungleClear = KennenMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
-            LaneJungleClear.Add("LCE", new CheckBox("Use E"));
+            LaneJungleClear.Add("LCW", new CheckBox("Use W"));
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
 
             LastHit = KennenMenu.AddSubMenu("Last Hit", "lasthit");
             LastHit.AddGroupLabel("Last Hit Settings");
             LastHit.Add("LHQ", new CheckBox("Use Q"));
+            LastHit.Add("LHW", new CheckBox("Use W"));
 
             MiscMenu = KennenMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("KS");
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS using Q"));
+            MiscMenu.Add("ksw", new CheckBox("KS using W"));
 
             SkinMenu = KennenMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 0, 0, 5));
+            var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 1, 0, 5));
             var skinid = new[] {"Default", "Deadly", "Swamp Master", "Karate", "Doctor", "Arctic Ops"};
             skinchange.DisplayName = skinid[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
@@ -99,6 +105,10 @@ namespace Kennen
                 {
                     Drawing.DrawCircle(Kennen.Position, Q.Range, Color.DarkBlue);
                 }
+                if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+                {
+                    Drawing.DrawCircle(Kennen.Position, W.Range, Color.DarkGreen);
+                }
             }
         }
 
@@ -119,6 +129,7 @@ namespace Kennen
             {
                 Combo.KennenCombo();
                 Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                Eincombo(ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue);
             }
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
@@ -143,8 +154,17 @@ namespace Kennen
                 if (useR && R.IsReady() &&
                     Kennen.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
-                    var rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
                     R.Cast();
+                }
+        }
+
+        public static
+            void Eincombo(bool useE)
+        {
+            if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue)
+                if (useE && E.IsReady() && Kennen.CountEnemiesInRange(W.Range) >= 2)
+                {
+                    E.Cast();
                 }
         }
 
@@ -166,6 +186,29 @@ namespace Kennen
                             {
                                 Q.Cast(poutput.CastPosition);
                             }
+                            if (MiscMenu["ksw"].Cast<CheckBox>().CurrentValue && W.IsReady())
+                            {
+                                {
+                                    try
+                                    {
+                                        foreach (
+                                            var wtarget in
+                                                HeroManager.Enemies.Where(
+                                                    hero =>
+                                                        hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                                        {
+                                            if (Kennen.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health)
+                                                if (wtarget.HasBuff("kennenmarkofstorm"))
+                                                {
+                                                    W.Cast();
+                                                }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -175,7 +218,8 @@ namespace Kennen
             }
         }
 
-        private static void SkinChange()
+        private static
+            void SkinChange()
         {
             var style = SkinMenu["skinid"].DisplayName;
             switch (style)

@@ -30,14 +30,21 @@ namespace Kennen
 
             if (WCHECK && WREADY)
             {
-                Program.W.Cast();
-            }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var enemy = TargetSelector.GetTarget(Player.Instance.GetAutoAttackRange(), DamageType.Physical);
+                var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
+                if (wenemy != null)
+                {
+                    if (wenemy.HasBuff("kennenmarkofstorm"))
+                    {
+                        Program.W.Cast();
+                    }
+                    if (Orbwalker.CanAutoAttack)
+                    {
+                        var enemy = TargetSelector.GetTarget(Player.Instance.GetAutoAttackRange(), DamageType.Physical);
 
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
+                        if (enemy != null)
+                            Orbwalker.ForcedTarget = enemy;
+                    }
+                }
             }
         }
     }

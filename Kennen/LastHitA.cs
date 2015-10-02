@@ -10,7 +10,8 @@ namespace Kennen
     {
         public enum AttackSpell
         {
-            Q
+            Q,
+            W
         };
 
         public static AIHeroClient Kennen
@@ -50,6 +51,9 @@ namespace Kennen
         {
             var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
+            var WCHECK = Program.LastHit["LHW"].Cast<CheckBox>().CurrentValue;
+            var WREADY = Program.W.IsReady();
+
             if (!QCHECK || !QREADY)
             {
                 return;
@@ -62,10 +66,23 @@ namespace Kennen
                 {
                     Program.Q.Cast(minion.ServerPosition);
                 }
+                
+                if (!WCHECK || !WREADY)
+                {
+                    return;
+                }
+                var wminion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.W);
+                if (wminion != null)
+                {
+                    if (wminion.HasBuff("kennenmarkofstorm"))
+                    {
+                        Program.W.Cast();
+                    }
+                }
             }
             if (Orbwalker.CanAutoAttack)
             {
-                var enemy = (AIHeroClient)GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                var enemy = (AIHeroClient) GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.AIHeroClient);
 
                 if (enemy != null)
                     Orbwalker.ForcedTarget = enemy;

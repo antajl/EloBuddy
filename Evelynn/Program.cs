@@ -174,7 +174,6 @@ namespace Evelynn
                         {
                             Q.Cast(qenemy);
                         }
-                        Chat.Print("q-ks");
                         var eenemy = TargetSelector.GetTarget(E.Range, DamageType.Physical);
                         if (MiscMenu["kse"].Cast<CheckBox>().CurrentValue && E.IsReady())
                         {
@@ -190,7 +189,6 @@ namespace Evelynn
                                     {
                                         E.Cast(eenemy);
                                     }
-                                    Chat.Print("e-ks");
                                 }
                             }
                             catch

@@ -127,7 +127,7 @@ namespace Morgana
             var intTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             {
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
-                    Q.Cast(intTarget);
+                    Q.Cast(intTarget.ServerPosition);
             }
         }
 
@@ -173,34 +173,22 @@ namespace Morgana
                 try
                 {
                     foreach (
-                        var enemy in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(x => x.IsValidTarget(MiscMenu["qmax"].Cast<Slider>().CurrentValue)))
+                        var enemy in HeroManager.Enemies
+                            .Where(x => x.IsValidTarget(MiscMenu["qmax"].Cast<Slider>().CurrentValue)))
                     {
                         if (MiscMenu["dashq"].Cast<CheckBox>().CurrentValue &&
                             MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
-                            if (enemy.Distance(Me.ServerPosition) > MiscMenu["qmin"].Cast<Slider>().CurrentValue)
-                                if (Q.GetPrediction(enemy).HitChance == HitChance.Dashing)
-                                {
-                                    Q.Cast(enemy);
-
-                                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                                    {
-                                        Chat.Print("q-dash");
-                                    }
-                                }
-                        if (MiscMenu["immoq"].Cast<CheckBox>().CurrentValue &&
-                            MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
-                            if (enemy.Distance(Me.ServerPosition) > MiscMenu["qmin"].Cast<Slider>().CurrentValue)
-                                if (Q.GetPrediction(enemy).HitChance == HitChance.Immobile)
-                                {
-                                    Q.Cast(enemy);
-
-                                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                                    {
-                                        Chat.Print("q-immo");
-                                    }
-                                }
+                        {
+                            var pred = Q.GetPrediction(enemy);
+                            if (pred.HitChance >= HitChance.Dashing)
+                            {
+                                Q.Cast(pred.CastPosition);
+                            }
+                        }
+                        if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                        {
+                            Chat.Print("q-dash");
+                        }
                     }
                 }
                 catch
@@ -211,22 +199,23 @@ namespace Morgana
                     try
                     {
                         foreach (
-                            var enemy in
-                                ObjectManager.Get<AIHeroClient>()
-                                    .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
+                            var enemy in HeroManager.Enemies
+                                .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
                         {
                             if (MiscMenu["immow"].Cast<CheckBox>().CurrentValue &&
                                 MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
-                                if (enemy.Distance(Me.ServerPosition) > MiscMenu["wmin"].Cast<Slider>().CurrentValue)
-                                    if (W.GetPrediction(enemy).HitChance == HitChance.Immobile)
-                                    {
-                                        W.Cast(enemy);
+                            {
+                                var pred = W.GetPrediction(enemy);
+                                if (pred.HitChance >= HitChance.Immobile)
+                                {
+                                    W.Cast(pred.CastPosition);
+                                }
 
-                                        if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                                        {
-                                            Chat.Print("w-immo");
-                                        }
-                                    }
+                                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                                {
+                                    Chat.Print("w-immo");
+                                }
+                            }
                         }
                     }
                     catch

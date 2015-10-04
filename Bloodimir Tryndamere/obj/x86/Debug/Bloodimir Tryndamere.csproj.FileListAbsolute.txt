@@ -1,0 +1,11 @@
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\Bloodimir Tryndamere.exe.config
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\Bloodimir Tryndamere.exe
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\Bloodimir Tryndamere.pdb
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\EloBuddy.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\EloBuddy.SDK.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\SharpDX.Direct3D9.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\SharpDX.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\Newtonsoft.Json.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\obj\x86\Debug\Bloodimir Tryndamere.exe
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\obj\x86\Debug\Bloodimir Tryndamere.pdb
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\obj\x86\Debug\Bloodimir Tryndamere.csprojResolveAssemblyReference.cache

@@ -32,7 +32,7 @@ namespace Morgana
                 return;
             Bootstrap.Init(null);
             Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, (int) 250f, (int) 1200f, (int) 80f);
-            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int) 250f, (int) 20f, (int) 0f);
+            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int) 250f, (int) 2200f, (int) 400f);
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
 
@@ -104,6 +104,7 @@ namespace Morgana
             MiscMenu.Add("immoq", new CheckBox("Q on Immobile"));
             MiscMenu.Add("immow", new CheckBox("W on Immobile"));
             MiscMenu.AddSeparator();
+            MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("debug", new CheckBox("Debug", false));
 
             DrawMenu = MorgMenu.AddSubMenu("Drawings", "drawings");
@@ -119,6 +120,7 @@ namespace Morgana
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
+            Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
@@ -220,6 +222,24 @@ namespace Morgana
                     }
                     catch
                     {
+                    }
+                }
+            }
+        }
+
+        private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
+        {
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) ||
+                (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) ||
+                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)))
+            {
+                var t = target as Obj_AI_Minion;
+                if (t != null)
+                {
+                    {
+                        if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
+                            args.Process = false;
                     }
                 }
             }

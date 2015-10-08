@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Ziggs
@@ -82,10 +83,13 @@ namespace Bloodimir_Ziggs
             {
                 var enemy = (AIHeroClient) GetEnemy(Spells.Q.Range, GameObjectType.AIHeroClient);
 
-                if (enemy != null)
-                    Spells.Q.Cast(enemy.ServerPosition);
+                var pred = Spells.Q.GetPrediction(enemy);
+                if (pred.HitChance >= HitChance.High)
+                    if (enemy != null)
+                { 
+                    Spells.Q.Cast(pred.CastPosition);
             }
-
+                }
             if (ECHECK && EREADY)
             {
                 var enemy = (AIHeroClient) GetBestEWLocation(GameObjectType.AIHeroClient);

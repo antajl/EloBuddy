@@ -3,7 +3,6 @@ using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Menu.Values;
-using Bloodimir_Ziggs;
 
 namespace Bloodimir_Ziggs
 {
@@ -28,7 +27,8 @@ namespace Bloodimir_Ziggs
                                                                                                range
                                                                                                && !a.IsDead
                                                                                                && !a.IsInvulnerable
-                                                                                               && a.IsValidTarget(range));
+                                                                                               && a.IsValidTarget(range) &&
+            a.Health <= Misc.Passivecalc(a));
         }
 
         public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
@@ -65,12 +65,16 @@ namespace Bloodimir_Ziggs
                 }
                 if (Orbwalker.CanAutoAttack)
                 {
+                    if (Player.HasBuff("ziggsShortFuse"))
+            {
                     var enemy = (AIHeroClient) GetEnemy(Ziggs.GetAutoAttackRange(), GameObjectType.AIHeroClient);
-
+                    if (enemy.Health <= Misc.Passivecalc(enemy))
                     if (enemy != null)
                         Orbwalker.ForcedTarget = enemy;
                 }
+
             }
         }
     }
+}
 }

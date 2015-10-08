@@ -31,6 +31,12 @@ namespace Bloodimir_Ziggs
                  (0.30f*Ziggs.FlatMagicDamageMod)) + (new float[] {0, 16, 26, 36, 46, 56}[Spells.E.Level] +
                                                       (0.12f*Ziggs.FlatMagicDamageMod)));
         }
+        public static float Rcalc(Obj_AI_Base target)
+        {
+            return Ziggs.CalculateDamageOnUnit(target, DamageType.Magical,
+                (new float[] {0, 200, 300, 400,}[Spells.R.Level] +
+                 (0.72f*Ziggs.FlatMagicDamageMod)));
+        }
         public static float Passivecalc(Obj_AI_Base target)
         {
             return Ziggs.CalculateDamageOnUnit(target, DamageType.Magical,

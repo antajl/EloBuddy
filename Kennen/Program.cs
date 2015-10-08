@@ -43,7 +43,7 @@ namespace Kennen
             KennenMenu = MainMenu.AddMenu("BloodimirKennen", "bloodimirkennen");
             KennenMenu.AddGroupLabel("Bloodimir.Kennen");
             KennenMenu.AddSeparator();
-            KennenMenu.AddLabel("Bloodimir Kennen V1.0.0.0");
+            KennenMenu.AddLabel("Bloodimir Kennen V1.0.1.0");
 
             ComboMenu = KennenMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -193,7 +193,7 @@ namespace Kennen
                 {
                     foreach (
                         var qtarget in
-                            HeroManager.Enemies.Where(
+                            EntityManager.Heroes.Enemies.Where(
                                 hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                     {
                         if (Kennen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
@@ -210,7 +210,7 @@ namespace Kennen
                                     {
                                         foreach (
                                             var wtarget in
-                                                HeroManager.Enemies.Where(
+                                              EntityManager.Heroes.Enemies.Where(
                                                     hero =>
                                                         hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                                         {

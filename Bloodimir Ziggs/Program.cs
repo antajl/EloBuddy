@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Events;
@@ -66,7 +67,7 @@ namespace Bloodimir_Ziggs
             SkinMenu = ZiggsMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 0, 0, 5));
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 4, 0, 5));
             var sID = new[] {"Default", "Mad Scientist", "Major", "Pool Party", "Snow Day", "Master Arcanist"};
             skinchange.DisplayName = sID[skinchange.CurrentValue];
             skinchange.OnValueChange +=
@@ -96,6 +97,7 @@ namespace Bloodimir_Ziggs
 
         private static void Tick(EventArgs args)
         {
+            Killsteal();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
@@ -128,6 +130,32 @@ namespace Bloodimir_Ziggs
                     var rtarget = TargetSelector.GetTarget(1975, DamageType.Magical);
                     Spells.R.Cast(rtarget.ServerPosition);
                 }
+        }
+        private static void Killsteal()
+        {
+            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Spells.Q.IsReady())
+            {
+                try
+                {
+                    foreach (
+                        var qtarget in
+                            EntityManager.Heroes.Enemies.Where(
+                                hero => hero.IsValidTarget(Spells.Q.Range) && !hero.IsDead && !hero.IsZombie))
+                    {
+                        if (Ziggs.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
+                        {
+                            {
+                                Spells.Q.Cast(qtarget.ServerPosition);
+                            }   
+                                    {
+                                    }
+                                }
+                            }
+                }
+                catch
+                {
+                }
+            }
         }
         
    private static void SkinChange()

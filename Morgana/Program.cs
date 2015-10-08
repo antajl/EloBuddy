@@ -201,7 +201,7 @@ namespace Morgana
                     try
                     {
                         foreach (
-                            var enemy in HeroManager.Enemies
+                            var enemy in EntityManager.Heroes.Enemies
                                 .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
                         {
                             if (MiscMenu["immow"].Cast<CheckBox>().CurrentValue &&
@@ -253,7 +253,7 @@ namespace Morgana
                 {
                     foreach (
                         var qtarget in
-                            HeroManager.Enemies.Where(
+                            EntityManager.Heroes.Enemies.Where(
                                 hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                     {
                         if (Me.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)

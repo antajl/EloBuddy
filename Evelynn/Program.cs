@@ -166,7 +166,7 @@ namespace Evelynn
                 {
                     foreach (
                         var qtarget in
-                            HeroManager.Enemies.Where(
+                            EntityManager.Heroes.Enemies.Where(
                                 hero =>
                                     hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                     {
@@ -181,7 +181,7 @@ namespace Evelynn
                             {
                                 foreach (
                                     var etarget in
-                                        HeroManager.Enemies.Where(
+                                        EntityManager.Heroes.Enemies.Where(
                                             hero =>
                                                 hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie))
                                 {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
-using System.Linq.Expressions;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -38,10 +37,12 @@ namespace Bloodimir_Tryndamere
             Bootstrap.Init(null);
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W, 400);
-            E = new Spell.Skillshot(SpellSlot.E, 659, SkillShotType.Linear, (int) 250f, (int) 700f, (int) 92.5f);
+            E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, (int) 250f, (int) 700f, (int) 92.5f);
             R = new Spell.Active(SpellSlot.R);
+            var slot = Tryndamere.GetSpellSlotFromName("summonerdot");
+            if (slot != SpellSlot.Unknown)
 
-            botrk = new Item(3153, 550f);
+                botrk = new Item(3153, 550f);
             bilgewater = new Item(3144, 475f);
             hydra = new Item(3074, 250f);
             tiamat = new Item(3077, 250f);
@@ -104,6 +105,7 @@ namespace Bloodimir_Tryndamere
             };
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
+            Obj_AI_Base.OnProcessSpellCast += OnSpellCast;
         }
 
         public static void AutoQ(bool useR)
@@ -139,6 +141,45 @@ namespace Bloodimir_Tryndamere
                     Drawing.DrawCircle(Tryndamere.Position, E.Range, Color.DarkBlue);
                 }
             }
+        }
+
+        private static void OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe)
+            {
+                if (sender.Type == Tryndamere.Type && sender.Team != Tryndamere.Team &&
+                    ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
+                {
+                    if (Tryndamere.Distance(sender) < 1000)
+                    {
+                        var unit = (AIHeroClient) sender;
+                        if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
+                        {
+                            if (ActivateDspell(unit, args.SData.Name))
+                            {
+                                {
+                                    Q.Cast();
+                                    R.Cast();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool ActivateDspell(AIHeroClient unit, string name)
+        {
+            var slot = "Q";
+            if (name.Equals(unit.Spellbook.GetSpell(SpellSlot.Q).SData.Name))
+            {
+                slot = "Q";
+            }
+            else if (name.Equals(unit.Spellbook.GetSpell(SpellSlot.R).SData.Name))
+            {
+                slot = "R";
+            }
+            return ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue;
         }
 
         public static void Flee()
@@ -179,7 +220,7 @@ namespace Bloodimir_Tryndamere
                 {
                     foreach (
                         var etarget in
-                            HeroManager.Enemies.Where(
+                            EntityManager.Heroes.Enemies.Where(
                                 hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie))
                     {
                         if (Tryndamere.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health)
@@ -195,7 +236,7 @@ namespace Bloodimir_Tryndamere
                                     {
                                         foreach (
                                             var itarget in
-                                                HeroManager.Enemies.Where(
+                                                EntityManager.Heroes.Enemies.Where(
                                                     hero =>
                                                         hero.IsValidTarget(botrk.Range) && !hero.IsDead &&
                                                         !hero.IsZombie))
@@ -214,7 +255,7 @@ namespace Bloodimir_Tryndamere
                                                         {
                                                             foreach (
                                                                 var htarget in
-                                                                    HeroManager.Enemies.Where(
+                                                                    EntityManager.Heroes.Enemies.Where(
                                                                         hero =>
                                                                             hero.IsValidTarget(hydra.Range) &&
                                                                             !hero.IsDead && !hero.IsZombie))
@@ -246,8 +287,8 @@ namespace Bloodimir_Tryndamere
                         }
                     }
                 }
-                        catch
-                        {
+                catch
+                {
                 }
             }
         }
@@ -260,30 +301,30 @@ namespace Bloodimir_Tryndamere
             switch (style)
             {
                 case "Default":
-                Player.SetSkinId(0);
-                break;
+                    Player.SetSkinId(0);
+                    break;
                 case "Highland":
-                Player.SetSkinId(1);
-                break;
+                    Player.SetSkinId(1);
+                    break;
                 case "King":
-                Player.SetSkinId(2);
-                break;
+                    Player.SetSkinId(2);
+                    break;
                 case "Viking":
-                Player.SetSkinId(3);
-                break;
+                    Player.SetSkinId(3);
+                    break;
                 case "Demon Blade":
-                Player.SetSkinId(4);
-                break;
+                    Player.SetSkinId(4);
+                    break;
                 case "Sultan":
-                Player.SetSkinId(5);
-                break;
+                    Player.SetSkinId(5);
+                    break;
                 case "Warring Kingdoms":
-                Player.SetSkinId(5);
-                break;
+                    Player.SetSkinId(5);
+                    break;
                 case "Nightmare":
-                Player.SetSkinId(5);
-                break;
+                    Player.SetSkinId(5);
+                    break;
             }
-                            }
+        }
     }
 }

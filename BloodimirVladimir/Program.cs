@@ -157,7 +157,7 @@ namespace BloodimirVladimir
                 if (useR && R.IsReady() &&
                     Vlad.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
 	        {
-	            var rtarget = TargetSelector.GetTarget(1500, DamageType.True);
+	            var rtarget = TargetSelector.GetTarget(1500, DamageType.Magical);
 	            R.Cast(rtarget.ServerPosition);
 	        }
 	}
@@ -170,7 +170,7 @@ namespace BloodimirVladimir
 				{
 					foreach (
 						var qtarget in
-							HeroManager.Enemies.Where(
+							EntityManager.Heroes.Enemies.Where(
 								hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
 					{
 						if (Vlad.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)

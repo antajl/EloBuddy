@@ -25,7 +25,7 @@ namespace BloodimirVladimir
 		public static float Rdmg(Obj_AI_Base target)
 		{
 			return Vladimir.CalculateDamageOnUnit(target, DamageType.Magical,
-				(new float[] {0, 168, 280, 392}[Program.R.Level] + (0.78f*Vladimir.FlatMagicDamageMod)));
+				(new float[] {0, 168, 280, 392}[Program.E.Level] + (0.78f*Vladimir.FlatMagicDamageMod)));
 		}
 	}
 }

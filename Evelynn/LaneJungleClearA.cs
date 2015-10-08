@@ -33,7 +33,7 @@ namespace Evelynn
         public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
         {
             var eminion =
-                EntityManager.GetJungleMonsters(Program.Eve.Position.To2D(), Program.E.Range)
+                EntityManager.MinionsAndMonsters.GetJungleMonsters(Program.Eve.Position, Program.E.Range)
                     .FirstOrDefault(
                         m =>
                             m.Distance(Program.Eve) <= Program.E.Range &&

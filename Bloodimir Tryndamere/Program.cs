@@ -39,8 +39,6 @@ namespace Bloodimir_Tryndamere
             W = new Spell.Active(SpellSlot.W, 400);
             E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, (int) 250f, (int) 700f, (int) 92.5f);
             R = new Spell.Active(SpellSlot.R);
-            var slot = Tryndamere.GetSpellSlotFromName("summonerdot");
-            if (slot != SpellSlot.Unknown)
 
                 botrk = new Item(3153, 550f);
             bilgewater = new Item(3144, 475f);
@@ -105,7 +103,6 @@ namespace Bloodimir_Tryndamere
             };
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
-            Obj_AI_Base.OnProcessSpellCast += OnSpellCast;
         }
 
         public static void AutoQ(bool useR)
@@ -141,45 +138,6 @@ namespace Bloodimir_Tryndamere
                     Drawing.DrawCircle(Tryndamere.Position, E.Range, Color.DarkBlue);
                 }
             }
-        }
-
-        private static void OnSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (sender.IsMe)
-            {
-                if (sender.Type == Tryndamere.Type && sender.Team != Tryndamere.Team &&
-                    ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (Tryndamere.Distance(sender) < 1000)
-                    {
-                        var unit = (AIHeroClient) sender;
-                        if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                        {
-                            if (ActivateDspell(unit, args.SData.Name))
-                            {
-                                {
-                                    Q.Cast();
-                                    R.Cast();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private static bool ActivateDspell(AIHeroClient unit, string name)
-        {
-            var slot = "Q";
-            if (name.Equals(unit.Spellbook.GetSpell(SpellSlot.Q).SData.Name))
-            {
-                slot = "Q";
-            }
-            else if (name.Equals(unit.Spellbook.GetSpell(SpellSlot.R).SData.Name))
-            {
-                slot = "R";
-            }
-            return ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue;
         }
 
         public static void Flee()

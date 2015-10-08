@@ -70,7 +70,7 @@ namespace Bloodimir_Ziggs
             {
                 return;
             }
-            var eminion = (Obj_AI_Minion) GetEnemy(Spells.W.Range, GameObjectType.obj_AI_Minion);
+            var eminion = (Obj_AI_Minion) GetEnemy(Spells.E.Range, GameObjectType.obj_AI_Minion);
             if (eminion != null)
             {
                 Spells.E.Cast(eminion.ServerPosition);

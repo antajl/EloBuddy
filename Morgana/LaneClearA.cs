@@ -27,7 +27,7 @@ namespace Morgana
                 var enemy = GetBestWLocation(GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
-                    Program.W.Cast(enemy.Position);
+                    Program.W.Cast(enemy.ServerPosition);
             }
         }
 

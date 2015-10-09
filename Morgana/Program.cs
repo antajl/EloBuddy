@@ -16,7 +16,8 @@ namespace Morgana
         public static Spell.Skillshot W;
         public static Spell.Targeted E;
         public static Spell.Active R;
-        public static Menu MorgMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu, WMenu, LaneClear;
+        public static Spell.Targeted Ignite;
+        public static Menu MorgMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu, WMenu, LaneClear, LastHit;
         public static AIHeroClient Me = ObjectManager.Player;
         public static HitChance QHitChance;
         public static HitChance WHitChance;
@@ -24,6 +25,11 @@ namespace Morgana
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
+        }
+
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
 
         private static void OnLoaded(EventArgs args)
@@ -35,11 +41,13 @@ namespace Morgana
             W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int) 250f, (int) 2200f, (int) 400f);
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
+            if (HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             MorgMenu = MainMenu.AddMenu("B.Morgana", "bloodimirmorgana");
             MorgMenu.AddGroupLabel("Bloodimir.Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("An Addon made my Bloodimir/turkey");
+            MorgMenu.AddLabel("Bloodimir Morgana v1.0.3.0");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -47,6 +55,7 @@ namespace Morgana
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
+            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
 
@@ -61,11 +70,6 @@ namespace Morgana
                 QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));
             }
             QMenu.AddSeparator();
-            QMenu.AddLabel("EB's common prediction and hitchance is still beta and sometimes it wont cast Q." +
-                           Environment.NewLine + "But it works just fine if you use Medium hitchance prediction." +
-                           Environment.NewLine +
-                           "This allows Q to cast more but also a slightly smaller bind success percentage.");
-            QMenu.AddSeparator();
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
 
             WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
@@ -79,7 +83,7 @@ namespace Morgana
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 0, 0, 6));
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 6));
             var sID = new[]
             {"Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
             skinchange.DisplayName = sID[skinchange.CurrentValue];
@@ -104,6 +108,9 @@ namespace Morgana
             MiscMenu.Add("immoq", new CheckBox("Q on Immobile"));
             MiscMenu.Add("immow", new CheckBox("W on Immobile"));
             MiscMenu.AddSeparator();
+            MiscMenu.Add("ELowAllies", new CheckBox("Use E on % Hp Allies"));
+            MiscMenu.Add("EHPPercent", new Slider("Ally HP %", 45));
+            MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("debug", new CheckBox("Debug", false));
 
@@ -116,6 +123,10 @@ namespace Morgana
             LaneClear = MorgMenu.AddSubMenu("Lane Clear", "laneclear");
             LaneClear.AddGroupLabel("Lane Clear Settings");
             LaneClear.Add("LCW", new CheckBox("Use W"));
+
+            LastHit = MorgMenu.AddSubMenu("Last Hit", "lasthit");
+            LastHit.AddGroupLabel("Last Hit Settings");
+            LastHit.Add("LHQ", new CheckBox("Use Q"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnTick += Tick;
@@ -130,6 +141,25 @@ namespace Morgana
             {
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
                     Q.Cast(intTarget.ServerPosition);
+            }
+        }
+
+        private static void AutoE()
+        {
+            var shieldAllies = MiscMenu["ELowAllies"].Cast<CheckBox>().CurrentValue;
+            var shieldHealthPercent = MiscMenu["EHPPercent"].Cast<Slider>().CurrentValue;
+
+            if (shieldAllies)
+            {
+                var ally =
+                    EntityManager.Heroes.Allies.Where(
+                        x => x.IsValidTarget(W.Range) && x.HealthPercent < shieldHealthPercent)
+                        .FirstOrDefault();
+
+                if (ally != null && ally.CountEnemiesInRange(750) >= 1)
+                {
+                    E.Cast(ally);
+                }
             }
         }
 
@@ -154,18 +184,38 @@ namespace Morgana
             WHitChance = WMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             Killsteal();
             AutoCast();
-            if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
-                Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
-                    ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
-                    ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                {
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
+                    {
+                        Ignite.Cast(source);
+                        return;
+                    }
+                }
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                    Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
+                        ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
+                        ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
             {
                 LaneClearA.LaneClear();
             }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            {
+                LastHitA.LastHitB();
+            }
             SkinChange();
+            AutoE();
         }
 
         private static void AutoCast()
@@ -175,7 +225,7 @@ namespace Morgana
                 try
                 {
                     foreach (
-                        var enemy in HeroManager.Enemies
+                        var enemy in EntityManager.Heroes.Enemies
                             .Where(x => x.IsValidTarget(MiscMenu["qmax"].Cast<Slider>().CurrentValue)))
                     {
                         if (MiscMenu["dashq"].Cast<CheckBox>().CurrentValue &&
@@ -305,7 +355,25 @@ namespace Morgana
             }
         }
 
-        private static void Combo(bool useW, bool useQ, bool useR)
+        private static void Ignitec(EventArgs args)
+        {
+            if (!ComboMenu["useI"].Cast<CheckBox>().CurrentValue ||
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+            foreach (
+                var source in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(
+                            a =>
+                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
+            {
+                Ignite.Cast(source);
+                return;
+            }
+        }
+
+        private static
+            void Combo(bool useW, bool useQ, bool useR)
         {
             if (useW && W.IsReady())
             {

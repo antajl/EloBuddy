@@ -25,6 +25,10 @@ namespace BloodimirVladimir
 		{
 			get { return ObjectManager.Player; }
 		}
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
+        }
 		private static void Main(string[] args)
 		{
 			Loading.OnLoadingComplete += OnLoaded;
@@ -38,16 +42,13 @@ namespace BloodimirVladimir
 			W = new Spell.Active(SpellSlot.W);
 			E = new Spell.Active(SpellSlot.E, 610);
 			R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, (int) 250f, (int) 1200f, (int) 150f);
-			var summoner1 = _Player.Spellbook.GetSpell(SpellSlot.Summoner1);
-			var summoner2 = _Player.Spellbook.GetSpell(SpellSlot.Summoner2);
-			if (summoner1.Name == "summonerdot")
-				Ignite = new Spell.Targeted(SpellSlot.Summoner1, 600);
-			else if (summoner2.Name == "summonerdot")
-				Ignite = new Spell.Targeted(SpellSlot.Summoner2, 600);
-			VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
+            if (HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+			
+            VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
 			VladMenu.AddGroupLabel("Bloodimir.Bloodimir");
 			VladMenu.AddSeparator();
-			VladMenu.AddLabel("Bloodimir c what i did there?");
+			VladMenu.AddLabel("Bloodimir c what i did there? v1.0.3.0");
 
 			ComboMenu = VladMenu.AddSubMenu("Combo", "sbtw");
 			ComboMenu.AddGroupLabel("Combo Settings");
@@ -55,8 +56,9 @@ namespace BloodimirVladimir
 			ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
 			ComboMenu.Add("usecomboe", new CheckBox("Use E"));
 			ComboMenu.Add("usecombor", new CheckBox("Use R"));
+            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
 			ComboMenu.AddSeparator();
-			ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
+			ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
 
 			DrawMenu = VladMenu.AddSubMenu("Drawings", "drawings");
 			DrawMenu.AddGroupLabel("Drawings");
@@ -87,7 +89,7 @@ namespace BloodimirVladimir
 			SkinMenu = VladMenu.AddSubMenu("Skin Changer", "skin");
 			SkinMenu.AddGroupLabel("Choose the desired skin");
 
-			var skinchange = SkinMenu.Add("sID", new Slider("Skin", 0, 0, 7));
+			var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 7));
 			var sID = new[]
 			{"Default", "Count", "Marquius", "Nosferatu", "Vandal", "Blood Lord", "Soulstealer", "Academy"};
 			skinchange.DisplayName = sID[skinchange.CurrentValue];
@@ -148,6 +150,19 @@ namespace BloodimirVladimir
 		        {
 		            LastHitA.LastHitB();
 		        }
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.Health < 50 + 20*Vlad.Level - (a.HPRegenRate/5*3)))
+                    {
+                        Ignite.Cast(source);
+                        return;
+                    }
 		    }
 		    SkinChange();
 		}

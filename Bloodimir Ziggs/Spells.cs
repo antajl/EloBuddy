@@ -17,6 +17,7 @@ namespace Bloodimir_Ziggs
         public static Spell.Skillshot W;
         public static Spell.Skillshot E;
         public static Spell.Skillshot R;
+        public static Spell.Targeted Ignite;
 
         static Spells()
         {

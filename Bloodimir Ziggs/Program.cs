@@ -13,6 +13,10 @@ namespace Bloodimir_Ziggs
     {
         public static Menu ZiggsMenu, ComboMenu, LaneJungleClear, SkinMenu,  LastHit, MiscMenu;
         public static AIHeroClient Ziggs = ObjectManager.Player;
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
+        }
 
         public static AIHeroClient _Player
         {
@@ -36,7 +40,7 @@ namespace Bloodimir_Ziggs
             ZiggsMenu = MainMenu.AddMenu("BloodimirZiggs", "bloodimirziggs");
             ZiggsMenu.AddGroupLabel("Bloodimir.Ziggs");
             ZiggsMenu.AddSeparator();
-            ZiggsMenu.AddLabel("Bloodimir Ziggs v1.0.0.0");
+            ZiggsMenu.AddLabel("Bloodimir Ziggs v1.0.1.0");
 
             ComboMenu = ZiggsMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -45,6 +49,7 @@ namespace Bloodimir_Ziggs
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
+            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
 
@@ -116,6 +121,21 @@ namespace Bloodimir_Ziggs
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                 {
                     LastHitA.LastHitB();
+                }
+                {
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Spells.Ignite.Range) &&
+                                        a.Health < 50 + 20 * Ziggs.Level - (a.HPRegenRate / 5 * 3)))
+                    {
+                        Spells.Ignite.Cast(source);
+                        return;
+                    }
                 }
             }
             SkinChange();

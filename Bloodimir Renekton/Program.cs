@@ -65,6 +65,7 @@ namespace Bloodimir_Renekton
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
+            ComboMenu.Add("useignite", new CheckBox("Use E"));
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.Add("autoult", new CheckBox("Auto Ult"));
             ComboMenu.AddSeparator();

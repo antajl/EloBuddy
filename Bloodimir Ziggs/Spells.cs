@@ -29,6 +29,8 @@ namespace Bloodimir_Ziggs
             W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, (int) 250f, (int) 1750f, (int) 275f);
             E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, (int) 500f, (int) 1750f, (int) 100f);
             R = new Spell.Skillshot(SpellSlot.R, 5000, SkillShotType.Circular, (int) 1000f, (int) 1750f, (int) 500f);
+            if (Program.HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
     {
     }
             }        

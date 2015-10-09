@@ -18,16 +18,17 @@ namespace Evelynn
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType type)
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
-            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                               && a.Type == type
-                                                                                               &&
-                                                                                               a.Distance(Evelynn) <=
-                                                                                               range
-                                                                                               && !a.IsDead
-                                                                                               && !a.IsInvulnerable
-                                                                                               && a.IsValidTarget(range));
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
         }
 
         public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
@@ -90,7 +91,7 @@ namespace Evelynn
             }
             if (Orbwalker.CanAutoAttack)
             {
-                var enemy = (AIHeroClient) GetEnemy(Evelynn.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                var enemy = (Obj_AI_Minion) GetEnemy(Evelynn.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Orbwalker.ForcedTarget = enemy;

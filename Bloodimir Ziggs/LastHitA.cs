@@ -18,19 +18,18 @@ namespace Bloodimir_Ziggs
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType type)
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
-            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                               && a.Type == type
-                                                                                               &&
-                                                                                               a.Distance(Ziggs) <=
-                                                                                               range
-                                                                                               && !a.IsDead
-                                                                                               && !a.IsInvulnerable
-                                                                                               && a.IsValidTarget(range) &&
-            a.Health <= Misc.Passivecalc(a));
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable && a.Health <= Misc.Passivecalc(a));
         }
-
+            }
         public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
         {
             return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
@@ -67,7 +66,7 @@ namespace Bloodimir_Ziggs
                 {
                     if (Player.HasBuff("ziggsShortFuse"))
             {
-                    var enemy = (AIHeroClient) GetEnemy(Ziggs.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                    var enemy = (Obj_AI_Minion) GetEnemy(Ziggs.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
                     if (enemy.Health <= Misc.Passivecalc(enemy))
                     if (enemy != null)
                         Orbwalker.ForcedTarget = enemy;

@@ -18,17 +18,18 @@ namespace BloodimirVladimir
 			get { return ObjectManager.Player; }
 		}
 
-		public static Obj_AI_Base GetEnemy(float range, GameObjectType type)
-		{
-			return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-			                                                                                   && a.Type == type
-			                                                                                   &&
-			                                                                                   a.Distance(Vladimir) <=
-			                                                                                   range
-			                                                                                   && !a.IsDead
-			                                                                                   && !a.IsInvulnerable
-			                                                                                   && a.IsValidTarget(range));
-		}
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
+        }
 
 		public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
 		{
@@ -85,49 +86,18 @@ namespace BloodimirVladimir
 
 			if (ECHECK && EREADY)
 			{
-				var enemy = GetBestELocation(GameObjectType.obj_AI_Minion);
+				var enemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
 				if (enemy != null)
 					Program.E.Cast();
 			}
 			if (Orbwalker.CanAutoAttack)
 			{
-				var enemy = (AIHeroClient) GetEnemy(Vladimir.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+				var enemy = (Obj_AI_Minion) GetEnemy(Vladimir.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
 				if (enemy != null)
 					Orbwalker.ForcedTarget = enemy;
 			}
 		}
-
-		public static Obj_AI_Base GetBestELocation(GameObjectType type)
-		{
-			var numEnemiesInRange = 0;
-			Obj_AI_Base enem = null;
-
-			foreach (var enemy in ObjectManager.Get<Obj_AI_Base>()
-				.OrderBy(a => a.Health)
-				.Where(a => a.Distance(Vladimir) <= Program.E.Range
-				            && a.IsEnemy
-				            && a.Type == type
-				            && !a.IsDead
-				            && !a.IsInvulnerable))
-			{
-				var tempNumEnemies =
-					ObjectManager.Get<Obj_AI_Base>()
-						.OrderBy(a => a.Health)
-						.Where(
-							a =>
-								a.Distance(Vladimir) <= Program.E.Range && a.IsEnemy && !a.IsDead && a.Type == type &&
-								!a.IsInvulnerable)
-						.Count(enemy2 => enemy != enemy2 && enemy2.Distance(enemy) <= 75);
-				if (tempNumEnemies > numEnemiesInRange)
-				{
-					enem = enemy;
-					numEnemiesInRange = tempNumEnemies;
-				}
-			}
-
-			return enem;
 		}
-	}
 }

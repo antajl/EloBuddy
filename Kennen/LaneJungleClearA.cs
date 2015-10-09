@@ -18,16 +18,17 @@ namespace Kennen
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType type)
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
-            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                               && a.Type == type
-                                                                                               &&
-                                                                                               a.Distance(Kennen) <=
-                                                                                               range
-                                                                                               && !a.IsDead
-                                                                                               && !a.IsInvulnerable
-                                                                                               && a.IsValidTarget(range));
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
         }
 
         public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
@@ -79,7 +80,7 @@ namespace Kennen
                 }
                 if (Orbwalker.CanAutoAttack)
                 {
-                    var enemy = (AIHeroClient) GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                    var enemy = (Obj_AI_Minion) GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
                     if (enemy != null)
                         Orbwalker.ForcedTarget = enemy;

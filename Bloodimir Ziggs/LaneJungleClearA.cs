@@ -77,7 +77,7 @@ namespace Bloodimir_Ziggs
             }
             if (Orbwalker.CanAutoAttack)
             {
-                var enemy = (AIHeroClient) GetEnemy(Ziggs.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                var enemy = (Obj_AI_Minion) GetEnemy(Ziggs.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Orbwalker.ForcedTarget = enemy;

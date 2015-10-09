@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
-using System.Linq.Expressions;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
@@ -17,12 +16,18 @@ namespace Kennen
         public static Spell.Active W;
         public static Spell.Active E;
         public static Spell.Active R;
+        public static Spell.Targeted Ignite;
         public static Menu KennenMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHit;
         public static AIHeroClient Kennen = ObjectManager.Player;
 
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
+        }
+
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
 
         private static void Main(string[] args)
@@ -35,10 +40,12 @@ namespace Kennen
             if (Player.Instance.ChampionName != "Kennen")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, (int) 250f, (int)1700f, (int)50f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, (int) 250f, (int) 1700f, (int) 50f);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
             R = new Spell.Active(SpellSlot.R, 565);
+            if (HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             KennenMenu = MainMenu.AddMenu("BloodimirKennen", "bloodimirkennen");
             KennenMenu.AddGroupLabel("Bloodimir.Kennen");
@@ -99,7 +106,7 @@ namespace Kennen
         }
 
         private static void Interruptererer(Obj_AI_Base sender,
-           Interrupter.InterruptableSpellEventArgs args)
+            Interrupter.InterruptableSpellEventArgs args)
         {
             var intTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             if (intTarget.HasBuff("kennenmarkofstorm"))
@@ -114,6 +121,7 @@ namespace Kennen
                 Player.IssueOrder(GameObjectOrder.MoveTo, intTarget);
             }
         }
+
         private static void OnDraw(EventArgs args)
         {
             if (!Kennen.IsDead)
@@ -142,23 +150,38 @@ namespace Kennen
             {
                 Flee();
             }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                Combo.KennenCombo();
-                Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
-                Eincombo(ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue);
-            }
-            {
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                    Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                    !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                foreach (
+                    var source in
+                        ObjectManager.Get<AIHeroClient>()
+                            .Where(
+                                a =>
+                                    a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                    a.Health < 50 + 20*Kennen.Level - (a.HPRegenRate/5*3)))
                 {
-                    LaneJungleClearA.LaneClear();
+                    Ignite.Cast(source);
+                    return;
                 }
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    LastHitA.LastHitB();
+                    Combo.KennenCombo();
+                    Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                    Eincombo(ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue);
                 }
-                SkinChange();
+                {
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                        Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                    {
+                        LaneJungleClearA.LaneClear();
+                    }
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+                    {
+                        LastHitA.LastHitB();
+                    }
+                    SkinChange();
+                }
             }
         }
 
@@ -210,7 +233,7 @@ namespace Kennen
                                     {
                                         foreach (
                                             var wtarget in
-                                              EntityManager.Heroes.Enemies.Where(
+                                                EntityManager.Heroes.Enemies.Where(
                                                     hero =>
                                                         hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                                         {

@@ -16,6 +16,7 @@ namespace Bloodimir_Tryndamere
         public static Spell.Active W;
         public static Spell.Skillshot E;
         public static Spell.Active R;
+        public static Spell.Targeted Ignite;
         public static Menu TrynMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear;
         public static Item tiamat, hydra, bilgewater, youmuu, botrk;
         public static AIHeroClient Tryndamere = ObjectManager.Player;
@@ -30,6 +31,11 @@ namespace Bloodimir_Tryndamere
             Loading.OnLoadingComplete += OnLoaded;
         }
 
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
+        }
+
         private static void OnLoaded(EventArgs args)
         {
             if (Player.Instance.ChampionName != "Tryndamere")
@@ -39,8 +45,10 @@ namespace Bloodimir_Tryndamere
             W = new Spell.Active(SpellSlot.W, 400);
             E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, (int) 250f, (int) 700f, (int) 92.5f);
             R = new Spell.Active(SpellSlot.R);
+            if (HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
-                botrk = new Item(3153, 550f);
+            botrk = new Item(3153, 550f);
             bilgewater = new Item(3144, 475f);
             hydra = new Item(3074, 250f);
             tiamat = new Item(3077, 250f);
@@ -152,6 +160,19 @@ namespace Bloodimir_Tryndamere
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
+            }
+            if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+            foreach (
+                var source in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(
+                            a =>
+                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                a.Health < 50 + 20*Tryndamere.Level - (a.HPRegenRate/5*3)))
+            {
+                Ignite.Cast(source);
+                return;
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {

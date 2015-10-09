@@ -17,6 +17,7 @@ namespace Evelynn
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
         public static Spell.Targeted Smite;
+        public static Spell.Targeted Ignite;
         public static Menu EveMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHit;
         public static AIHeroClient Eve = ObjectManager.Player;
 
@@ -28,6 +29,11 @@ namespace Evelynn
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
+        }
+
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
 
         private static void OnLoaded(EventArgs args)
@@ -45,6 +51,9 @@ namespace Evelynn
                 Smite = new Spell.Targeted(SpellSlot.Summoner1, 500);
             else if (summoner2.Name == "summonerdot")
                 Smite = new Spell.Targeted(SpellSlot.Summoner2, 500);
+            if (HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+
 
             EveMenu = MainMenu.AddMenu("BloodimirEve", "bloodimireve");
             EveMenu.AddGroupLabel("Bloodimir.Evelynn");
@@ -127,23 +136,38 @@ namespace Evelynn
             {
                 Flee();
             }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                Combo.EveCombo();
-                Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
-            }
-            {
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                    Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                    !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                foreach (
+                    var source in
+                        ObjectManager.Get<AIHeroClient>()
+                            .Where(
+                                a =>
+                                    a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                    a.Health < 50 + 20*Eve.Level - (a.HPRegenRate/5*3)))
                 {
-                    LaneJungleClearA.LaneClear();
+                    Ignite.Cast(source);
+                    return;
                 }
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 {
-                    LastHitA.LastHitB();
+                    Combo.EveCombo();
+                    Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
                 }
+                {
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                        Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                    {
+                        LaneJungleClearA.LaneClear();
+                    }
+                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+                    {
+                        LastHitA.LastHitB();
+                    }
+                }
+                SkinChange();
             }
-            SkinChange();
         }
 
         public static void Rincombo(bool useR)

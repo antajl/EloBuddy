@@ -16,6 +16,7 @@ namespace Bloodimir_Renekton
         public static Spell.Active W;
         public static Spell.Skillshot E;
         public static Spell.Active R;
+        public static Spell.Targeted Ignite;
         public static Item Hydra;
         public static Item Tiamat;
         public static Menu RenekMenu, ComboMenu, SkinMenu, MiscMenu, DrawMenu, LaneJungleClear, LastHit;
@@ -31,6 +32,10 @@ namespace Bloodimir_Renekton
         {
             Loading.OnLoadingComplete += OnLoaded;
         }
+        public static bool HasSpell(string s)
+        {
+            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
+        }
 
         private static void OnLoaded(EventArgs args)
         {
@@ -40,6 +45,8 @@ namespace Bloodimir_Renekton
             Q = new Spell.Active(SpellSlot.Q, 225);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Skillshot(SpellSlot.E, 450, SkillShotType.Linear);
+            if (HasSpell("summonerdot"))
+                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             R = new Spell.Active(SpellSlot.R);
             Tiamat = new Item((int) ItemId.Tiamat_Melee_Only, 420);
             Hydra = new Item((int) ItemId.Ravenous_Hydra_Melee_Only, 420);
@@ -156,11 +163,26 @@ namespace Bloodimir_Renekton
                     LastHitA.LastHitB();
                     LastHitA.Items();
                 }
+                {
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.Health < 50 + 20 * Renek.Level - (a.HPRegenRate / 5 * 3)))
+                    {
+                        Ignite.Cast(source);
+                        return;
+                    }
+                }
                 SkinChange();
             }
         }
 
-        public static void AutoUlt(bool UseR)
+        public static void AutoUlt(bool useR)
         {
             var autoR = ComboMenu["autoult"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = ComboMenu["rslider"].Cast<Slider>().CurrentValue;

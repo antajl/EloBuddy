@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EloBuddy;
+﻿using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Enumerations;
 
@@ -21,18 +16,16 @@ namespace Bloodimir_Ziggs
 
         static Spells()
         {
-            Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, (int) 250f, (int) 1700f, (int) 140f);
-            Q2 = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, (int) 250f, (int) 1600f,
-                (int) 140f);
-            Q3 = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, (int) 250f, (int) 1600f,
-                (int) 160f);
-            W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, (int) 250f, (int) 1750f, (int) 275f);
-            E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, (int) 500f, (int) 1750f, (int) 100f);
-            R = new Spell.Skillshot(SpellSlot.R, 5000, SkillShotType.Circular, (int) 1000f, (int) 1750f, (int) 500f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, 250, 1700, 140);
+            Q2 = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, 250, 1600, 140);
+            Q3 = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, 250, 1600, 160);
+            W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, 250, 1750, 275);
+            E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 500, 1750, 100);
+            R = new Spell.Skillshot(SpellSlot.R, 5000, SkillShotType.Circular, 1000, 1750, 500);
             if (Program.HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-    {
-    }
-            }        
+            {
+            }
         }
     }
+}

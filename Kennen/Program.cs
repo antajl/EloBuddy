@@ -40,7 +40,7 @@ namespace Kennen
             if (Player.Instance.ChampionName != "Kennen")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, (int) 250f, (int) 1700f, (int) 50f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, 250, 1700, 50);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
             R = new Spell.Active(SpellSlot.R, 565);

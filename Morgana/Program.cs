@@ -355,23 +355,6 @@ namespace Morgana
             }
         }
 
-        private static void Ignitec(EventArgs args)
-        {
-            if (!ComboMenu["useI"].Cast<CheckBox>().CurrentValue ||
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-            foreach (
-                var source in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(
-                            a =>
-                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
-            {
-                Ignite.Cast(source);
-                return;
-            }
-        }
-
         private static
             void Combo(bool useW, bool useQ, bool useR)
         {

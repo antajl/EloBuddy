@@ -102,6 +102,7 @@ namespace Bloodimir_Renekton
             var target = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
             var eenemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
             if (target != null && Player.Instance.Distance(target.Position) < Program.E.Range)
+                if (Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue)
                 if (Program.E.IsReady())
                 {
                     Player.CastSpell(SpellSlot.E, target.Position);

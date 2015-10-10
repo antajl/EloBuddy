@@ -43,7 +43,7 @@ namespace Bloodimir_Tryndamere
             Bootstrap.Init(null);
             Q = new Spell.Active(SpellSlot.Q);
             W = new Spell.Active(SpellSlot.W, 400);
-            E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, (int) 250f, (int) 700f, (int) 92.5f);
+            E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, 250, 700, (int) 92.5);
             R = new Spell.Active(SpellSlot.R);
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);

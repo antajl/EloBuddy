@@ -32,6 +32,7 @@ namespace Bloodimir_Renekton
         {
             Loading.OnLoadingComplete += OnLoaded;
         }
+
         public static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
@@ -173,7 +174,7 @@ namespace Bloodimir_Renekton
                                 .Where(
                                     a =>
                                         a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20 * Renek.Level - (a.HPRegenRate / 5 * 3)))
+                                        a.Health < 50 + 20*Renek.Level - (a.HPRegenRate/5*3)))
                     {
                         Ignite.Cast(source);
                         return;

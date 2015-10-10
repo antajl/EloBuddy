@@ -33,6 +33,7 @@ namespace Bloodimir_Renekton
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
+
         public static void LaneClear()
         {
             var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
@@ -66,7 +67,7 @@ namespace Bloodimir_Renekton
             }
             if (Orbwalker.CanAutoAttack)
             {
-                var cenemy = (Obj_AI_Minion)GetEnemy(Renekton.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+                var cenemy = (Obj_AI_Minion) GetEnemy(Renekton.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
                 if (cenemy != null)
                     Orbwalker.ForcedTarget = cenemy;
@@ -77,7 +78,7 @@ namespace Bloodimir_Renekton
             void Items()
         {
             var ienemy =
-                (Obj_AI_Minion)GetEnemy(Player.Instance.GetAutoAttackRange() + 335, GameObjectType.obj_AI_Minion);
+                (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange() + 335, GameObjectType.obj_AI_Minion);
 
             if (ienemy != null)
             {

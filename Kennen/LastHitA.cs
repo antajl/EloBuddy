@@ -33,7 +33,7 @@ namespace Kennen
         }
         public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
         {
-            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
+            return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
                                                                                                && a.Type == type
                                                                                                &&
                                                                                                a.Distance(Kennen) <=

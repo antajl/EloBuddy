@@ -17,32 +17,39 @@ namespace Evelynn
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
+        public static float Qcalc(Obj_AI_Base target)
         {
-            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                               && a.Type == type
-                                                                                               &&
-                                                                                               a.Distance(Evelynn) <=
-                                                                                               Program.Q.Range
-                                                                                               && !a.IsDead
-                                                                                               && !a.IsInvulnerable
-                                                                                               &&
-                                                                                               a.IsValidTarget(
-                                                                                                   Program.Q.Range)
-                                                                                               &&
-                                                                                               a.Health <= Misc.Qcalc(a));
+            return Evelynn.CalculateDamageOnUnit(target, DamageType.Magical,
+                new float[] {0, 40, 50, 60, 70, 80}[Program.Q.Level] +
+                new float[] {0, 35, 40, 45, 50, 55}[Program.Q.Level]/100*Player.Instance.FlatMagicDamageMod +
+                new float[] {0, 50, 55, 60, 65, 70}[Program.Q.Level]/100*Player.Instance.FlatPhysicalDamageMod);
+        }
+
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a =>
+                            a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable &&
+                            a.Health <= Qcalc(a));
+            }
         }
 
         public static void LastHitB()
         {
-            var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
+            var QCHECK = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
             if (!QCHECK || !QREADY)
             {
                 return;
             }
 
-            var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+            var minion = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (minion != null)
             {
                 Program.Q.Cast();

@@ -77,7 +77,6 @@
     <Compile Include="Combo.cs" />
     <Compile Include="LaneJungleClearA.cs" />
     <Compile Include="LastHitA.cs" />
-    <Compile Include="Misc.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

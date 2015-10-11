@@ -16,9 +16,8 @@ namespace Evelynn
         public static Spell.Active W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Spell.Targeted Smite;
         public static Spell.Targeted Ignite;
-        public static Menu EveMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHit;
+        public static Menu EveMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHitMenu;
         public static AIHeroClient Eve = ObjectManager.Player;
 
         public static AIHeroClient _Player
@@ -41,16 +40,10 @@ namespace Evelynn
             if (Player.Instance.ChampionName != "Evelynn")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Active(SpellSlot.Q, 500);
+            Q = new Spell.Active(SpellSlot.Q, 475);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Targeted(SpellSlot.E, 225);
-            R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, (int) 250f, (int) 1200f, (int) 150f);
-            var summoner1 = _Player.Spellbook.GetSpell(SpellSlot.Summoner1);
-            var summoner2 = _Player.Spellbook.GetSpell(SpellSlot.Summoner2);
-            if (summoner1.Name == "summonerdot")
-                Smite = new Spell.Targeted(SpellSlot.Summoner1, 500);
-            else if (summoner2.Name == "summonerdot")
-                Smite = new Spell.Targeted(SpellSlot.Summoner2, 500);
+            R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, 250, 1200, 150);
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
@@ -58,7 +51,7 @@ namespace Evelynn
             EveMenu = MainMenu.AddMenu("BloodimirEve", "bloodimireve");
             EveMenu.AddGroupLabel("Bloodimir.Evelynn");
             EveMenu.AddSeparator();
-            EveMenu.AddLabel("Bloodimir Evelynn V1.0.0.0");
+            EveMenu.AddLabel("Bloodimir Evelynn V1.0.1.0");
 
             ComboMenu = EveMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -67,6 +60,7 @@ namespace Evelynn
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
+            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
 
@@ -81,9 +75,9 @@ namespace Evelynn
             LaneJungleClear.Add("LCE", new CheckBox("Use E"));
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
 
-            LastHit = EveMenu.AddSubMenu("Last Hit", "lasthit");
-            LastHit.AddGroupLabel("Last Hit Settings");
-            LastHit.Add("LHQ", new CheckBox("Use Q"));
+            LastHitMenu = EveMenu.AddSubMenu("Last Hit", "lasthit");
+            LastHitMenu.AddGroupLabel("Last Hit Settings");
+            LastHitMenu.Add("LHQ", new CheckBox("Use Q"));
 
             MiscMenu = EveMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("KS");
@@ -95,18 +89,14 @@ namespace Evelynn
             SkinMenu = EveMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 0, 0, 4));
-            var skinid = new[]
-            {"Default", "Shadow", "Masquerade", "Tango", "Safecracker"};
-            skinchange.DisplayName = skinid[skinchange.CurrentValue];
-            skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
-            {
-                sender.DisplayName = skinid[changeArgs.NewValue];
-                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 2, 0, 4));
+            var sid = new[] {"Default", "Shadow", "Masquerade", "Tango", "Safecracker"};
+            skinchange.DisplayName = sid[skinchange.CurrentValue];
+            skinchange.OnValueChange +=
+                delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
                 {
-                    Chat.Print("skin-changed");
-                }
-            };
+                    sender.DisplayName = sid[changeArgs.NewValue];
+                };
 
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
@@ -132,41 +122,41 @@ namespace Evelynn
         private static void Tick(EventArgs args)
         {
             Killsteal();
+            SkinChange();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
             }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                    !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                foreach (
-                    var source in
-                        ObjectManager.Get<AIHeroClient>()
-                            .Where(
-                                a =>
-                                    a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                    a.Health < 50 + 20*Eve.Level - (a.HPRegenRate/5*3)))
+                Combo.EveCombo();
+                Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+            }
+            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                    Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
                 {
-                    Ignite.Cast(source);
-                    return;
+                    LaneJungleClearA.LaneClearB();
                 }
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                 {
-                    Combo.EveCombo();
-                    Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                    LastHitA.LastHitB();
                 }
                 {
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                        Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.Health < 50 + 20*Eve.Level - (a.HPRegenRate/5*3)))
                     {
-                        LaneJungleClearA.LaneClear();
-                    }
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-                    {
-                        LastHitA.LastHitB();
+                        Ignite.Cast(source);
+                        return;
                     }
                 }
-                SkinChange();
             }
         }
 
@@ -196,7 +186,7 @@ namespace Evelynn
                     {
                         if (Eve.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                         {
-                            Q.Cast(qenemy);
+                            Q.Cast();
                         }
                         var eenemy = TargetSelector.GetTarget(E.Range, DamageType.Physical);
                         if (MiscMenu["kse"].Cast<CheckBox>().CurrentValue && E.IsReady())
@@ -229,7 +219,7 @@ namespace Evelynn
 
         private static void SkinChange()
         {
-            var style = SkinMenu["skinid"].DisplayName;
+            var style = SkinMenu["sID"].DisplayName;
             switch (style)
             {
                 case "Default":

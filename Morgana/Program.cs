@@ -185,21 +185,6 @@ namespace Morgana
             Killsteal();
             AutoCast();
             {
-                {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
-                    {
-                        Ignite.Cast(source);
-                        return;
-                    }
-                }
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
                         ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
@@ -216,7 +201,22 @@ namespace Morgana
             }
             SkinChange();
             AutoE();
+               {
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
+                    {
+                        Ignite.Cast(source);
+                        return;
+                    }
         }
+            }
 
         private static void AutoCast()
         {

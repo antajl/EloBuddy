@@ -25,19 +25,6 @@ namespace Morgana
                  (0.90f*Morgana.FlatMagicDamageMod)));
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
-        {
-            switch (t)
-            {
-                case GameObjectType.AIHeroClient:
-                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-                default:
-                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-            }
-        }
-
         public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
         {
             return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
@@ -71,13 +58,6 @@ namespace Morgana
                 {
                     Program.Q.Cast(minion.ServerPosition);
                 }
-            }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var enemy = (Obj_AI_Minion) GetEnemy(Morgana.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
             }
         }
     }

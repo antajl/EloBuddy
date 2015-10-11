@@ -21,7 +21,7 @@ namespace BloodimirVladimir
         {
             switch (t)
             {
-                case GameObjectType.AIHeroClient:
+                case GameObjectType.obj_AI_Hero:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
@@ -88,7 +88,7 @@ namespace BloodimirVladimir
 
             if (QCHECK && QREADY)
             {
-                var enemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
+                var enemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Hero);
 
                 if (enemy != null)
                     Program.Q.Cast(enemy);
@@ -96,14 +96,14 @@ namespace BloodimirVladimir
 
             if (ECHECK && EREADY)
             {
-                var enemy = (AIHeroClient) GetBestELocation(GameObjectType.AIHeroClient);
+                var enemy = (AIHeroClient) GetBestELocation(GameObjectType.obj_AI_Hero);
 
                 if (enemy != null)
                     Program.E.Cast();
             }
             if (Orbwalker.CanAutoAttack)
             {
-                var enemy = (AIHeroClient) GetEnemy(Vladimir.GetAutoAttackRange(), GameObjectType.AIHeroClient);
+                var enemy = (AIHeroClient) GetEnemy(Vladimir.GetAutoAttackRange(), GameObjectType.obj_AI_Hero);
 
                 if (enemy != null)
                     Orbwalker.ForcedTarget = enemy;

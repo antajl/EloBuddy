@@ -22,7 +22,7 @@ namespace Bloodimir_Ziggs_v2
         {
             switch (t)
             {
-                case GameObjectType.AIHeroClient:
+                case GameObjectType.obj_AI_Hero:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:

@@ -84,7 +84,6 @@ namespace BloodimirVladimir
 			MiscMenu.AddSeparator();
 			MiscMenu.Add("dodgew", new CheckBox("Use W to Dodge WIP"));
 			MiscMenu.AddSeparator();
-			MiscMenu.Add("debug", new CheckBox("Debug", false));
 
 			SkinMenu = VladMenu.AddSubMenu("Skin Changer", "skin");
 			SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -92,15 +91,11 @@ namespace BloodimirVladimir
 			var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 7));
 			var sID = new[]
 			{"Default", "Count", "Marquius", "Nosferatu", "Vandal", "Blood Lord", "Soulstealer", "Academy"};
-			skinchange.DisplayName = sID[skinchange.CurrentValue];
-			skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
-			{
-				sender.DisplayName = sID[changeArgs.NewValue];
-				if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-				{
-					Chat.Print("skin-changed");
-				}
-			};
+            skinchange.DisplayName = sID[skinchange.CurrentValue];
+            skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+            {
+                sender.DisplayName = sID[changeArgs.NewValue];
+            };
 
 			Game.OnTick += Tick;
 			Drawing.OnDraw += OnDraw;
@@ -191,10 +186,6 @@ namespace BloodimirVladimir
 						if (Vlad.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
 						{
 							Q.Cast(enemy);
-							if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-							{
-								Chat.Print("q-ks");
-							}
 						}
 					}
 				}

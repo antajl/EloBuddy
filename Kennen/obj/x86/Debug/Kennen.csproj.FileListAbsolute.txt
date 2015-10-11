@@ -8,4 +8,3 @@ c:\users\asus\documents\visual studio 2013\Projects\Kennen\Kennen\bin\x86\Debug\
 c:\users\asus\documents\visual studio 2013\Projects\Kennen\Kennen\bin\x86\Debug\Newtonsoft.Json.dll
 c:\users\asus\documents\visual studio 2013\Projects\Kennen\Kennen\obj\x86\Debug\Kennen.exe
 c:\users\asus\documents\visual studio 2013\Projects\Kennen\Kennen\obj\x86\Debug\Kennen.pdb
-C:\Users\Asus\documents\visual studio 2013\Projects\Kennen\Kennen\obj\x86\Debug\Kennen.csprojResolveAssemblyReference.cache

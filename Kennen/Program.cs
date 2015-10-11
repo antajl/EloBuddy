@@ -19,6 +19,7 @@ namespace Kennen
         public static Spell.Targeted Ignite;
         public static Menu KennenMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHit;
         public static AIHeroClient Kennen = ObjectManager.Player;
+        public static int LastE = 0;
 
         public static AIHeroClient _Player
         {
@@ -58,6 +59,7 @@ namespace Kennen
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E "));
+            ComboMenu.Add("useignite", new CheckBox("Use Ignite "));
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.AddSeparator();
@@ -141,46 +143,52 @@ namespace Kennen
         {
             Orbwalker.MoveTo(Game.CursorPos);
             E.Cast();
+            if (Player.Instance.HasBuff("KennenLightingRushBuff"))
+                if (Environment.TickCount - LastE >= 1950)
+                {
+                    E.Cast();
+                }
         }
 
         private static void Tick(EventArgs args)
         {
             Killsteal();
+            SkinChange();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
             }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
-                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                    !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                foreach (
-                    var source in
-                        ObjectManager.Get<AIHeroClient>()
-                            .Where(
-                                a =>
-                                    a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                    a.Health < 50 + 20*Kennen.Level - (a.HPRegenRate/5*3)))
+                Combo.KennenCombo();
+                Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                Eincombo(ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue);
+            }
+            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                    Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
                 {
-                    Ignite.Cast(source);
-                    return;
+                    LaneJungleClearA.LaneClear();
                 }
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                 {
-                    Combo.KennenCombo();
-                    Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
-                    Eincombo(ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue);
+                    LastHitA.LastHitB();
                 }
+                SkinChange();
                 {
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                        Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                    foreach (
+                        var source in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(
+                                    a =>
+                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.Health < 50 + 20*Kennen.Level - (a.HPRegenRate/5*3)))
                     {
-                        LaneJungleClearA.LaneClear();
+                        Ignite.Cast(source);
+                        return;
                     }
-                    if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-                    {
-                        LastHitA.LastHitB();
-                    }
-                    SkinChange();
                 }
             }
         }

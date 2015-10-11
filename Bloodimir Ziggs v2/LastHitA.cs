@@ -26,40 +26,10 @@ namespace Bloodimir_Ziggs_v2
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
-                        a =>
-                            a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable &&
-                            a.Health <= Calculations.Passivecalc(a));
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
-
-        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
-        {
-            return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                                            &&
-                                                                                                            a.Type ==
-                                                                                                            type
-                                                                                                            &&
-                                                                                                            a.Distance(
-                                                                                                                Ziggs) <=
-                                                                                                            Program.Q
-                                                                                                                .Range
-                                                                                                            && !a.IsDead
-                                                                                                            &&
-                                                                                                            !a
-                                                                                                                .IsInvulnerable
-                                                                                                            &&
-                                                                                                            a
-                                                                                                                .IsValidTarget
-                                                                                                                (
-                                                                                                                    Program
-                                                                                                                        .Q
-                                                                                                                        .Range)
-                                                                                                            &&
-                                                                                                            a.Health <=
-                                                                                                            Calculations
-                                                                                                                .Qcalc(a));
-        }
-
+   
         public static void LastHitB()
         {
             var QCHECK = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
@@ -69,7 +39,7 @@ namespace Bloodimir_Ziggs_v2
                 return;
             }
 
-            var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+            var minion = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (minion != null)
                 if (Ziggs.ManaPercent > Program.LastHitMenu["lhmanamanager"].Cast<Slider>().CurrentValue)
             {

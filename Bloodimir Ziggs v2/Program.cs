@@ -14,11 +14,14 @@ namespace Bloodimir_Ziggs_v2
     internal class Program
     {
         public static Spell.Skillshot Q;
+        public static Spell.Skillshot Q2;
+        public static Spell.Skillshot Q3;
         public static Spell.Skillshot W;
         public static Spell.Skillshot E;
         public static Spell.Skillshot R;
         public static Spell.Targeted Ignite;
         public static AIHeroClient Ziggs = ObjectManager.Player;
+        public static int UseSecondWTime;
 
         public static Menu ZiggsMenu,
             ComboMenu,
@@ -34,6 +37,11 @@ namespace Bloodimir_Ziggs_v2
         public static CheckBox SmartMode;
         public static AIHeroClient SelectedHero { get; set; }
 
+        private static Vector3 mousePos
+        {
+            get { return Game.CursorPos; }
+        }
+
         public static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
@@ -43,19 +51,19 @@ namespace Bloodimir_Ziggs_v2
         {
             Loading.OnLoadingComplete += OnLoaded;
         }
-        private static Vector3 mousePos
-        {
-            get { return Game.CursorPos; }
-        }
+
         private static void OnLoaded(EventArgs args)
         {
             if (Player.Instance.ChampionName != "Ziggs")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, 250, 1700, 140);
+            Q = new Spell.Skillshot(SpellSlot.Q, 850, SkillShotType.Circular, 300, 1700, 130);
+            Q2 = new Spell.Skillshot(SpellSlot.Q, 1125, SkillShotType.Circular, 250 + Q.CastDelay, 1700, 130);
+            Q3 = new Spell.Skillshot(SpellSlot.Q, 1400, SkillShotType.Circular, 300 + Q2.CastDelay, 1700, 140);
             W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, 250, 1750, 275);
             E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 500, 1750, 100);
-            R = new Spell.Skillshot(SpellSlot.R, 2500, SkillShotType.Circular, 1000, 1750, 500);
+            R = new Spell.Skillshot(SpellSlot.R, 5300, SkillShotType.Circular, 2000, 1500, 500);
+
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
@@ -67,7 +75,6 @@ namespace Bloodimir_Ziggs_v2
             ComboMenu = ZiggsMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
-            ComboMenu.Add("burst", new KeyBind("Burst Target", false, KeyBind.BindTypes.HoldActive, 'N'));
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
@@ -102,6 +109,7 @@ namespace Bloodimir_Ziggs_v2
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
             DrawMenu.Add("draww", new CheckBox("Draw W"));
             DrawMenu.Add("drawe", new CheckBox("Draw E"));
+            DrawMenu.Add("drawaa", new CheckBox("Draw AA"));
 
             MiscMenu = ZiggsMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("KS");
@@ -109,6 +117,7 @@ namespace Bloodimir_Ziggs_v2
             MiscMenu.Add("ksq", new CheckBox("KS using Q"));
             MiscMenu.Add("int", new CheckBox("TRY to Interrupt spells"));
             MiscMenu.Add("gapw", new CheckBox("Anti Gapcloser W"));
+            MiscMenu.Add("peel", new CheckBox("Peel From Melees"));
             SmartMode = MiscMenu.Add("smartMode", new CheckBox("Smart Mana Management"));
 
             FleeMenu = ZiggsMenu.AddSubMenu("Flee", "Flee");
@@ -116,8 +125,8 @@ namespace Bloodimir_Ziggs_v2
 
             PredMenu = ZiggsMenu.AddSubMenu("Prediction", "pred");
             PredMenu.AddGroupLabel("Q Hitchance");
-            var qslider = PredMenu.Add("hQ", new Slider("Q HitChance", 1, 0, 2));
-            var qMode = new[] { "Low (Fast Casting)", "Medium", "High (Slow Casting)" };
+            var qslider = PredMenu.Add("hQ", new Slider("Q HitChance", 2, 0, 2));
+            var qMode = new[] {"Low (Fast Casting)", "Medium", "High (Slow Casting)"};
             qslider.DisplayName = qMode[qslider.CurrentValue];
 
             qslider.OnValueChange +=
@@ -127,7 +136,7 @@ namespace Bloodimir_Ziggs_v2
                 };
             PredMenu.AddGroupLabel("E Hitchance");
             var eslider = PredMenu.Add("hE", new Slider("E HitChance", 2, 0, 2));
-            var eMode = new[] { "Low (Fast Casting)", "Medium", "High (Slow Casting)" };
+            var eMode = new[] {"Low (Fast Casting)", "Medium", "High (Slow Casting)"};
             eslider.DisplayName = eMode[eslider.CurrentValue];
 
             eslider.OnValueChange +=
@@ -136,8 +145,8 @@ namespace Bloodimir_Ziggs_v2
                     sender.DisplayName = eMode[changeArgs.NewValue];
                 };
             PredMenu.AddGroupLabel("W Hitchance");
-            var wslider = PredMenu.Add("hW", new Slider("W HitChance", 2, 0, 2));
-            var wMode = new[] { "Low (Fast Casting)", "Medium", "High (Slow Casting)" };
+            var wslider = PredMenu.Add("hW", new Slider("W HitChance", 1, 0, 2));
+            var wMode = new[] {"Low (Fast Casting)", "Medium", "High (Slow Casting)"};
             wslider.DisplayName = wMode[wslider.CurrentValue];
 
             wslider.OnValueChange +=
@@ -145,27 +154,17 @@ namespace Bloodimir_Ziggs_v2
                 {
                     sender.DisplayName = wMode[changeArgs.NewValue];
                 };
-
-            PredMenu.AddGroupLabel("R Hitchance");
-            var rslider = PredMenu.Add("hR", new Slider("R HitChance", 2, 0, 2));
-            var rMode = new[] { "Low (Fast Casting)", "Medium", "High (Slow Casting)" };
-            rslider.DisplayName = rMode[rslider.CurrentValue];
-
-            rslider.OnValueChange +=
-                delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
-                {
-                    sender.DisplayName = rMode[changeArgs.NewValue];
-                };
             SkinMenu = ZiggsMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
             var skinchange = SkinMenu.Add("sID", new Slider("Skin", 4, 0, 5));
-            var sID = new[] { "Default", "Mad Scientist", "Major", "Pool Party", "Snow Day", "Master Arcanist" };
+            var sID = new[] {"Default", "Mad Scientist", "Major", "Pool Party", "Snow Day", "Master Arcanist"};
             skinchange.DisplayName = sID[skinchange.CurrentValue];
-            skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
-            {
-                sender.DisplayName = sID[changeArgs.NewValue];
-            };
+            skinchange.OnValueChange +=
+                delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
+                {
+                    sender.DisplayName = sID[changeArgs.NewValue];
+                };
             Game.OnTick += Game_OnTick;
             Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
             Interrupter.OnInterruptableSpell += Interruptererer;
@@ -178,28 +177,38 @@ namespace Bloodimir_Ziggs_v2
             Killsteal();
             SkinChange();
             Orbwalker.ForcedTarget = null;
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) Combo();
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
-                LaneJungleClearA.LaneClear();
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-                LastHitA.LastHitB();
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) Flee();
-            else if (ComboMenu["burst"].Cast<KeyBind>().CurrentValue) BurstCombo();
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                Combo();
+            var target = TargetSelector.GetTarget(1200f, DamageType.Magical);
+            if (target != null)
             {
+                if (ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue
+                    && Q.IsReady())
                 {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20 * Ziggs.Level - (a.HPRegenRate / 5 * 3)))
+                    CastQ(target);
+                }
+
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+                    LaneJungleClearA.LaneClear();
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+                    LastHitA.LastHitB();
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) Flee();
+                {
                     {
-                        Ignite.Cast(source);
-                        return;
+                        if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                            !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                        foreach (
+                            var source in
+                                ObjectManager.Get<AIHeroClient>()
+                                    .Where(
+                                        a =>
+                                            a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                            a.Health < 50 + 20*Ziggs.Level - (a.HPRegenRate/5*3)))
+                        {
+                            Ignite.Cast(source);
+                            return;
+                        }
                     }
                 }
             }
@@ -211,7 +220,7 @@ namespace Bloodimir_Ziggs_v2
         {
             if (!MiscMenu["gapw"].Cast<CheckBox>().CurrentValue) return;
             if (ObjectManager.Player.Distance(gapcloser.Sender, true) <
-                W.Range * W.Range && sender.IsValidTarget())
+                W.Range*W.Range && sender.IsValidTarget())
             {
                 W.Cast(gapcloser.Sender);
                 W.Cast(gapcloser.Sender);
@@ -230,6 +239,7 @@ namespace Bloodimir_Ziggs_v2
                     W.Cast(intTarget.ServerPosition);
             }
         }
+
         private static void OnDraw(EventArgs args)
         {
             if (!Ziggs.IsDead)
@@ -237,11 +247,21 @@ namespace Bloodimir_Ziggs_v2
                 if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
                     Drawing.DrawCircle(Ziggs.Position, Q.Range, Color.Goldenrod);
+                    Drawing.DrawCircle(Ziggs.Position, Q2.Range, Color.Blue);
+                    Drawing.DrawCircle(Ziggs.Position, Q3.Range, Color.Tomato);
                 }
                 {
                     if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
                     {
                         Drawing.DrawCircle(Ziggs.Position, E.Range, Color.MediumVioletRed);
+                    }
+                    if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
+                    {
+                        Drawing.DrawCircle(Ziggs.Position, W.Range, Color.DarkRed);
+                    }
+                    if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawCircle(Ziggs.Position, Player.Instance.AttackRange, Color.DimGray);
                     }
                 }
             }
@@ -295,7 +315,7 @@ namespace Bloodimir_Ziggs_v2
             (WndEventArgs
                 args)
         {
-            if (args.Msg != (uint)WindowMessages.LeftButtonDown)
+            if (args.Msg != (uint) WindowMessages.LeftButtonDown)
             {
                 return;
             }
@@ -303,54 +323,6 @@ namespace Bloodimir_Ziggs_v2
                 EntityManager.Heroes.Enemies
                     .FindAll(hero => hero.IsValidTarget() && hero.Distance(Game.CursorPos, true) < 39999)
                     .OrderBy(h => h.Distance(Game.CursorPos, true)).FirstOrDefault();
-        }
-
-        public static
-            void BurstCombo
-            ()
-        {
-            var target = TargetSelector.GetTarget(860, DamageType.Magical);
-
-            if (SelectedHero != null)
-            {
-                target = SelectedHero;
-            }
-
-            if (target == null || !target.IsValid())
-            {
-                return;
-            }
-
-            Orbwalker.OrbwalkTo(mousePos);
-            if (R.IsReady() &&
-                R.GetPrediction(target).HitChance >= PredR())
-            {
-                var predR = R.GetPrediction(target).CastPosition;
-                R.Cast(predR);
-            }
-
-            if (E.IsReady() &&
-                E.GetPrediction(target).HitChance >= PredE())
-            {
-                var predE = E.GetPrediction(target).CastPosition;
-                E.Cast(predE);
-            }
-
-            if (Q.IsReady() &&
-                Q.GetPrediction(target).HitChance >= PredQ())
-            {
-                var predQ = Q.GetPrediction(target).CastPosition;
-                Q.Cast(predQ);
-            }
-
-            if (W.IsReady() &&
-                W.GetPrediction(target).HitChance >= PredW())
-            {
-                var predW = W.GetPrediction(target).CastPosition;
-                W.Cast(predW);
-                if (W.IsReady())
-                    W.Cast(predW);
-            }
         }
 
         public static
@@ -365,38 +337,176 @@ namespace Bloodimir_Ziggs_v2
 
             if (Orbwalker.IsAutoAttacking && HarassMenu["waitAA"].Cast<CheckBox>().CurrentValue) return;
 
-            {
-                target = TargetSelector.GetTarget(1550, DamageType.Magical);
-
-            }
-
             if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue && E.IsReady() &&
                 E.GetPrediction(target).HitChance >= PredE())
             {
                 var predE = E.GetPrediction(target).CastPosition;
                 E.Cast(predE);
             }
-
-            if (ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue && Q.IsReady() &&
-                Q.GetPrediction(target).HitChance >= PredQ())
+            if (ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue && W.IsReady())
             {
-                var predQ = Q.GetPrediction(target).CastPosition;
-                Q.Cast(predQ);
             }
-              if (ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue && W.IsReady() &&
-                W.GetPrediction(target).HitChance >= PredW())
+            var wpred = W.GetPrediction(target);
+            if (wpred.HitChance <= PredW())
             {
-                var predW = W.GetPrediction(target).CastPosition;
-                W.Cast(predW);
-                W.Cast(predW);
-            }
-            if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                if (R.IsReady() &&
-                    Ziggs.CountEnemiesInRange(1670) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+                if ((W.IsInRange(wpred.UnitPosition) &&
+                     ObjectManager.Player.ServerPosition.Distance(wpred.UnitPosition) > W.Range - 250 &&
+                     wpred.UnitPosition.Distance(ObjectManager.Player.ServerPosition) >
+                     target.Distance(ObjectManager.Player)))
                 {
-                    var rtarget = TargetSelector.GetTarget(1670, DamageType.Magical);
-                    R.Cast(rtarget.ServerPosition);
+                    var pp =
+                        ObjectManager.Player.ServerPosition.To2D()
+                            .Extend(wpred.UnitPosition.To2D(), W.Range)
+                            .To3D();
+                    W.Cast(pp);
+                    UseSecondWTime = Environment.TickCount;
                 }
+                if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
+                    if (R.IsReady())
+                    {
+                        var predR = R.GetPrediction(target).CastPosition;
+                       if (target.CountEnemiesInRange(R.Width) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+                        R.Cast(predR);
+                    }
+
+                if (MiscMenu["peel"].Cast<CheckBox>().CurrentValue)
+                {
+                    foreach (var pos in from enemy in ObjectManager.Get<Obj_AI_Base>()
+                        where
+                            enemy.IsValidTarget() &&
+                            enemy.Distance(ObjectManager.Player) <=
+                            enemy.BoundingRadius + enemy.AttackRange + ObjectManager.Player.BoundingRadius &&
+                            enemy.IsMelee
+                        let direction =
+                            (enemy.ServerPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
+                        let pos = ObjectManager.Player.ServerPosition.To2D()
+                        select pos + Math.Min(200, Math.Max(50, enemy.Distance(ObjectManager.Player)/2))*direction)
+                    {
+                        W.Cast(pos.To3D());
+                        UseSecondWTime = Environment.TickCount;
+                    }
+                }
+            }
+        }
+
+        private static void CastQ(Obj_AI_Base target)
+        {
+           if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) && ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue)
+            {
+            PredictionResult prediction;
+
+            if (Q.IsInRange(target))
+            {
+             prediction = Q.GetPrediction(target);
+                Q.Cast(prediction.CastPosition);
+            }
+            else if (Q2.IsInRange(target))
+            {
+                prediction = Q2.GetPrediction(target);
+                Q2.Cast(prediction.CastPosition);
+            }
+            else if (Q3.IsInRange(target))
+            {
+             prediction = Q3.GetPrediction(target);
+                Q3.Cast(prediction.CastPosition);
+            }
+            else
+            {
+                return;
+            }
+
+            if (prediction.HitChance >= HitChance.High)
+            {
+                if (ObjectManager.Player.ServerPosition.Distance(prediction.CastPosition) <= Q.Range + Q.Width)
+                {
+                    Vector3 p;
+                    if (ObjectManager.Player.ServerPosition.Distance(prediction.CastPosition) > 300)
+                    {
+                        p = prediction.CastPosition -
+                            100*
+                            (prediction.CastPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
+                                .To3D();
+                    }
+                    else
+                    {
+                        p = prediction.CastPosition;
+                    }
+
+                    Q.Cast(p);
+                }
+                else if (ObjectManager.Player.ServerPosition.Distance(prediction.CastPosition) <=
+                         ((Q.Range + Q2.Range)/2))
+                {
+                    var p = ObjectManager.Player.ServerPosition.To2D()
+                        .Extend(prediction.CastPosition.To2D(), Q.Range - 100);
+
+                    if (!CheckQCollision(target, prediction.UnitPosition, p.To3D()))
+                    {
+                        Q.Cast(p.To3D());
+                    }
+                }
+                else
+                {
+                    var p = ObjectManager.Player.ServerPosition.To2D() +
+                            Q.Range*
+                            (prediction.CastPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized
+                                ();
+
+                    if (!CheckQCollision(target, prediction.UnitPosition, p.To3D()))
+                    {
+                        Q.Cast(p.To3D());
+                    }
+                }
+            }
+        }}
+            
+
+        private static bool CheckQCollision(Obj_AI_Base target, Vector3 targetPosition, Vector3 castPosition)
+        {
+            var direction = (castPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized();
+            var firstBouncePosition = castPosition.To2D();
+            var secondBouncePosition = firstBouncePosition +
+                                       direction*0.4f*
+                                       ObjectManager.Player.ServerPosition.To2D().Distance(firstBouncePosition);
+            var thirdBouncePosition = secondBouncePosition +
+                                      direction*0.6f*firstBouncePosition.Distance(secondBouncePosition);
+
+            if (thirdBouncePosition.Distance(targetPosition.To2D()) < Q.Width + target.BoundingRadius)
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>())
+                {
+                    if (minion.IsValidTarget(3000))
+                    {
+                        var predictedPos = Q2.GetPrediction(minion);
+                        if (predictedPos.UnitPosition.To2D().Distance(secondBouncePosition) <
+                            Q2.Width + minion.BoundingRadius)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (secondBouncePosition.Distance(targetPosition.To2D()) < Q.Width + target.BoundingRadius ||
+                thirdBouncePosition.Distance(targetPosition.To2D()) < Q.Width + target.BoundingRadius)
+            {
+                foreach (var minion in ObjectManager.Get<Obj_AI_Minion>())
+                {
+                    if (minion.IsValidTarget(3000))
+                    {
+                        var predictedPos = Q.GetPrediction(minion);
+                        if (predictedPos.UnitPosition.To2D().Distance(firstBouncePosition) <
+                            Q.Width + minion.BoundingRadius)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         private static
@@ -414,9 +524,22 @@ namespace Bloodimir_Ziggs_v2
                     {
                         if (Ziggs.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                         {
+                            var qkspred = Q.GetPrediction(qtarget).CastPosition;
+                            var qks2Pred = Q2.GetPrediction(qtarget).CastPosition;
+                            var qks3Pred = Q3.GetPrediction(qtarget).CastPosition;
                             {
-                                var qkspred = Q.GetPrediction(qtarget).CastPosition;
-                                Q.Cast(qkspred);
+                                if (Q.IsInRange(qtarget))
+                                {
+                                    Q.Cast(qkspred);
+                                }
+                                else if (Q2.IsInRange(qtarget))
+                                {
+                                    Q2.Cast(qks2Pred);
+                                }
+                                else if (Q3.IsInRange(qtarget))
+                                {
+                                    Q3.Cast(qks3Pred);
+                                }
                             }
                             {
                             }
@@ -436,7 +559,7 @@ namespace Bloodimir_Ziggs_v2
             if (FleeMenu["fleew"].Cast<CheckBox>().CurrentValue)
             {
                 Orbwalker.MoveTo(Game.CursorPos);
-                W.Cast(Ziggs.Position);
+                W.Cast(Ziggs.ServerPosition);
             }
         }
 
@@ -462,23 +585,6 @@ namespace Bloodimir_Ziggs_v2
             ()
         {
             var mode = PredMenu["hE"].DisplayName;
-            switch (mode)
-            {
-                case "Low (Fast Casting)":
-                    return HitChance.Low;
-                case "Medium":
-                    return HitChance.Medium;
-                case "High (Slow Casting)":
-                    return HitChance.High;
-            }
-            return HitChance.Medium;
-        }
-
-        private static
-            HitChance PredR
-            ()
-        {
-            var mode = PredMenu["hR"].DisplayName;
             switch (mode)
             {
                 case "Low (Fast Casting)":

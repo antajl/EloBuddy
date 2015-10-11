@@ -31,7 +31,7 @@ namespace Bloodimir_Renekton
         {
             switch (t)
             {
-                case GameObjectType.obj_AI_Hero:
+                case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:

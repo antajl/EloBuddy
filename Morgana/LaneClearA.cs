@@ -17,6 +17,18 @@ namespace Morgana
             get { return ObjectManager.Player; }
         }
 
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
+        }
         public static void LaneClear()
         {
             var WCHECK = Program.LaneClear["LCW"].Cast<CheckBox>().CurrentValue;
@@ -24,47 +36,14 @@ namespace Morgana
 
             if (WCHECK && WREADY)
             {
-                var enemy = GetBestWLocation(GameObjectType.obj_AI_Minion);
+                var wenemy =
+                    (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
 
-                if (enemy != null)
-                    Program.W.Cast(enemy.ServerPosition);
+                if (wenemy != null)
+                { 
+                        Program.W.Cast(wenemy.ServerPosition);
+                    }
             }
-        }
-
-        public static Obj_AI_Base GetBestWLocation(GameObjectType type)
-        {
-            var numEnemiesInRange = 0;
-            Obj_AI_Base enem = null;
-
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Base>()
-                .OrderBy(a => a.Health)
-                .Where(a => a.Distance(Morgana) <= Program.W.Range
-                            && a.IsEnemy
-                            && a.Type == type
-                            && !a.IsDead
-                            && !a.IsInvulnerable))
-            {
-                var tempNumEnemies = 0;
-                foreach (var enemy2 in ObjectManager.Get<Obj_AI_Base>()
-                    .OrderBy(a => a.Health)
-                    .Where(a => a.Distance(Morgana) <= Program.W.Range
-                                && a.IsEnemy
-                                && !a.IsDead
-                                && a.Type == type
-                                && !a.IsInvulnerable))
-                {
-                    if (enemy != enemy2
-                        && enemy2.Distance(enemy) <= 75)
-                        tempNumEnemies++;
-                }
-
-                if (tempNumEnemies > numEnemiesInRange)
-                {
-                    enem = enemy;
-                    numEnemiesInRange = tempNumEnemies;
-                }
-            }
-            return enem;
         }
     }
 }

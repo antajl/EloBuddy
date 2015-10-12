@@ -47,7 +47,7 @@ namespace Morgana
             MorgMenu = MainMenu.AddMenu("B.Morgana", "bloodimirmorgana");
             MorgMenu.AddGroupLabel("Bloodimir.Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Morgana v1.0.3.0");
+            MorgMenu.AddLabel("Bloodimir Morgana v1.0.4.0");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -71,6 +71,11 @@ namespace Morgana
             }
             QMenu.AddSeparator();
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
+            QMenu.AddSeparator();
+            QMenu.Add("intq", new CheckBox("Q to Interrupt"));
+            QMenu.Add("dashq", new CheckBox("Q on Dashing"));
+            QMenu.Add("immoq", new CheckBox("Q on Immobile"));
+            QMenu.Add("gapq", new CheckBox("Q on Gapcloser"));
 
             WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
             WMenu.AddGroupLabel("W Settings");
@@ -79,6 +84,8 @@ namespace Morgana
             WMenu.Add("wmin", new Slider("Min Range", 124, 0, (int) W.Range));
             WMenu.AddSeparator();
             WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction / Disabled = High"));
+            WMenu.AddSeparator();
+            WMenu.Add("immow", new CheckBox("W on Immobile"));
 
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -90,29 +97,18 @@ namespace Morgana
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
             {
                 sender.DisplayName = sID[changeArgs.NewValue];
-                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                {
-                    Chat.Print("skin-changed");
-                }
             };
 
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
-            MiscMenu.AddGroupLabel("KS");
+            MiscMenu.AddGroupLabel("Misc");
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
-            MiscMenu.AddSeparator();
-            MiscMenu.AddGroupLabel("Interrupt");
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("intq", new CheckBox("Q to Interrupt"));
-            MiscMenu.Add("dashq", new CheckBox("Q on Dashing"));
-            MiscMenu.Add("immoq", new CheckBox("Q on Immobile"));
-            MiscMenu.Add("immow", new CheckBox("W on Immobile"));
+            MiscMenu.Add("peel", new CheckBox("Peel from Melee Champions"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("ELowAllies", new CheckBox("Use E on % Hp Allies"));
             MiscMenu.Add("EHPPercent", new Slider("Ally HP %", 45));
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
-            MiscMenu.Add("debug", new CheckBox("Debug", false));
 
             DrawMenu = MorgMenu.AddSubMenu("Drawings", "drawings");
             DrawMenu.AddGroupLabel("Drawings");
@@ -123,7 +119,7 @@ namespace Morgana
             LaneClear = MorgMenu.AddSubMenu("Lane Clear", "laneclear");
             LaneClear.AddGroupLabel("Lane Clear Settings");
             LaneClear.Add("LCW", new CheckBox("Use W"));
-
+            
             LastHit = MorgMenu.AddSubMenu("Last Hit", "lasthit");
             LastHit.AddGroupLabel("Last Hit Settings");
             LastHit.Add("LHQ", new CheckBox("Use Q"));
@@ -132,6 +128,7 @@ namespace Morgana
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
+            Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
@@ -142,8 +139,24 @@ namespace Morgana
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
                     Q.Cast(intTarget.ServerPosition);
             }
-        }
-
+        
+          if (MiscMenu["peel"].Cast<CheckBox>().CurrentValue)
+                {
+                    foreach (var pos in from enemy in ObjectManager.Get<Obj_AI_Base>()
+                        where
+                            enemy.IsValidTarget() &&
+                            enemy.Distance(ObjectManager.Player) <=
+                            enemy.BoundingRadius + enemy.AttackRange + ObjectManager.Player.BoundingRadius &&
+                            enemy.IsMelee
+                        let direction =
+                            (enemy.ServerPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
+                        let pos = ObjectManager.Player.ServerPosition.To2D()
+                        select pos + Math.Min(200, Math.Max(50, enemy.Distance(ObjectManager.Player)/2))*direction)
+                    {
+                        Q.Cast(pos.To3D());
+                    }
+                }
+            }
         private static void AutoE()
         {
             var shieldAllies = MiscMenu["ELowAllies"].Cast<CheckBox>().CurrentValue;
@@ -154,15 +167,24 @@ namespace Morgana
                 var ally =
                     EntityManager.Heroes.Allies.Where(
                         x => x.IsValidTarget(W.Range) && x.HealthPercent < shieldHealthPercent)
-                        .FirstOrDefault();
-
-                if (ally != null && ally.CountEnemiesInRange(750) >= 1)
+                        .FirstOrDefault();    
+                if (ally != null && ally.CountEnemiesInRange(650) >= 1)
                 {
                     E.Cast(ally);
                 }
             }
         }
-
+        private static
+           void Gapcloser_OnGapCloser
+           (AIHeroClient sender, Gapcloser.GapcloserEventArgs gapcloser)
+        {
+            if (!QMenu["gapq"].Cast<CheckBox>().CurrentValue) return;
+            if (ObjectManager.Player.Distance(gapcloser.Sender, true) <
+                Q.Range * Q.Range && sender.IsValidTarget())
+            {
+                Q.Cast(gapcloser.Sender);
+            }
+        }
         private static void OnDraw(EventArgs args)
         {
             if (!Me.IsDead)
@@ -184,6 +206,8 @@ namespace Morgana
             WHitChance = WMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             Killsteal();
             AutoCast();
+            SkinChange();
+            AutoE();
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
@@ -199,8 +223,6 @@ namespace Morgana
             {
                 LastHitA.LastHitB();
             }
-            SkinChange();
-            AutoE();
                {
                     if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
                         !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
@@ -226,20 +248,16 @@ namespace Morgana
                 {
                     foreach (
                         var enemy in EntityManager.Heroes.Enemies
-                            .Where(x => x.IsValidTarget(MiscMenu["qmax"].Cast<Slider>().CurrentValue)))
+                            .Where(x => x.IsValidTarget(QMenu["qmax"].Cast<Slider>().CurrentValue)))
                     {
-                        if (MiscMenu["dashq"].Cast<CheckBox>().CurrentValue &&
-                            MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
+                        if (QMenu["dashq"].Cast<CheckBox>().CurrentValue &&
+                            QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
                         {
                             var pred = Q.GetPrediction(enemy);
                             if (pred.HitChance >= HitChance.Dashing)
                             {
                                 Q.Cast(pred.CastPosition);
                             }
-                        }
-                        if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                        {
-                            Chat.Print("q-dash");
                         }
                     }
                 }
@@ -252,20 +270,15 @@ namespace Morgana
                     {
                         foreach (
                             var enemy in EntityManager.Heroes.Enemies
-                                .Where(x => x.IsValidTarget(MiscMenu["wmax"].Cast<Slider>().CurrentValue)))
+                                .Where(x => x.IsValidTarget(WMenu["wmax"].Cast<Slider>().CurrentValue)))
                         {
-                            if (MiscMenu["immow"].Cast<CheckBox>().CurrentValue &&
-                                MiscMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
+                            if (WMenu["immow"].Cast<CheckBox>().CurrentValue &&
+                                QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
                             {
                                 var pred = W.GetPrediction(enemy);
                                 if (pred.HitChance >= HitChance.Immobile)
                                 {
                                     W.Cast(pred.CastPosition);
-                                }
-
-                                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                                {
-                                    Chat.Print("w-immo");
                                 }
                             }
                         }
@@ -312,10 +325,6 @@ namespace Morgana
                             if (poutput.HitChance >= HitChance.Medium)
                             {
                                 Q.Cast(poutput.CastPosition);
-                                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                                {
-                                    Chat.Print("q-ks");
-                                }
                             }
                         }
                     }
@@ -363,20 +372,12 @@ namespace Morgana
                 var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
                 if (soilTarget.IsValidTarget(W.Range))
                 {
-                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                    {
-                        Chat.Print("Valid soil target found");
-                    }
                     if (W.GetPrediction(soilTarget).HitChance >= WHitChance)
                     {
                         if (soilTarget.Distance(Me.ServerPosition) > WMenu["wmin"].Cast<Slider>().CurrentValue)
                         {
                             W.Cast(soilTarget);
 
-                            if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                            {
-                                Chat.Print("w-combo");
-                            }
                         }
                     }
                 }
@@ -389,10 +390,6 @@ namespace Morgana
                     var bindTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
                     if (bindTarget.IsValidTarget(Q.Range))
                     {
-                        if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                        {
-                            Chat.Print("Valid target found");
-                        }
                         if (Q.GetPrediction(bindTarget).HitChance >= QHitChance)
                         {
                             if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
@@ -400,11 +397,6 @@ namespace Morgana
                                 if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                                 {
                                     Q.Cast(bindTarget);
-
-                                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                                    {
-                                        Chat.Print("q-combo");
-                                    }
                                 }
                             }
                         }
@@ -417,10 +409,6 @@ namespace Morgana
                     Me.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
-                    if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
-                    {
-                        Chat.Print("r-combo");
-                    }
                 }
             }
         }

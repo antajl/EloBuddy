@@ -68,9 +68,9 @@ namespace Bloodimir_Ziggs_v2
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             ZiggsMenu = MainMenu.AddMenu("BloodimirZiggs", "bloodimirziggs");
-            ZiggsMenu.AddGroupLabel("Bloodimir Ziggs v2.0.0.0");
+            ZiggsMenu.AddGroupLabel("Bloodimir Ziggs v2.0.1.0");
             ZiggsMenu.AddSeparator();
-            ZiggsMenu.AddLabel("Bloodimir Ziggs v2.0.0.0");
+            ZiggsMenu.AddLabel("Bloodimir Ziggs v2.0.1.0");
 
             ComboMenu = ZiggsMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -82,6 +82,7 @@ namespace Bloodimir_Ziggs_v2
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
+            ComboMenu.Add("wslider", new Slider("Enemy Health Percentage to use W", 15));
             ComboMenu.Add("waitAA", new CheckBox("wait for AA to finish", false));
 
             HarassMenu = ZiggsMenu.AddSubMenu("HarassMenu", "Harass");
@@ -349,7 +350,7 @@ namespace Bloodimir_Ziggs_v2
             var wpred = W.GetPrediction(target);
             if (wpred.HitChance <= PredW())
             {
-                if ((W.IsInRange(wpred.UnitPosition) &&
+                if ((W.IsInRange(wpred.UnitPosition) && target.HealthPercent >= ComboMenu["wslider"].Cast<Slider>().CurrentValue &&
                      ObjectManager.Player.ServerPosition.Distance(wpred.UnitPosition) > W.Range - 250 &&
                      wpred.UnitPosition.Distance(ObjectManager.Player.ServerPosition) >
                      target.Distance(ObjectManager.Player)))

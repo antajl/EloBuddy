@@ -18,6 +18,7 @@ namespace Bloodimir_Sona
         public static Spell.Active E;
         public static Spell.Skillshot R;
         public static Spell.Targeted Ignite;
+        public static Spell.Targeted Exhaust;
         public static AIHeroClient Sona = ObjectManager.Player;
         public static Item FrostQueen;
 
@@ -59,6 +60,7 @@ namespace Bloodimir_Sona
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             FrostQueen = new Item(3092, 850f);
+            Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
 
             SonaMenu = MainMenu.AddMenu("BloodimirSona", "bloodimirsona");
             SonaMenu.AddGroupLabel("Bloodimir Sona v1.0.0.0");
@@ -71,6 +73,7 @@ namespace Bloodimir_Sona
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
+            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
@@ -101,6 +104,12 @@ namespace Bloodimir_Sona
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("HPLowAllies", new CheckBox("Use W on % HP Allies to Heal", false));
             MiscMenu.Add("wslider", new Slider("Ally Health Percentage to use W", 60));
+            MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
+            foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
+            {
+                MiscMenu.Add(source.ChampionName + "exhaust",
+                    new CheckBox("Exhaust " + source.ChampionName, false));
+            }
 
             FleeMenu = SonaMenu.AddSubMenu("Flee", "Flee");
             FleeMenu.Add("fleee", new CheckBox("Use E"));
@@ -156,12 +165,30 @@ namespace Bloodimir_Sona
                                             a.Health < 50 + 20*Sona.Level - (a.HPRegenRate/5*3)))
                         {
                             Ignite.Cast(source);
-                            return;
+            if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue || ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                return;
+            foreach (
+                var enemy in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
+                        .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
+            {
+                if (enemy.IsFacing(Sona))
+                {
+                    if (!(Sona.HealthPercent < 50)) continue;
+                    Exhaust.Cast(enemy);
+                    return;
+                }
+                if (!(enemy.HealthPercent < 50)) continue;
+                Exhaust.Cast(enemy);
+                return;
+            }
+        }
                         }
                     }
                 }
             }
-        }
 
         private static
             void Interruptererer

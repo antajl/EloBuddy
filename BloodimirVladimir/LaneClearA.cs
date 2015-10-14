@@ -31,45 +31,6 @@ namespace BloodimirVladimir
             }
         }
 
-        public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
-        {
-            if (spell == AttackSpell.E)
-            {
-                return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                                   && a.Type == type
-                                                                                                   &&
-                                                                                                   a.Distance(Vladimir) <=
-                                                                                                   Program.E.Range
-                                                                                                   && !a.IsDead
-                                                                                                   && !a.IsInvulnerable
-                                                                                                   &&
-                                                                                                   a.IsValidTarget(
-                                                                                                       Program.E.Range)
-                                                                                                   &&
-                                                                                                   a.Health <=
-                                                                                                   Misc.Edmg(a));
-            }
-
-            if (spell == AttackSpell.Q)
-            {
-                return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                                   && a.Type == type
-                                                                                                   &&
-                                                                                                   a.Distance(Vladimir) <=
-                                                                                                   Program.Q.Range
-                                                                                                   && !a.IsDead
-                                                                                                   && !a.IsInvulnerable
-                                                                                                   &&
-                                                                                                   a.IsValidTarget(
-                                                                                                       Program.Q.Range)
-                                                                                                   &&
-                                                                                                   a.Health <=
-                                                                                                   Misc.Qdmg(a));
-            }
-
-            return null;
-        }
-
         public static void LaneClear()
         {
             var ECHECK = Program.LaneClear["LCE"].Cast<CheckBox>().CurrentValue;

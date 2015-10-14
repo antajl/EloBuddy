@@ -10,7 +10,7 @@ namespace BloodimirVladimir
         public enum AttackSpell
         {
             Q,
-            E,
+            E
         };
 
         public static AIHeroClient Vladimir
@@ -28,55 +28,6 @@ namespace BloodimirVladimir
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
-        }
-
-        public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
-        {
-            if (spell == AttackSpell.E)
-            {
-                return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                                   && a.Type == type
-                                                                                                   &&
-                                                                                                   a.Distance(Vladimir) <=
-                                                                                                   Program.E.Range
-                                                                                                   && !a.IsDead
-                                                                                                   && !a.IsInvulnerable
-                                                                                                   &&
-                                                                                                   a.IsValidTarget(
-                                                                                                       Program.E.Range)
-                                                                                                   &&
-                                                                                                   a.Health <=
-                                                                                                   Misc.Edmg(a));
-            }
-
-            if (spell == AttackSpell.Q)
-            {
-                return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                                   && a.Type == type
-                                                                                                   &&
-                                                                                                   a.Distance(Vladimir) <=
-                                                                                                   Program.Q.Range
-                                                                                                   && !a.IsDead
-                                                                                                   && !a.IsInvulnerable
-                                                                                                   &&
-                                                                                                   a.IsValidTarget(
-                                                                                                       Program.Q.Range)
-                                                                                                   &&
-                                                                                                   a.Health <=
-                                                                                                   Misc.Qdmg(a));
-            }
-            var target = TargetSelector.GetTarget(1500, DamageType.True);
-            if (target == null || !target.IsValid())
-                if (Program.Ignite.IsInRange(target) &&
-                    target.Health < 50 + 20*Program._Player.Level - (target.HPRegenRate/5*3) &&
-                    Program.ComboMenu["useignite"].Cast<CheckBox>().CurrentValue)
-                {
-                    Program.Ignite.Cast(target);
-                }
-            {
-                Chat.Print("igniteused");
-            }
-            return null;
         }
 
         public static void VladCombo()

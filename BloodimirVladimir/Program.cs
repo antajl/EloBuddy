@@ -75,14 +75,10 @@ namespace BloodimirVladimir
             LastHit.AddGroupLabel("Last Hit Settings");
             LastHit.Add("LHQ", new CheckBox("Use Q"));
 
-            MiscMenu = VladMenu.AddSubMenu("Misc Menu", "miscmenu");
+            MiscMenu = VladMenu.AddSubMenu("KS Menu", "miscmenu");
             MiscMenu.AddGroupLabel("KS");
             MiscMenu.AddSeparator();
-            MiscMenu.Add("ksq", new CheckBox("KS with Q"));
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("ksignite", new CheckBox("Ks with Ignite", false));
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("dodgew", new CheckBox("Use W to Dodge WIP"));
+            MiscMenu.Add("ksq", new CheckBox("KS with Q", false));
             MiscMenu.AddSeparator();
 
             SkinMenu = VladMenu.AddSubMenu("Skin Changer", "skin");

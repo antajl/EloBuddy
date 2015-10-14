@@ -73,9 +73,6 @@ namespace Morgana
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
             QMenu.AddSeparator();
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
-            QMenu.Add("dashq", new CheckBox("Q on Dashing"));
-            QMenu.Add("immoq", new CheckBox("Q on Immobile"));
-            QMenu.Add("gapq", new CheckBox("Q on Gapcloser"));
 
             WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
             WMenu.AddGroupLabel("W Settings");
@@ -105,7 +102,7 @@ namespace Morgana
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
             MiscMenu.Add("peel", new CheckBox("Peel from Melee Champions"));
             MiscMenu.AddSeparator();
-            MiscMenu.Add("ELowAllies", new CheckBox("Use E on % Hp Allies"));
+            MiscMenu.Add("ELowAllies", new CheckBox("Use E on % Hp Allies", false));
             MiscMenu.Add("EHPPercent", new Slider("Ally HP %", 45));
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
@@ -128,7 +125,6 @@ namespace Morgana
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
-            Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
@@ -174,17 +170,6 @@ namespace Morgana
                 }
             }
         }
-        private static
-           void Gapcloser_OnGapCloser
-           (AIHeroClient sender, Gapcloser.GapcloserEventArgs gapcloser)
-        {
-            if (!QMenu["gapq"].Cast<CheckBox>().CurrentValue) return;
-            if (ObjectManager.Player.Distance(gapcloser.Sender, true) <
-                Q.Range * Q.Range && sender.IsValidTarget())
-            {
-                Q.Cast(gapcloser.Sender);
-            }
-        }
         private static void OnDraw(EventArgs args)
         {
             if (!Me.IsDead)
@@ -205,7 +190,6 @@ namespace Morgana
             QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             WHitChance = WMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             Killsteal();
-            AutoCast();
             SkinChange();
             AutoE();
             {
@@ -239,56 +223,6 @@ namespace Morgana
                     }
         }
             }
-
-        private static void AutoCast()
-        {
-            if (Q.IsReady())
-            {
-                try
-                {
-                    foreach (
-                        var enemy in EntityManager.Heroes.Enemies
-                            .Where(x => x.IsValidTarget(QMenu["qmax"].Cast<Slider>().CurrentValue)))
-                    {
-                        if (QMenu["dashq"].Cast<CheckBox>().CurrentValue &&
-                            QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
-                        {
-                            var pred = Q.GetPrediction(enemy);
-                            if (pred.HitChance >= HitChance.Dashing)
-                            {
-                                Q.Cast(pred.CastPosition);
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-                if (W.IsReady())
-                {
-                    try
-                    {
-                        foreach (
-                            var enemy in EntityManager.Heroes.Enemies
-                                .Where(x => x.IsValidTarget(WMenu["wmax"].Cast<Slider>().CurrentValue)))
-                        {
-                            if (WMenu["immow"].Cast<CheckBox>().CurrentValue &&
-                                QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue)
-                            {
-                                var pred = W.GetPrediction(enemy);
-                                if (pred.HitChance >= HitChance.Immobile)
-                                {
-                                    W.Cast(pred.CastPosition);
-                                }
-                            }
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
 
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {

@@ -55,7 +55,7 @@ namespace Bloodimir_Ziggs_v2
                 if (eminion != null)
                     if (Ziggs.ManaPercent > Program.LaneJungleClear["lcmanamanager"].Cast<Slider>().CurrentValue)
                     {
-                        var predE = Program.Q.GetPrediction(eminion).CastPosition;
+                        var predE = Program.E.GetPrediction(eminion).CastPosition;
                         Program.E.Cast(predE);
                     }
                 if (Orbwalker.CanAutoAttack)

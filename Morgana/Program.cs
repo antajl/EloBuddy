@@ -160,6 +160,7 @@ namespace Morgana
             var shieldHealthPercent = MiscMenu["EHPPercent"].Cast<Slider>().CurrentValue;
 
             if (shieldAllies)
+                if (sender.IsEnemy)
             {
                 var ally =
                     EntityManager.Heroes.Allies.Where(

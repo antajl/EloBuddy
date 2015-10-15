@@ -125,6 +125,7 @@ namespace Morgana
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
+            Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessSpell;
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
@@ -153,7 +154,7 @@ namespace Morgana
                     }
                 }
             }
-        private static void AutoE()
+        private static void Auto_EOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             var shieldAllies = MiscMenu["ELowAllies"].Cast<CheckBox>().CurrentValue;
             var shieldHealthPercent = MiscMenu["EHPPercent"].Cast<Slider>().CurrentValue;
@@ -191,7 +192,6 @@ namespace Morgana
             WHitChance = WMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             Killsteal();
             SkinChange();
-            AutoE();
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,

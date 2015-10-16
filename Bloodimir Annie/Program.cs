@@ -22,7 +22,6 @@ namespace Bloodimir_Annie
         public static Menu AnnieMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHit;
         public static Item Zhonia;
         public static AIHeroClient Annie = ObjectManager.Player;
-        public static CheckBox SmartMode;
         public static List<Obj_AI_Turret> Turrets = new List<Obj_AI_Turret>();
         public static GameObject TibbersObject { get; set; }
         public static int[] AbilitySequence;
@@ -107,7 +106,6 @@ namespace Bloodimir_Annie
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
             LaneJungleClear.Add("LCW", new CheckBox("Use W"));
-            LaneJungleClear.Add("lcmanamanager", new Slider("Lane/Jungle Clear Mana Manager %", 55));
 
             MiscMenu = AnnieMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("MISC");
@@ -133,7 +131,6 @@ namespace Bloodimir_Annie
             MiscMenu.Add("eaa", new CheckBox("Auto E on enemy AA's"));
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells"));
-            SmartMode = MiscMenu.Add("smartMode", new CheckBox("Smart Mana Management"));
             MiscMenu.Add("savestun", new CheckBox("Save Stun", false));
 
 

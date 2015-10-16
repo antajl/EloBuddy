@@ -44,8 +44,6 @@ namespace Bloodimir_Annie
             }
             var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy != null)
-                if (Program.SmartMode.CurrentValue &&
-                    Annie.ManaPercent > Program.LaneJungleClear["lcmanamanager"].Cast<Slider>().CurrentValue)
                 {
                     Program.Q.Cast(qenemy);
                 }
@@ -55,8 +53,6 @@ namespace Bloodimir_Annie
             }
             var wminion = (Obj_AI_Minion) GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
             if (wminion != null)
-                if (Program.SmartMode.CurrentValue &&
-                    Annie.ManaPercent > Program.LaneJungleClear["lcmanamanager"].Cast<Slider>().CurrentValue)
                 {
                     Program.W.Cast(wminion.ServerPosition);
                 }

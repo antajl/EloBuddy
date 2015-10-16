@@ -401,9 +401,9 @@ namespace Bloodimir_Annie
                                         }
                                     }
                                     catch
-                                    {
-                                    }
-                                    if (MiscMenu["ksr"].Cast<CheckBox>().CurrentValue && W.IsReady())
+                                    { }
+       
+                                    if (MiscMenu["ksr"].Cast<CheckBox>().CurrentValue && R.IsReady())
                                     {
                                         {
                                             try

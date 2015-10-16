@@ -1,0 +1,11 @@
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\Bloodimir Annie.exe.config
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\Bloodimir Annie.exe
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\Bloodimir Annie.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\SharpDX.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\x86\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\obj\x86\Debug\Bloodimir Annie.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\obj\x86\Debug\Bloodimir Annie.exe
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\obj\x86\Debug\Bloodimir Annie.pdb

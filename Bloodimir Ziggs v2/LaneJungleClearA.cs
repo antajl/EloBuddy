@@ -37,7 +37,10 @@ namespace Bloodimir_Ziggs_v2
             var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var EREADY = Program.E.IsReady();
 
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
+            {
+                return;
+            }
             {
                 var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
@@ -51,7 +54,7 @@ namespace Bloodimir_Ziggs_v2
                 {
                     return;
                 }
-                var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+                var eminion = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
                 if (eminion != null)
                     if (Ziggs.ManaPercent > Program.LaneJungleClear["lcmanamanager"].Cast<Slider>().CurrentValue)
                     {

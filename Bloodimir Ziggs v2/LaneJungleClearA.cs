@@ -56,10 +56,8 @@ namespace Bloodimir_Ziggs_v2
                 }
                 var eminion = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
                 if (eminion != null)
-                    if (Ziggs.ManaPercent > Program.LaneJungleClear["lcmanamanager"].Cast<Slider>().CurrentValue)
                     {
-                        var predE = Program.E.GetPrediction(eminion).CastPosition;
-                        Program.E.Cast(predE);
+                        Program.E.Cast(eminion.ServerPosition);
                     }
                 if (Orbwalker.CanAutoAttack)
                 {

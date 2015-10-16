@@ -16,19 +16,29 @@ namespace Bloodimir_Ziggs_v2
         {
             get { return ObjectManager.Player; }
         }
-
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        public static float Qcalc(Obj_AI_Base target)
         {
-            switch (t)
-            {
-                case GameObjectType.AIHeroClient:
-                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-                default:
-                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-            }
+            return Ziggs.CalculateDamageOnUnit(target, DamageType.Magical,
+                (new float[] { 0, 75, 120, 165, 210, 255 }[Program.Q.Level] +
+                 (0.75f * Ziggs.FlatMagicDamageMod)));
         }
+
+        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
+        {
+            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
+                                                                                               && a.Type == type
+                                                                                               &&
+                                                                                               a.Distance(Ziggs) <=
+                                                                                               Program.Q.Range
+                                                                                               && !a.IsDead
+                                                                                               && !a.IsInvulnerable
+                                                                                               &&
+                                                                                               a.IsValidTarget(
+                                                                                                   Program.Q.Range)
+                                                                                               &&
+                                                                                               a.Health <= Qcalc(a));
+        }
+
    
         public static void LastHitB()
         {
@@ -39,9 +49,8 @@ namespace Bloodimir_Ziggs_v2
                 return;
             }
 
-            var minion = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
-                if (Ziggs.ManaPercent > Program.LastHitMenu["lhmanamanager"].Cast<Slider>().CurrentValue)
             {
                 {
                     var predQ = Program.Q.GetPrediction(minion).CastPosition;

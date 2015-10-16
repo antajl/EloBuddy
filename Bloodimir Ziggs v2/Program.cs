@@ -34,7 +34,6 @@ namespace Bloodimir_Ziggs_v2
             FleeMenu,
             PredMenu;
 
-        public static CheckBox SmartMode;
         public static AIHeroClient SelectedHero { get; set; }
 
         private static Vector3 mousePos
@@ -87,22 +86,16 @@ namespace Bloodimir_Ziggs_v2
 
             HarassMenu = ZiggsMenu.AddSubMenu("HarassMenu", "Harass");
             HarassMenu.Add("useQHarass", new CheckBox("Use Q"));
-            HarassMenu.Add("useEHarass", new CheckBox("Use E"));
             HarassMenu.Add("waitAA", new CheckBox("wait for AA to finish", false));
-            HarassMenu.AddLabel("Harass Smart Mana Mode");
-            HarassMenu.Add("manamanager", new Slider("Harass Mana Manager %", 40));
 
             LaneJungleClear = ZiggsMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCE", new CheckBox("Use E"));
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
-            LaneJungleClear.Add("lcmanamanager", new Slider("Lane/Jungle Clear Mana Manager %", 35));
-
 
             LastHitMenu = ZiggsMenu.AddSubMenu("Last Hit", "lasthit");
             LastHitMenu.AddGroupLabel("Last Hit Settings");
             LastHitMenu.Add("LHQ", new CheckBox("Use Q"));
-            LastHitMenu.Add("lhmanamanager", new Slider("Last Hit Mana Manager %", 35));
 
             DrawMenu = ZiggsMenu.AddSubMenu("Drawings", "drawings");
             DrawMenu.AddGroupLabel("Drawings");
@@ -119,7 +112,6 @@ namespace Bloodimir_Ziggs_v2
             MiscMenu.Add("int", new CheckBox("TRY to Interrupt spells"));
             MiscMenu.Add("gapw", new CheckBox("Anti Gapcloser W"));
             MiscMenu.Add("peel", new CheckBox("Peel From Melees"));
-            SmartMode = MiscMenu.Add("smartMode", new CheckBox("Smart Mana Management"));
 
             FleeMenu = ZiggsMenu.AddSubMenu("Flee", "Flee");
             FleeMenu.Add("fleew", new CheckBox("Use W to mousePos"));
@@ -291,24 +283,13 @@ namespace Bloodimir_Ziggs_v2
                 return;
             if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Q.IsReady() && qpredvalue)
             {
-                if (target.Distance(Ziggs) <= Q.Range ||
-                    (Ziggs.ManaPercent > HarassMenu["manamanager"].Cast<Slider>().CurrentValue && SmartMode.CurrentValue))
+                if (target.Distance(Ziggs) <= Q.Range)
                 {
                     var predQ = Q.GetPrediction(target).CastPosition;
                     Q.Cast(predQ);
-                    return;
                 }
             }
 
-            if (HarassMenu["useEHarass"].Cast<CheckBox>().CurrentValue && E.IsReady() && epredvalue)
-            {
-                if (target.Distance(Ziggs) <= E.Range ||
-                    (Ziggs.ManaPercent > HarassMenu["manamanager"].Cast<Slider>().CurrentValue && SmartMode.CurrentValue))
-                {
-                    var predE = E.GetPrediction(target).CastPosition;
-                    E.Cast(predE);
-                }
-            }
         }
 
         private static

@@ -153,7 +153,7 @@ namespace Bloodimir_Annie
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
             Gapcloser.OnGapcloser += OnGapClose;
-            Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessSpell;
+            Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessCastSpell;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Orbwalker.OnPreAttack += Support_Orbwalker;
             Core.DelayAction(Combo, 1);
@@ -357,17 +357,17 @@ namespace Bloodimir_Annie
         }
         
 
-        private static void Auto_EOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        private static void Auto_EOnProcessCastSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!MiscMenu["eaa"].Cast<CheckBox>().CurrentValue) 
-                return;
-            if (sender.IsEnemy && !sender.IsMinion && !sender.IsAlly && sender.IsValidTarget(802)
-                && args.SData.IsAutoAttack()
-                && args.Target.IsMe)
+                return; 
+            if (sender.IsEnemy && args.SData.Name.ToLowerInvariant().Contains("attack") && sender is AIHeroClient && args.Target != null && args.Target.IsMe)
             {
                 E.Cast();
             }
         }
+
+        
 
         private static void Killsteal()
         {
@@ -548,7 +548,7 @@ namespace Bloodimir_Annie
             if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue)
                 if (E.IsReady())
                 {
-                    if (Annie.CountEnemiesInRange(Player.Instance.AttackRange) >= 2)
+                    if (!Annie.HasBuff("pyromania_particle") && Annie.CountEnemiesInRange(W.Range) >= 1)
                         E.Cast();
                 }
         }

@@ -1,0 +1,10 @@
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\Bloodimir Blitz.exe.config
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\Bloodimir Blitz.exe
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\Bloodimir Blitz.pdb
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\EloBuddy.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\EloBuddy.SDK.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\SharpDX.Direct3D9.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\SharpDX.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\Newtonsoft.Json.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\obj\x86\Debug\Bloodimir Blitz.exe
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\obj\x86\Debug\Bloodimir Blitz.pdb

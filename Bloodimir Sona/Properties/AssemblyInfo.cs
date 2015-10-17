@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Bloodimir Sona")]
+[assembly: AssemblyTitle("Bloodimir Tryndamere")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Bloodimir Sona")]
+[assembly: AssemblyProduct("Bloodimir Tryndamere")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d76b0a36-3bce-4c60-b677-bf7da5253817")]
+[assembly: Guid("d59000ee-9e68-4fd5-9099-e8922042b6a1")]
 
 // Version information for an assembly consists of the following four values:
 //

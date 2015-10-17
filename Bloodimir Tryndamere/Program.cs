@@ -66,7 +66,7 @@ namespace Bloodimir_Tryndamere
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E "));
             ComboMenu.Add("usecombor", new CheckBox("Auto R"));
-            ComboMenu.Add("useignite", new CheckBox("Auto R"));
+            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum health for R", 15, 0, 95));
             ComboMenu.AddSeparator();

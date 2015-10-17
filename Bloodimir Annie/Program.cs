@@ -62,10 +62,10 @@ namespace Bloodimir_Annie
             W = new Spell.Skillshot(SpellSlot.W, 550, SkillShotType.Cone, 500, int.MaxValue, 80);
             E = new Spell.Active(SpellSlot.E);
             R = new Spell.Skillshot(SpellSlot.R, 600, SkillShotType.Circular, 200, int.MaxValue, 251);
-            Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
+            Zhonia = new Item((int)ItemId.Zhonyas_Hourglass);
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-            AbilitySequence = new[] {1, 2, 1, 2, 3, 4, 1, 1, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
+            AbilitySequence = new[] { 1, 2, 1, 2, 3, 4, 1, 1, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             var FlashSlot = Annie.GetSpellSlotFromName("summonerflash");
             Flash = new Spell.Skillshot(FlashSlot, 32767, SkillShotType.Linear);
@@ -209,7 +209,7 @@ namespace Bloodimir_Annie
             var rL = Annie.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
             if (qL + wL + eL + rL < ObjectManager.Player.Level)
             {
-                int[] level = {0, 0, 0, 0};
+                int[] level = { 0, 0, 0, 0 };
                 for (var i = 0; i < ObjectManager.Player.Level; i++)
                 {
                     level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
@@ -239,11 +239,11 @@ namespace Bloodimir_Annie
                 }
                 if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
                 {
-                    Drawing.DrawCircle(Annie.Position, 640, Color.DarkBlue);
+                    Drawing.DrawCircle(Annie.Position, 633, Color.DarkSlateGray);
                 }
                 if (DrawMenu["drawtf"].Cast<CheckBox>().CurrentValue && R.IsLearned)
                 {
-                    Drawing.DrawCircle(Annie.Position, R.Range + 425, Color.YellowGreen);
+                    Drawing.DrawCircle(Annie.Position, R.Range + 425, Color.DarkBlue);
                 }
             }
         }
@@ -326,7 +326,7 @@ namespace Bloodimir_Annie
                         .Where(
                             a =>
                                 a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                a.Health < 50 + 20*Annie.Level - (a.HPRegenRate/5*3)))
+                                a.Health < 50 + 20 * Annie.Level - (a.HPRegenRate / 5 * 3)))
             {
                 Ignite.Cast(source);
                 return;
@@ -410,7 +410,7 @@ namespace Bloodimir_Annie
                                             .Where(
                                                 a =>
                                                     a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                                    a.Health < 50 + 20*Annie.Level - (a.HPRegenRate/5*3)))
+                                                    a.Health < 50 + 20 * Annie.Level - (a.HPRegenRate / 5 * 3)))
                                 {
                                     Ignite.Cast(source);
                                     return;
@@ -457,7 +457,7 @@ namespace Bloodimir_Annie
                 if (GetPassiveBuff == 4 && Flash.IsReady() && R.IsReady() && E.IsReady())
                     if (target.IsValidTarget(R.Range + 425))
                     {
-                        Flash.Cast((Vector3) xpos);
+                        Flash.Cast((Vector3)xpos);
                         R.Cast(predrpos.CastPosition);
                         W.Cast(predwpos.CastPosition);
                     }
@@ -472,7 +472,7 @@ namespace Bloodimir_Annie
                 if (Annie.HasBuff("pyromania_particle"))
                     if (target.IsValidTarget(R.Range + 425))
                     {
-                        Flash.Cast((Vector3) xpos);
+                        Flash.Cast((Vector3)xpos);
                         R.Cast(predrpos.CastPosition);
                         W.Cast(predwpos.CastPosition);
                     }

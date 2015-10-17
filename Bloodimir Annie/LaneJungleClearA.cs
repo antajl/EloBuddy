@@ -38,7 +38,7 @@ namespace Bloodimir_Annie
             var WCHECK = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
             var WREADY = Program.W.IsReady();
 
-            if (!QCHECK && !QREADY || Program.MiscMenu["savestun"].Cast<CheckBox>().CurrentValue)
+            if (!QCHECK && !QREADY)
             {
                 return;
             }
@@ -47,7 +47,7 @@ namespace Bloodimir_Annie
                 {
                     Program.Q.Cast(qenemy);
                 }
-            if (!WCHECK || !WREADY || Program.MiscMenu["savestun"].Cast<CheckBox>().CurrentValue)
+            if (!WCHECK || !WREADY)
             {
                 return;
             }

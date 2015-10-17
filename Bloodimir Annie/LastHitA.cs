@@ -44,7 +44,7 @@ namespace Bloodimir_Annie
         {
             var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
-            if (!QCHECK || !QREADY || Program.MiscMenu["savestun"].Cast<CheckBox>().CurrentValue)
+            if (!QCHECK || !QREADY)
             {
                 return;
             }

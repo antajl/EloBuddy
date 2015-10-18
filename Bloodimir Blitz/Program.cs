@@ -92,7 +92,6 @@ namespace Bloodimir_Blitz
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
             MiscMenu.Add("ksr", new CheckBox("KS with R"));
             MiscMenu.Add("LHE", new CheckBox("Last Hit E"));
-            MiscMenu.Add("peel", new CheckBox("Peel from Melee Champions"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode"));
             MiscMenu.Add("intr", new CheckBox("R to Interrupt"));
@@ -130,23 +129,6 @@ namespace Bloodimir_Blitz
                 if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu["intr"].Cast<CheckBox>().CurrentValue)
                     R.Cast();
             }
-
-            if (MiscMenu["peel"].Cast<CheckBox>().CurrentValue)
-            {
-                foreach (var pos in from enemy in ObjectManager.Get<Obj_AI_Base>()
-                                    where
-                                        enemy.IsValidTarget() &&
-                                        enemy.Distance(ObjectManager.Player) <=
-                                        enemy.BoundingRadius + enemy.AttackRange + ObjectManager.Player.BoundingRadius &&
-                                        enemy.IsMelee
-                                    let direction =
-                                        (enemy.ServerPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
-                                    let pos = ObjectManager.Player.ServerPosition.To2D()
-                                    select pos + Math.Min(200, Math.Max(50, enemy.Distance(ObjectManager.Player) / 2)) * direction)
-                {
-                    Q.Cast(pos.To3D());
-                }
-            }
         }
         private static void OnDraw(EventArgs args)
         {
@@ -175,7 +157,6 @@ namespace Bloodimir_Blitz
         private static void Tick(EventArgs args)
         {
             QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
-            JustGrab();
             SkinChange();
             Killsteal();
             {
@@ -187,6 +168,10 @@ namespace Bloodimir_Blitz
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 LastHit();
+            }
+            if (MiscMenu["justgrab"].Cast<KeyBind>().CurrentValue)
+            {
+                JustGrab();
             }
             {
                 if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
@@ -269,8 +254,7 @@ namespace Bloodimir_Blitz
         {
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                try
-                {
+
                     foreach (
                         var qtarget in
                             EntityManager.Heroes.Enemies.Where(
@@ -286,8 +270,6 @@ namespace Bloodimir_Blitz
                 if (MiscMenu["ksr"].Cast<CheckBox>().CurrentValue && W.IsReady())
                             {
                                 {
-                                    try
-                                    {
                                         foreach (
                                             var rtarget in
                                                 EntityManager.Heroes.Enemies.Where(
@@ -298,18 +280,13 @@ namespace Bloodimir_Blitz
                                                 R.Cast();
                                         }
                                     }
-                catch
-                {
-                }
                                 }
                             }
                         }
                     }
                 }
-                catch
-                { }
-            }
-        }
+
+        
         
 
         private static void SkinChange()

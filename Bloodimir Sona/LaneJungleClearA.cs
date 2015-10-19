@@ -1,69 +1,55 @@
-﻿    using System.Linq;
-    using EloBuddy;
-    using EloBuddy.SDK;
-    using EloBuddy.SDK.Menu.Values;
+﻿using System.Linq;
+using EloBuddy;
+using EloBuddy.SDK;
+using EloBuddy.SDK.Menu.Values;
 
-    namespace Bloodimir_Tryndamere
+namespace Bloodimir_Sona
+{
+    internal class LaneJungleClearA
     {
-        internal class LaneJungleClearA
+        public enum AttackSpell
         {
-            public enum AttackSpell
-            {
-                E
-            };
+            Q
+        };
 
-            public static AIHeroClient Tryndamere
+        public static AIHeroClient Sona
+        {
+            get { return ObjectManager.Player; }
+        }
+
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
             {
-                get { return ObjectManager.Player; }
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
+        }
+        public static void LaneClear()
+        {
+            var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var QREADY = Program.Q.IsReady();
 
-            public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+            if (QCHECK && QREADY)
             {
-                switch (t)
-                {
-                    case GameObjectType.AIHeroClient:
-                        return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
-                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-                    default:
-                        return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
-                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-                }
-            }
+                var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
-            public static void LaneClear()
-            {
-                var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
-                var EREADY = Program.E.IsReady();
-
-                if (!ECHECK || !EREADY)
-                {
-                    return;
-                }
-                var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
-                if (eminion != null)
-                {
-                    Program.E.Cast(eminion.ServerPosition);
-                }
-                var benemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
-                if (Program.MiscMenu["usehydra"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (Program.hydra.IsOwned() && Program.hydra.IsReady() &&
-                        Program.hydra.IsInRange(benemy))
-                        Program.hydra.Cast();
-                }
-                if (Program.MiscMenu["useTiamat"].Cast<CheckBox>().CurrentValue)
-                {
-                    if (Program.tiamat.IsOwned() && Program.tiamat.IsReady() &&
-                        Program.tiamat.IsInRange(benemy))
-                        Program.tiamat.Cast();
-                }
+                if (qenemy != null)
+                    {
+                        Program.Q.Cast();
+                    }
                 if (Orbwalker.CanAutoAttack)
                 {
-                    var cenemy = (Obj_AI_Minion) GetEnemy(Tryndamere.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+                    var enemy = (Obj_AI_Minion)GetEnemy(Sona.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
-                    if (cenemy != null)
-                        Orbwalker.ForcedTarget = cenemy;
+                    if (enemy != null)
+                        Orbwalker.ForcedTarget = enemy;
                 }
             }
         }
     }
+}

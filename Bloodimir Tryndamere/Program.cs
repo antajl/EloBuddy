@@ -162,19 +162,6 @@ namespace Bloodimir_Tryndamere
             {
                 Flee();
             }
-            if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-            foreach (
-                var source in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(
-                            a =>
-                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                a.Health < 50 + 20*Tryndamere.Level - (a.HPRegenRate/5*3)))
-            {
-                Ignite.Cast(source);
-                return;
-            }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo.TrynCombo();
@@ -184,10 +171,23 @@ namespace Bloodimir_Tryndamere
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
                     Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
                 {
-                    LaneJungleClearA.LaneClear();
+                    LaneJungleClearA.LaneClearA();
                 }
                 AutoUlt(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
                 AutoQ(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
+            }
+            if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+              !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+            foreach (
+                var source in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(
+                            a =>
+                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                a.Health < 50 + 20 * Tryndamere.Level - (a.HPRegenRate / 5 * 3)))
+            {
+                Ignite.Cast(source);
+                return;
             }
         }
 

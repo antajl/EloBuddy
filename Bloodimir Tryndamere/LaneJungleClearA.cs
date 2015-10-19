@@ -30,7 +30,7 @@ namespace Bloodimir_Tryndamere
             }
         }
 
-        public static void LaneClear()
+        public static void LaneClearA()
         {
             var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var EREADY = Program.E.IsReady();

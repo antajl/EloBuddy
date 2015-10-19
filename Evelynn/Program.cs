@@ -19,12 +19,6 @@ namespace Evelynn
         public static Spell.Targeted Ignite;
         public static Menu EveMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHitMenu;
         public static AIHeroClient Eve = ObjectManager.Player;
-
-        public static AIHeroClient _Player
-        {
-            get { return ObjectManager.Player; }
-        }
-
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
@@ -69,6 +63,7 @@ namespace Evelynn
             DrawMenu.AddSeparator();
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
             DrawMenu.Add("drawr", new CheckBox("Draw R"));
+            DrawMenu.Add("drawe", new CheckBox("Draw R"));
 
             LaneJungleClear = EveMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
@@ -109,6 +104,14 @@ namespace Evelynn
                 if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
                     Drawing.DrawCircle(Eve.Position, Q.Range, Color.DarkBlue);
+                }
+                if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+                {
+                    Drawing.DrawCircle(Eve.Position, R.Range, Color.Red);
+                }
+                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+                {
+                    Drawing.DrawCircle(Eve.Position, E.Range, Color.Red);
                 }
             }
         }

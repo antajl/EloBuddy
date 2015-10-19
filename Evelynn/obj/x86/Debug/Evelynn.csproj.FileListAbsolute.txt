@@ -8,3 +8,4 @@ c:\users\asus\documents\visual studio 2013\Projects\Evelynn\Evelynn\bin\x86\Debu
 c:\users\asus\documents\visual studio 2013\Projects\Evelynn\Evelynn\bin\x86\Debug\Newtonsoft.Json.dll
 c:\users\asus\documents\visual studio 2013\Projects\Evelynn\Evelynn\obj\x86\Debug\Evelynn.exe
 c:\users\asus\documents\visual studio 2013\Projects\Evelynn\Evelynn\obj\x86\Debug\Evelynn.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Evelynn\Evelynn\obj\x86\Debug\Evelynn.csprojResolveAssemblyReference.cache

@@ -77,7 +77,7 @@ namespace Bloodimir_Blitz
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 8, 0, 8));
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 4, 0, 8));
             var sID = new[] { "Default", "Rusty", "Goalkeeper", "Boom Boom", "Piltover Customs", "DefNotBlitz", "iBlitzCrank", "RiotCrank", "Battle Boss" };
             skinchange.DisplayName = sID[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
@@ -88,13 +88,11 @@ namespace Bloodimir_Blitz
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("Misc");
             MiscMenu.AddSeparator();
-            MiscMenu.Add("justgrab", new KeyBind("Just Grab", false, KeyBind.BindTypes.HoldActive, 'N'));
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
             MiscMenu.Add("ksr", new CheckBox("KS with R"));
             MiscMenu.Add("LHE", new CheckBox("Last Hit E"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode"));
-            MiscMenu.Add("intr", new CheckBox("R to Interrupt"));
             MiscMenu.Add("fleew", new CheckBox("Use W Flee"));
             MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
@@ -124,10 +122,6 @@ namespace Bloodimir_Blitz
             {
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
                     Q.Cast(intTarget.ServerPosition);
-            }
-            {
-                if (R.IsReady() && sender.IsValidTarget(R.Range) && MiscMenu["intr"].Cast<CheckBox>().CurrentValue)
-                    R.Cast();
             }
         }
         private static void OnDraw(EventArgs args)
@@ -168,10 +162,6 @@ namespace Bloodimir_Blitz
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 LastHit();
-            }
-            if (MiscMenu["justgrab"].Cast<KeyBind>().CurrentValue)
-            {
-                JustGrab();
             }
             {
                 if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
@@ -229,27 +219,6 @@ namespace Bloodimir_Blitz
             }
         }
 
-        private static void JustGrab()
-        {
-            if (MiscMenu["justgrab"].Cast<KeyBind>().CurrentValue)
-                Orbwalker.MoveTo(Game.CursorPos);
-            {
-                    var jgrabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-                    if (jgrabTarget.IsValidTarget(Q.Range))
-                    {
-                        if (Q.GetPrediction(jgrabTarget).HitChance >= QHitChance)
-                        {
-                            if (jgrabTarget.Distance(Blitz.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
-                            {
-                                if (QMenu["grab" + jgrabTarget.ChampionName].Cast<CheckBox>().CurrentValue)
-                                {
-                                    Q.Cast(jgrabTarget);
-                                }
-                            }
-                        }
-                    }
-            }
-        }
         private static void Killsteal()
         {
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())

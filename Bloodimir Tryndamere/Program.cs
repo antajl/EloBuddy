@@ -54,21 +54,21 @@ namespace Bloodimir_Tryndamere
             tiamat = new Item(3077, 250f);
             youmuu = new Item(3142, 10);
 
-            TrynMenu = MainMenu.AddMenu("BloodimirTryndamere", "bloodimirtryndamere");
-            TrynMenu.AddGroupLabel("Bloodimir.Tryndamere");
+            TrynMenu = MainMenu.AddMenu("BloodimirTryn", "bloodimirtry");
+            TrynMenu.AddGroupLabel("Bloodimir Tryndamere");
             TrynMenu.AddSeparator();
             TrynMenu.AddLabel("Bloodimir Tryndamere V1.0.0.0");
 
             ComboMenu = TrynMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
-            ComboMenu.Add("usecomboq", new CheckBox("Auto Q"));
+            ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
-            ComboMenu.Add("usecomboe", new CheckBox("Use E "));
-            ComboMenu.Add("usecombor", new CheckBox("Auto R"));
+            ComboMenu.Add("usecomboe", new CheckBox("Use E"));
+            ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("rslider", new Slider("Minimum health for R", 15, 0, 95));
+            ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
             ComboMenu.AddSeparator();
             ComboMenu.Add("qhp", new Slider("Q % HP", 25, 0, 95));
 
@@ -99,8 +99,7 @@ namespace Bloodimir_Tryndamere
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
             var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 4, 0, 7));
-            var skinid = new[]
-            {"Default", "Highland", "King", "Viking", "Demon Blade", "Sultan", "Warring Kingdoms", "Nightmare"};
+            var skinid = new[] { "Default", "Highland", "King", "Viking", "Demon Blade", "Sultan", "Warring Kingdoms", "Nightmare" };
             skinchange.DisplayName = skinid[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
             {
@@ -158,6 +157,7 @@ namespace Bloodimir_Tryndamere
         private static void Tick(EventArgs args)
         {
             Killsteal();
+            SkinChange();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
@@ -186,7 +186,6 @@ namespace Bloodimir_Tryndamere
                 {
                     LaneJungleClearA.LaneClear();
                 }
-                SkinChange();
                 AutoUlt(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
                 AutoQ(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
             }

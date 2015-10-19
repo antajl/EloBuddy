@@ -28,8 +28,7 @@ namespace Bloodimir_Tryndamere
             {
                 var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
                 if (enemy != null)
-                    if (Program.E.IsReady() &&
-                        Tryndamere.Distance(enemy) <= Program.E.Range - Player.Instance.GetAutoAttackRange())
+                    if (Tryndamere.Distance(enemy) <= Program.E.Range - Player.Instance.GetAutoAttackRange())
                     {
                         Program.E.Cast(enemy.ServerPosition);
                     }
@@ -80,7 +79,7 @@ namespace Bloodimir_Tryndamere
                             Program.hydra.IsInRange(ienemy))
                             Program.hydra.Cast();
                     }
-                    if (Program.MiscMenu["useTiamat"].Cast<CheckBox>().CurrentValue)
+                    if (Program.MiscMenu["usetiamat"].Cast<CheckBox>().CurrentValue)
                     {
                         if (Program.tiamat.IsOwned() && Program.tiamat.IsReady() &&
                             Program.tiamat.IsInRange(ienemy))

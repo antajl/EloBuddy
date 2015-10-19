@@ -236,7 +236,7 @@ namespace Bloodimir_Blitz
                             {
                                 Q.Cast(poutput.CastPosition);
                             }
-                if (MiscMenu["ksr"].Cast<CheckBox>().CurrentValue && W.IsReady())
+                if (MiscMenu["ksr"].Cast<CheckBox>().CurrentValue && R.IsReady())
                             {
                                 {
                                         foreach (

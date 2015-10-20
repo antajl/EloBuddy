@@ -45,7 +45,7 @@ namespace Bloodimir_Blitz
             MorgMenu = MainMenu.AddMenu("BloodimirBlitz", "bloodimirblitz");
             MorgMenu.AddGroupLabel("Bloodimir Blitzcrank");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Blitzcrank v1.0.0.0");
+            MorgMenu.AddLabel("Bloodimir Blitzcrank v1.0.1.0");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -94,7 +94,9 @@ namespace Bloodimir_Blitz
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode"));
             MiscMenu.Add("fleew", new CheckBox("Use W Flee"));
+            MiscMenu.AddSeparator();
             MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
+            MiscMenu.AddSeparator();
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
                 MiscMenu.Add(source.ChampionName + "exhaust",
@@ -162,6 +164,10 @@ namespace Bloodimir_Blitz
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 LastHit();
+            }
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
+            {
+                Flee();   
             }
             {
                 if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
@@ -354,8 +360,6 @@ namespace Bloodimir_Blitz
 
                 if (useQ && Q.IsReady() && ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue)
             {
-                try
-                {
                     var grabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
                     if (grabTarget.IsValidTarget(Q.Range))
                     {
@@ -371,9 +375,6 @@ namespace Bloodimir_Blitz
                         }
                     }
                 }
-                catch
-                {
-                }
                 if (useR && R.IsReady() &&
                     Blitz.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue && ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
                 {
@@ -382,4 +383,4 @@ namespace Bloodimir_Blitz
             }
         }
     }
-    }
+    

@@ -60,6 +60,10 @@ namespace VolatileAIO.Organs.Brain
                     new Evelynn();
                     _loaded = true;
                     break;
+                case "annie":
+                    new Annie();
+                    _loaded = true;
+                    break;
                 default:
                     Chat.Print("<font color = \"#740000\">Volatile AIO</font> doesn't support " + ObjectManager.Player.ChampionName + " yet.");
                     break;

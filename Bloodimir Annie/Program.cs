@@ -120,7 +120,7 @@ namespace Bloodimir_Annie
             MiscMenu.Add("estack", new CheckBox("Stack Passive E", false));
             MiscMenu.Add("wstack", new CheckBox("Stack Passive W ", false));
             MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
-            foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsAlly))
+            foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
                 MiscMenu.Add(source.ChampionName + "exhaust",
                     new CheckBox("Exhaust " + source.ChampionName, false));

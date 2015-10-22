@@ -1,0 +1,2 @@
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\x86\Debug\VolatileAIO.exe.config
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\obj\x86\Debug\VolatileAIO.csprojResolveAssemblyReference.cache

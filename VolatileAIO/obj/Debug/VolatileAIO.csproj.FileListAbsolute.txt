@@ -1,0 +1,10 @@
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\VolatileAIO.exe.config
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\VolatileAIO.exe
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\VolatileAIO.pdb
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\SharpDX.dll
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\obj\Debug\VolatileAIO.exe
+C:\Users\Asus\Desktop\New folder (3)\VolatileAIO\obj\Debug\VolatileAIO.pdb

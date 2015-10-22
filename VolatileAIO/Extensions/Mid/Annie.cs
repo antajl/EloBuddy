@@ -183,7 +183,12 @@ namespace VolatileAIO.Extensions.Mid
         protected override void Volatile_OnHeartBeat(EventArgs args)
         {
             TickManager.Tick();
+            if (Player.IsDead) return;
+            LevelUpSpells();
             MoveTibbers();
+            SkinChange();
+            Pyrostack();
+            Zhonya();
             ManaManager.SetMana();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {

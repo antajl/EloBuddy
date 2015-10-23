@@ -67,9 +67,9 @@ namespace Bloodimir_Ziggs_v2
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             ZiggsMenu = MainMenu.AddMenu("BloodimirZiggs", "bloodimirziggs");
-            ZiggsMenu.AddGroupLabel("Bloodimir Ziggs v2.0.1.0");
+            ZiggsMenu.AddGroupLabel("Bloodimir Ziggs v2.0.2.0");
             ZiggsMenu.AddSeparator();
-            ZiggsMenu.AddLabel("Bloodimir Ziggs v2.0.1.0");
+            ZiggsMenu.AddLabel("Bloodimir Ziggs v2.0.2.0");
 
             ComboMenu = ZiggsMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -169,7 +169,6 @@ namespace Bloodimir_Ziggs_v2
         {
             Killsteal();
             SkinChange();
-            Orbwalker.ForcedTarget = null;
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 Combo();
             var target = TargetSelector.GetTarget(1200f, DamageType.Magical);
@@ -181,12 +180,14 @@ namespace Bloodimir_Ziggs_v2
                     CastQ(target);
                 }
 
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
-                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) 
+                    Harass();
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
                     LaneJungleClearA.LaneClear();
-                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                     LastHitA.LastHitB();
-                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) Flee();
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee)) 
+                    Flee();
                 {
                     {
                         if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
@@ -266,7 +267,6 @@ namespace Bloodimir_Ziggs_v2
         {
             var target = TargetSelector.GetTarget(1000, DamageType.Magical);
             var qpredvalue = Q.GetPrediction(target).HitChance >= PredQ();
-            var epredvalue = E.GetPrediction(target).HitChance >= PredE();
 
             if (SelectedHero != null)
             {

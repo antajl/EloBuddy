@@ -16,47 +16,35 @@ namespace Bloodimir_Ziggs_v2
         {
             get { return ObjectManager.Player; }
         }
-        public static float Qcalc(Obj_AI_Base target)
+          public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
-            return Ziggs.CalculateDamageOnUnit(target, DamageType.Magical,
-                (new float[] { 0, 75, 120, 165, 210, 255 }[Program.Q.Level] +
-                 (0.75f * Ziggs.FlatMagicDamageMod)));
-        }
-
-        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
-        {
-            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                               && a.Type == type
-                                                                                               &&
-                                                                                               a.Distance(Ziggs) <=
-                                                                                               Program.Q.Range
-                                                                                               && !a.IsDead
-                                                                                               && !a.IsInvulnerable
-                                                                                               &&
-                                                                                               a.IsValidTarget(
-                                                                                                   Program.Q.Range)
-                                                                                               &&
-                                                                                               a.Health <= Qcalc(a));
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                        return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable && a.Health <= Calculations.Qcalc(a));
+            }
         }
 
    
         public static void LastHitB()
         {
-            var QCHECK = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            if (!QCHECK || !QREADY)
+            var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            if (qcheck && qready)
             {
-                return;
-            }
-
-            var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
-            if (minion != null)
+                var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            if (qenemy != null)
             {
                 {
-                    var predQ = Program.Q.GetPrediction(minion).CastPosition;
+                    var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
                     Program.Q.Cast(predQ);
                 }
             }
         }
+    }
     }
 }

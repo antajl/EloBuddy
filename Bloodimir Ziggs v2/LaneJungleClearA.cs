@@ -32,41 +32,30 @@ namespace Bloodimir_Ziggs_v2
         }
         public static void LaneClear()
         {
-            var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
-            var EREADY = Program.E.IsReady();
+            var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
+            var eready = Program.E.IsReady();
 
-            if (!QCHECK || !QREADY)
-            {
-                return;
-            }
+            if (qcheck && qready)
             {
                 var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (qenemy != null)
-                    if (Ziggs.ManaPercent > Program.LaneJungleClear["lcmanamanager"].Cast<Slider>().CurrentValue)
                     {
                         var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
                         Program.Q.Cast(predQ);
                     }
-                if (!ECHECK || !EREADY)
+                if (echeck && eready)
                 {
-                    return;
-                }
-                var eminion = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+                var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
                 if (eminion != null)
                     {
-                        Program.E.Cast(eminion.ServerPosition);
+                        var predE = Program.E.GetPrediction(eminion).CastPosition;
+                        Program.E.Cast(predE);
                     }
-                if (Orbwalker.CanAutoAttack)
-                {
-                    var enemy = (Obj_AI_Minion)GetEnemy(Ziggs.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                    if (enemy != null)
-                        Orbwalker.ForcedTarget = enemy;
-                }
             }
         }
+    }
     }
 }

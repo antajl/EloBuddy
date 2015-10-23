@@ -451,7 +451,6 @@ namespace Bloodimir_Annie
             }
 
             var predrpos = R.GetPrediction(target);
-            var predwpos = W.GetPrediction(target);
             if (ComboMenu["flashr"].Cast<KeyBind>().CurrentValue)
             {
                 if (GetPassiveBuff == 4 && Flash.IsReady() && R.IsReady() && E.IsReady())
@@ -459,7 +458,6 @@ namespace Bloodimir_Annie
                     {
                         Flash.Cast((Vector3)xpos);
                         R.Cast(predrpos.CastPosition);
-                        W.Cast(predwpos.CastPosition);
                     }
             }
 
@@ -474,7 +472,6 @@ namespace Bloodimir_Annie
                     {
                         Flash.Cast((Vector3)xpos);
                         R.Cast(predrpos.CastPosition);
-                        W.Cast(predwpos.CastPosition);
                     }
             }
         }

@@ -53,7 +53,7 @@ namespace BloodimirVladimir
             VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
             VladMenu.AddGroupLabel("Bloodimir.Bloodimir");
             VladMenu.AddSeparator();
-            VladMenu.AddLabel("Bloodimir c what i did there? version 1.0.5.0");
+            VladMenu.AddLabel("Bloodimir c what i did there? version 1.0.5.1");
 
             ComboMenu = VladMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -85,6 +85,9 @@ namespace BloodimirVladimir
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("hq", new CheckBox("Harass Q"));
             HarassMenu.Add("he", new CheckBox("Harass E"));
+            HarassMenu.Add("autohq", new CheckBox("Auto Harass Q"));
+            HarassMenu.Add("autohe", new CheckBox("Auto Harass E"));
+
 
             MiscMenu = VladMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("Misc");
@@ -176,6 +179,7 @@ namespace BloodimirVladimir
             Killsteal();
             SkinChange();
             Zhonya();
+            AutoHarass();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
@@ -239,6 +243,23 @@ namespace BloodimirVladimir
                     Q.Cast(enemy);
             }
             }
+        public static void AutoHarass()
+        {
+            if (HarassMenu["autohq"].Cast<CheckBox>().CurrentValue)
+            {
+                var enemy = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+
+                if (enemy != null)
+                    E.Cast();
+            }
+            if (HarassMenu["autohq"].Cast<CheckBox>().CurrentValue)
+            {
+                var enemy = (AIHeroClient)GetEnemy(Q.Range, GameObjectType.AIHeroClient);
+
+                if (enemy != null)
+                    Q.Cast(enemy);
+            }
+        }
         public static void Rincombo(bool useR)
         {
             foreach (

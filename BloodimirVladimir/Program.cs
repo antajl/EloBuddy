@@ -53,7 +53,7 @@ namespace BloodimirVladimir
             VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
             VladMenu.AddGroupLabel("Bloodimir.Bloodimir");
             VladMenu.AddSeparator();
-            VladMenu.AddLabel("Bloodimir c what i did there? version 1.0.4.0");
+            VladMenu.AddLabel("Bloodimir c what i did there? version 1.0.5.0");
 
             ComboMenu = VladMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -85,7 +85,6 @@ namespace BloodimirVladimir
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("hq", new CheckBox("Harass Q"));
             HarassMenu.Add("he", new CheckBox("Harass E"));
-            HarassMenu.Add("waitAA", new CheckBox("wait for AA to finish", false));
 
             MiscMenu = VladMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("Misc");
@@ -180,24 +179,22 @@ namespace BloodimirVladimir
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
-            }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            }if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo.VladCombo();
                 Rincombo(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
-            }
-            {
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+            } if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
                     Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
                 {
                     LaneClearA.LaneClear();
                 }
-                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass)) Harass();
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                Harass();
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                 {
                     LastHitA.LastHitB();
                 }
-                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                else if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
                     !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
                 foreach (
                     var source in
@@ -211,25 +208,37 @@ namespace BloodimirVladimir
                     return;
                 }
             }
+        
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
         }
-
         public static void Harass()
         {
             Orbwalker.OrbwalkTo(mousePos);
-            if (Orbwalker.IsAutoAttacking && HarassMenu["waitAA"].Cast<CheckBox>().CurrentValue)
-                return;
-            if (HarassMenu["hq"].Cast<CheckBox>().CurrentValue)
-            {
-                var qtarget = TargetSelector.GetTarget(600, DamageType.Magical);
-                Q.Cast(qtarget);
-            }
             if (HarassMenu["he"].Cast<CheckBox>().CurrentValue)
             {
-                var etarget = TargetSelector.GetTarget(610, DamageType.Magical);
-                if (etarget.Distance(Vlad) <= E.Range)
-                E.Cast();
+                var enemy = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+
+                if (enemy != null)
+                    E.Cast();
             }
-        }
+            if (HarassMenu["hq"].Cast<CheckBox>().CurrentValue)
+            {
+                var enemy = (AIHeroClient)GetEnemy(Q.Range, GameObjectType.AIHeroClient);
+
+                if (enemy != null)
+                    Q.Cast(enemy);
+            }
+            }
         public static void Rincombo(bool useR)
         {
             foreach (

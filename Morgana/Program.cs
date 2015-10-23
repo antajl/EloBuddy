@@ -300,23 +300,7 @@ namespace Morgana
         private static
             void Combo(bool useW, bool useQ, bool useR)
         {
-            if (useW && W.IsReady())
-            {
-                var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-                if (soilTarget.IsValidTarget(W.Range))
-                {
-                    if (W.GetPrediction(soilTarget).HitChance >= WHitChance)
-                    {
-                        if (soilTarget.Distance(Me.ServerPosition) > WMenu["wmin"].Cast<Slider>().CurrentValue)
-                        {
-                            W.Cast(soilTarget);
-
-                        }
-                    }
-                }
-            }
-
-            if (useQ && Q.IsReady())
+        if (useQ && Q.IsReady())
             {
                 try
                 {
@@ -333,17 +317,31 @@ namespace Morgana
                                 }
                             }
                         }
+                   }
+        
+            if (useW && W.IsReady())
+            {
+                var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
+                if (soilTarget.IsValidTarget(W.Range))
+                {
+                    if (W.GetPrediction(soilTarget).HitChance >= WHitChance)
+                    {
+                        if (soilTarget.Distance(Me.ServerPosition) > WMenu["wmin"].Cast<Slider>().CurrentValue && soilTarget.IsRooted)
+                        {
+                            W.Cast(soilTarget);
+
+                        }
                     }
                 }
-                catch
-                {
-                }
+            } 
                 if (useR && R.IsReady() &&
                     Me.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
                 }
             }
+            catch {}
         }
+            } 
     }
 }

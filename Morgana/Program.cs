@@ -178,11 +178,11 @@ namespace Morgana
             {
                 if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
-                    Drawing.DrawCircle(Me.Position, Q.Range, Color.LightYellow);
+                    Drawing.DrawCircle(Me.Position, Q.Range, Color.Red);
                 }
                 if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
-                    Drawing.DrawCircle(Me.Position, W.Range, Color.LightBlue);
+                    Drawing.DrawCircle(Me.Position, W.Range, Color.Purple);
                 }
             }
         }
@@ -195,9 +195,7 @@ namespace Morgana
             SkinChange();
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                    Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue,
-                        ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
-                        ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
+                    Combo(useW: ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue, useQ: ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue, useR: ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))

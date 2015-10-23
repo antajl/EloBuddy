@@ -45,15 +45,15 @@ namespace Bloodimir_Tryndamere
             var benemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
             if (Program.MiscMenu["usehydra"].Cast<CheckBox>().CurrentValue)
             {
-                if (Program.hydra.IsOwned() && Program.hydra.IsReady() &&
-                    Program.hydra.IsInRange(benemy))
-                    Program.hydra.Cast();
+                if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
+                    Program.Hydra.IsInRange(benemy))
+                    Program.Hydra.Cast();
             }
             if (Program.MiscMenu["useTiamat"].Cast<CheckBox>().CurrentValue)
             {
-                if (Program.tiamat.IsOwned() && Program.tiamat.IsReady() &&
-                    Program.tiamat.IsInRange(benemy))
-                    Program.tiamat.Cast();
+                if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
+                    Program.Tiamat.IsInRange(benemy))
+                    Program.Tiamat.Cast();
             }
             if (Orbwalker.CanAutoAttack)
             {

@@ -18,7 +18,7 @@ namespace Bloodimir_Tryndamere
         public static Spell.Active R;
         public static Spell.Targeted Ignite;
         public static Menu TrynMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear;
-        public static Item tiamat, hydra, bilgewater, youmuu, botrk;
+        public static Item Tiamat, Hydra, Bilgewater, Youmuu, Botrk;
         public static AIHeroClient Tryndamere = ObjectManager.Player;
 
         public static AIHeroClient _Player
@@ -48,11 +48,11 @@ namespace Bloodimir_Tryndamere
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
-            botrk = new Item(3153, 550f);
-            bilgewater = new Item(3144, 475f);
-            hydra = new Item(3074, 250f);
-            tiamat = new Item(3077, 250f);
-            youmuu = new Item(3142, 10);
+            Botrk = new Item(3153, 550f);
+            Bilgewater = new Item(3144, 475f);
+            Hydra = new Item(3074, 250f);
+            Tiamat = new Item(3077, 250f);
+            Youmuu = new Item(3142, 10);
 
             TrynMenu = MainMenu.AddMenu("BloodimirTryn", "bloodimirtry");
             TrynMenu.AddGroupLabel("Bloodimir Tryndamere");
@@ -158,6 +158,7 @@ namespace Bloodimir_Tryndamere
         {
             Killsteal();
             SkinChange();
+            AutoQ(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
@@ -174,7 +175,6 @@ namespace Bloodimir_Tryndamere
                     LaneJungleClearA.LaneClearA();
                 }
                 AutoUlt(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
-                AutoQ(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
             }
             if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
               !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
@@ -207,8 +207,8 @@ namespace Bloodimir_Tryndamere
                             {
                                 E.Cast(etarget.ServerPosition);
                             }
-                            if (MiscMenu["ksbotrk"].Cast<CheckBox>().CurrentValue && botrk.IsReady() ||
-                                bilgewater.IsReady() || tiamat.IsReady())
+                            if (MiscMenu["ksbotrk"].Cast<CheckBox>().CurrentValue && Botrk.IsReady() ||
+                                Bilgewater.IsReady() || Tiamat.IsReady())
                             {
                                 {
                                     try
@@ -217,17 +217,17 @@ namespace Bloodimir_Tryndamere
                                             var itarget in
                                                 EntityManager.Heroes.Enemies.Where(
                                                     hero =>
-                                                        hero.IsValidTarget(botrk.Range) && !hero.IsDead &&
+                                                        hero.IsValidTarget(Botrk.Range) && !hero.IsDead &&
                                                         !hero.IsZombie))
                                         {
                                             if (Tryndamere.GetItemDamage(itarget, ItemId.Blade_of_the_Ruined_King) >=
                                                 itarget.Health)
                                             {
                                                 {
-                                                    botrk.Cast(itarget);
+                                                    Botrk.Cast(itarget);
                                                 }
-                                                if (MiscMenu["kshydra"].Cast<CheckBox>().CurrentValue && botrk.IsReady() ||
-                                                    bilgewater.IsReady() || tiamat.IsReady())
+                                                if (MiscMenu["kshydra"].Cast<CheckBox>().CurrentValue && Botrk.IsReady() ||
+                                                    Bilgewater.IsReady() || Tiamat.IsReady())
                                                 {
                                                     {
                                                         try
@@ -236,16 +236,16 @@ namespace Bloodimir_Tryndamere
                                                                 var htarget in
                                                                     EntityManager.Heroes.Enemies.Where(
                                                                         hero =>
-                                                                            hero.IsValidTarget(hydra.Range) &&
+                                                                            hero.IsValidTarget(Hydra.Range) &&
                                                                             !hero.IsDead && !hero.IsZombie))
                                                             {
                                                                 if (
-                                                                    Tryndamere.GetItemDamage(itarget,
+                                                                    Tryndamere.GetItemDamage(htarget,
                                                                         ItemId.Ravenous_Hydra_Melee_Only) >=
-                                                                    itarget.Health)
+                                                                    htarget.Health)
                                                                 {
                                                                     {
-                                                                        hydra.Cast();
+                                                                        Hydra.Cast();
                                                                     }
                                                                 }
                                                             }

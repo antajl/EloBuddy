@@ -53,7 +53,7 @@ namespace BloodimirVladimir
             VladMenu = MainMenu.AddMenu("Bloodimir", "bloodimir");
             VladMenu.AddGroupLabel("Bloodimir.Bloodimir");
             VladMenu.AddSeparator();
-            VladMenu.AddLabel("Bloodimir c what i did there? version 1.0.5.1");
+            VladMenu.AddLabel("Bloodimir c what i did there? version 1.0.5.2");
 
             ComboMenu = VladMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -85,8 +85,9 @@ namespace BloodimirVladimir
             HarassMenu.AddGroupLabel("Harass Settings");
             HarassMenu.Add("hq", new CheckBox("Harass Q"));
             HarassMenu.Add("he", new CheckBox("Harass E"));
-            HarassMenu.Add("autohq", new CheckBox("Auto Harass Q"));
-            HarassMenu.Add("autohe", new CheckBox("Auto Harass E"));
+            HarassMenu.Add("autoh", new CheckBox("Auto Harass"));
+            HarassMenu.Add("autohq", new CheckBox("Use Q on Auto Harass"));
+            HarassMenu.Add("autohe", new CheckBox("Use E on Auto Harass"));
 
 
             MiscMenu = VladMenu.AddSubMenu("Misc Menu", "miscmenu");
@@ -179,7 +180,7 @@ namespace BloodimirVladimir
             Killsteal();
             SkinChange();
             Zhonya();
-            AutoHarass();
+            if (HarassMenu["autoh"].Cast<CheckBox>().CurrentValue) AutoHarass();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();

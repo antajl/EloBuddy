@@ -246,7 +246,7 @@ namespace BloodimirVladimir
             }
         public static void AutoHarass()
         {
-            if (HarassMenu["autohq"].Cast<CheckBox>().CurrentValue)
+            if (HarassMenu["autohe"].Cast<CheckBox>().CurrentValue)
             {
                 var enemy = TargetSelector.GetTarget(E.Range, DamageType.Magical);
 

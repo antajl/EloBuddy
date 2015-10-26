@@ -1,10 +1,10 @@
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Bloodimir Renekton.exe.config
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Bloodimir Renekton.exe
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Bloodimir Renekton.pdb
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\EloBuddy.dll
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\EloBuddy.SDK.dll
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\SharpDX.Direct3D9.dll
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\SharpDX.dll
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Newtonsoft.Json.dll
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.exe
-C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Bloodimir Renekton.exe.config
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Bloodimir Renekton.exe
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Bloodimir Renekton.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\SharpDX.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.exe
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.pdb

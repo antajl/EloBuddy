@@ -10,8 +10,7 @@ namespace Bloodimir_Renekton
         public enum AttackSpell
         {
             Q,
-            E,
-            W
+            E
         };
 
         private const string E2BuffName = "renektonsliceanddicedelay";

@@ -20,7 +20,6 @@ namespace Bloodimir_Renekton
         {
             get { return ObjectManager.Player; }
         }
-
         public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
@@ -34,6 +33,7 @@ namespace Bloodimir_Renekton
             }
         }
 
+
         public static void LaneClear()
         {
             var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
@@ -45,6 +45,9 @@ namespace Bloodimir_Renekton
 
             if (ECHECK && EREADY)
             {
+                return;
+            }
+            {
                 var aenemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (aenemy != null)
@@ -52,12 +55,19 @@ namespace Bloodimir_Renekton
             }
             if (QCHECK && QREADY)
             {
+                return;
+                
+            }
+            {
                 var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (qenemy != null)
                     Program.Q.Cast();
             }
             if (WCHECK && WREADY)
+            {
+                return;
+            }
             {
                 var wenemy =
                     (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);

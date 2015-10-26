@@ -27,6 +27,22 @@ namespace Bloodimir_Renekton
                  (0.80f*Renekton.FlatPhysicalDamageMod)));
         }
 
+        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
+        {
+            return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
+                                                                                               && a.Type == type
+                                                                                               &&
+                                                                                               a.Distance(Renekton) <=
+                                                                                               Program.Q.Range
+                                                                                               && !a.IsDead
+                                                                                               && !a.IsInvulnerable
+                                                                                               &&
+                                                                                               a.IsValidTarget(
+                                                                                                   Program.Q.Range)
+                                                                                               &&
+                                                                                               a.Health <= Qcalc(a));
+        }
+
         public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
@@ -47,32 +63,27 @@ namespace Bloodimir_Renekton
             var QREADY = Program.Q.IsReady();
             var WREADY = Program.W.IsReady();
 
-            if (QCHECK || QREADY)
+            if (!QCHECK || !QREADY)
             {
-                var minion = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
-                if (minion != null)
-                {
-                    Program.Q.Cast();
-                }
+                return;
+            }
+            var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+            if (minion != null)
+            {
+                Program.Q.Cast();
+            }
                 if (WCHECK || WREADY)
                 {
-                    var wminion = (Obj_AI_Minion) GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
-                    if (wminion != null)
+                    return;
+                }
+                    var wminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+                    if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.Q) >= wminion.Health)
                     {
                         Program.W.Cast();
                     }
-                    if (Orbwalker.CanAutoAttack)
-                    {
-                        var cenemy =
-                            (Obj_AI_Minion) GetEnemy(Renekton.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                        if (cenemy != null)
-                            Orbwalker.ForcedTarget = cenemy;
-                    }
                 }
-            }
-        }
-
+            
+     
         public static
             void Items()
         {

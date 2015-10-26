@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -7,6 +6,7 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using Color = System.Drawing.Color;
 
 namespace Bloodimir_Renekton
 {
@@ -19,10 +19,11 @@ namespace Bloodimir_Renekton
         public static Spell.Targeted Ignite;
         public static Item Hydra;
         public static Item Tiamat;
-        public static Menu RenekMenu, ComboMenu, SkinMenu, MiscMenu, DrawMenu, LaneJungleClear, LastHit;
+        public static Menu RenekMenu, ComboMenu, SkinMenu, MiscMenu, DrawMenu, HarassMenu, LaneJungleClear, LastHit;
         public static Item Bilgewater, Youmuu, Botrk;
         public static AIHeroClient Renek = ObjectManager.Player;
-
+        public static int[] AbilitySequence;
+        public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
@@ -37,7 +38,7 @@ namespace Bloodimir_Renekton
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
-
+        private const string E2BuffName = "renektonsliceanddicedelay";
         private static void OnLoaded(EventArgs args)
         {
             if (Player.Instance.ChampionName != "Renekton")
@@ -54,11 +55,12 @@ namespace Bloodimir_Renekton
             Botrk = new Item(3153, 550f);
             Bilgewater = new Item(3144, 475f);
             Youmuu = new Item(3142, 10);
+            AbilitySequence = new [] { 2, 1, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
 
             RenekMenu = MainMenu.AddMenu("BloodimiRenekton", "bloodimirrenekton");
             RenekMenu.AddGroupLabel("Bloodimir.enekton");
             RenekMenu.AddSeparator();
-            RenekMenu.AddLabel("BloodimiRenekton v1.0.0.");
+            RenekMenu.AddLabel("BloodimiRenekton v1.0.1.0");
 
             ComboMenu = RenekMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -70,7 +72,7 @@ namespace Bloodimir_Renekton
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.Add("autoult", new CheckBox("Auto Ult"));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("rslider", new Slider("Health Percentage to Ult", 31, 0, 100));
+            ComboMenu.Add("rslider", new Slider("Health Percentage to Ult", 31));
 
             LaneJungleClear = RenekMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
@@ -90,6 +92,12 @@ namespace Bloodimir_Renekton
             LastHit.Add("LHQ", new CheckBox("Use Q"));
             LastHit.Add("LHW", new CheckBox("Use W"));
             LastHit.Add("LHI", new CheckBox("Use Items"));
+            
+            HarassMenu = RenekMenu.AddSubMenu("Harass Menu", "harass");
+            HarassMenu.AddGroupLabel("Harass Settings");
+            HarassMenu.Add("hq", new CheckBox("Harass Q"));
+            HarassMenu.Add("hw", new CheckBox("Harass W"));
+            HarassMenu.Add("hi", new CheckBox("Harass Items"));
 
             MiscMenu = RenekMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("KS");
@@ -97,6 +105,9 @@ namespace Bloodimir_Renekton
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("intw", new CheckBox("W to Interrupt"));
+            MiscMenu.AddSeparator();
+            MiscMenu.Add("gapclose", new CheckBox("W to Interrupt"));
+            MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells", false));
 
             SkinMenu = RenekMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -115,15 +126,48 @@ namespace Bloodimir_Renekton
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
+            Gapcloser.OnGapcloser += OnGapClose;
         }
 
         public static void Flee()
         {
             Orbwalker.MoveTo(Game.CursorPos);
             E.Cast(Game.CursorPos);
-            E.Cast(Game.CursorPos);
         }
+        private static void LevelUpSpells()
+        {
+            var qL = Renek.Spellbook.GetSpell(SpellSlot.Q).Level + QOff;
+            var wL = Renek.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
+            var eL = Renek.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
+            var rL = Renek.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
+            if (qL + wL + eL + rL < ObjectManager.Player.Level)
+            {
+                int[] level = { 0, 0, 0, 0 };
+                for (var i = 0; i < ObjectManager.Player.Level; i++)
+                {
+                    level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+                }
+                if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+                if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+                if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+                if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+            }
+        }
+         private static
+            void OnGapClose
+            (AIHeroClient Sender, Gapcloser.GapcloserEventArgs gapcloser)
+        {
+            if (!gapcloser.Sender.IsEnemy)
+                return;
+            var gapclose = MiscMenu["gapclose"].Cast<CheckBox>().CurrentValue;
+            if (!gapclose)
+                return;
 
+                if (W.IsReady() && W.IsInRange(gapcloser.Start))
+                {
+                    W.Cast(gapcloser.Start);
+                }
+            }
         private static void OnDraw(EventArgs args)
         {
             if (!Renek.IsDead)
@@ -142,6 +186,8 @@ namespace Bloodimir_Renekton
         private static void Tick(EventArgs args)
         {
             Killsteal();
+            SkinChange();
+            if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
@@ -160,6 +206,10 @@ namespace Bloodimir_Renekton
                     LaneJungleClearA.LaneClear();
                     LaneJungleClearA.Items();
                 }
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                {
+                    Harass();
+                    }
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                 {
                     LastHitA.LastHitB();
@@ -180,7 +230,6 @@ namespace Bloodimir_Renekton
                         return;
                     }
                 }
-                SkinChange();
             }
         }
 
@@ -193,7 +242,47 @@ namespace Bloodimir_Renekton
                 R.Cast();
             }
         }
-
+         public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
+             }
+        public static void Harass()
+        {
+            var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+            if (target != null && Player.Instance.Distance(target.Position) < E.Range && !Renek.HasBuff(E2BuffName) && E.IsReady())
+                {
+                    Player.CastSpell(SpellSlot.E, target.Position);
+                }
+        if (Renek.HasBuff(E2BuffName))
+        { 
+            var qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            if (qtarget.Distance(Renek.Position) <= 225 && Q.IsReady() && HarassMenu["hq"].Cast<CheckBox>().CurrentValue)
+            Q.Cast();
+            var wtarget = TargetSelector.GetTarget(W.Range, DamageType.Physical);
+            if (wtarget.Distance(Renek.Position) <= W.Range && HarassMenu["hw"].Cast<CheckBox>().CurrentValue)
+            W.Cast();
+            var itarget = TargetSelector.GetTarget(Hydra.Range, DamageType.Physical);
+            if (itarget.Distance(Renek.Position) <= Hydra.Range && HarassMenu["hi"].Cast<CheckBox>().CurrentValue)
+                Hydra.Cast();
+            if (itarget.Distance(Renek.Position) <= Tiamat.Range && HarassMenu["hi"].Cast<CheckBox>().CurrentValue)
+                Tiamat.Cast();
+            if (Renek.HasBuff(E2BuffName) && E.IsReady())
+            {
+                if (!W.IsReady() || !Q.IsReady())
+                {
+                    Player.CastSpell(SpellSlot.E, qtarget.Position);
+                }
+            }
+            }
+        }
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) ||
@@ -208,6 +297,14 @@ namespace Bloodimir_Renekton
                         {
                             W.Cast();
                         }
+                        if (e.IsValidTarget() && Hydra.IsReady())
+                        {
+                            Hydra.Cast();
+                        }
+                        if (e.IsValidTarget() && Tiamat.IsReady())
+                        {
+                            Tiamat.Cast();
+                        }
                     }
             }
         }
@@ -215,10 +312,9 @@ namespace Bloodimir_Renekton
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
         {
-            var intTarget = TargetSelector.GetTarget(Player.Instance.GetAutoAttackRange(), DamageType.Physical);
             {
-                if (W.IsReady() && sender.IsValidTarget(W.Range) && MiscMenu["intw"].Cast<CheckBox>().CurrentValue)
-                    W.Cast(intTarget);
+                if (W.IsReady() && sender.IsValidTarget(Player.Instance.GetAutoAttackRange()) && MiscMenu["intw"].Cast<CheckBox>().CurrentValue)
+                    W.Cast(sender);
             }
         }
 
@@ -226,8 +322,6 @@ namespace Bloodimir_Renekton
         {
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                try
-                {
                     foreach (
                         var qtarget in
                             EntityManager.Heroes.Enemies.Where(
@@ -238,11 +332,8 @@ namespace Bloodimir_Renekton
                             Q.Cast();
                     }
                 }
-                catch
-                {
-                }
             }
-        }
+        
 
         private static void SkinChange()
         {

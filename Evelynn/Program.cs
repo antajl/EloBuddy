@@ -80,6 +80,8 @@ namespace Evelynn
             MiscMenu.Add("kse", new CheckBox("KS using E"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS using Q"));
+            MiscMenu.Add("asw", new CheckBox("Auto/Smart W"));
+
 
             SkinMenu = EveMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -122,10 +124,20 @@ namespace Evelynn
             W.Cast();
         }
 
+        public static void AutoW()
+        {
+            var useW = MiscMenu["asw"].Cast<CheckBox>().CurrentValue;
+
+            if (Player.HasBuffOfType(BuffType.Slow) || Eve.CountEnemiesInRange(550) <= 3 && useW)
+            {
+                W.Cast();
+            }
+        }
         private static void Tick(EventArgs args)
         {
             Killsteal();
             SkinChange();
+            AutoW();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();

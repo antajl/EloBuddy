@@ -77,7 +77,7 @@ namespace Bloodimir_Renekton
                     return;
                 }
                     var wminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-                    if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.Q) >= wminion.Health)
+                    if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.W) >= wminion.Health)
                     {
                         Program.W.Cast();
                     }

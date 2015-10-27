@@ -71,7 +71,7 @@ namespace Bloodimir_Renekton
                 var wenemy =
                     (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
-                if (wenemy != null)
+                if (wenemy != null &&  Renekton.GetSpellDamage(wenemy, SpellSlot.Q) >= wenemy.Health)
                     Program.W.Cast();
             }
             if (Orbwalker.CanAutoAttack)

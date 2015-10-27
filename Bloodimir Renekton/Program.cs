@@ -155,17 +155,19 @@ namespace Bloodimir_Renekton
         }
          private static
             void OnGapClose
-            (AIHeroClient Sender, Gapcloser.GapcloserEventArgs gapcloser)
-        {
+            (AIHeroClient sender, Gapcloser.GapcloserEventArgs gapcloser)
+         {
             if (!gapcloser.Sender.IsEnemy)
                 return;
             var gapclose = MiscMenu["gapclose"].Cast<CheckBox>().CurrentValue;
             if (!gapclose)
                 return;
 
-                if (W.IsReady() && W.IsInRange(gapcloser.Start))
+                if (W.IsReady() && ObjectManager.Player.Distance(gapcloser.Sender, true) <
+                Player.Instance.GetAutoAttackRange() && sender.IsValidTarget())
                 {
-                    W.Cast(gapcloser.Start);
+                    W.Cast();
+                    Orbwalker.ForcedTarget = gapcloser.Sender;
                 }
             }
         private static void OnDraw(EventArgs args)

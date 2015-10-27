@@ -166,8 +166,7 @@ namespace Bloodimir_Renekton
                 if (W.IsReady() && ObjectManager.Player.Distance(gapcloser.Sender, true) <
                 Player.Instance.GetAutoAttackRange() && sender.IsValidTarget())
                 {
-                    W.Cast();
-                    Orbwalker.ForcedTarget = gapcloser.Sender;
+                    W.Cast(gapcloser.Sender);
                 }
             }
         private static void OnDraw(EventArgs args)
@@ -178,7 +177,7 @@ namespace Bloodimir_Renekton
                 {
                     Drawing.DrawCircle(Renek.Position, 225, Color.DarkGoldenrod);
                 }
-                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
                 {
                     Drawing.DrawCircle(Renek.Position, E.Range, Color.DarkCyan);
                 }

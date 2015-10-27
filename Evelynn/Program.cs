@@ -128,7 +128,7 @@ namespace Evelynn
         {
             var useW = MiscMenu["asw"].Cast<CheckBox>().CurrentValue;
 
-            if (Player.HasBuffOfType(BuffType.Slow) || Eve.CountEnemiesInRange(550) <= 3 && useW)
+            if (Player.HasBuffOfType(BuffType.Slow) || Eve.CountEnemiesInRange(550) >= 3 && useW)
             {
                 W.Cast();
             }

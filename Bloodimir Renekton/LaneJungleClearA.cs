@@ -43,7 +43,7 @@ namespace Bloodimir_Renekton
             var QREADY = Program.Q.IsReady();
             var WREADY = Program.W.IsReady();
 
-            if (ECHECK && EREADY)
+            if (!ECHECK || !EREADY)
             {
                 return;
             }
@@ -53,10 +53,9 @@ namespace Bloodimir_Renekton
                 if (aenemy != null)
                     Program.E.Cast(aenemy.ServerPosition);
             }
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
             {
                 return;
-                
             }
             {
                 var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
@@ -64,7 +63,7 @@ namespace Bloodimir_Renekton
                 if (qenemy != null)
                     Program.Q.Cast();
             }
-            if (WCHECK && WREADY)
+            if (!WCHECK || !WREADY)
             {
                 return;
             }
@@ -83,7 +82,6 @@ namespace Bloodimir_Renekton
                     Orbwalker.ForcedTarget = cenemy;
             }
         }
-
         public static
             void Items()
         {

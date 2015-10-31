@@ -19,6 +19,7 @@ namespace Bloodimir_Blitz
         public static Menu MorgMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu;
         public static AIHeroClient Blitz = ObjectManager.Player;
         public static Item Talisman;
+        public static HitChance QHitChance;
 
         private static Vector3 MousePos
         {
@@ -40,7 +41,7 @@ namespace Bloodimir_Blitz
             if (Player.Instance.ChampionName != "Blitzcrank")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 940, SkillShotType.Linear, 250, 1800, 70);
+            Q = new Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1800, 70);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
             R = new Spell.Active(SpellSlot.R, 550);
@@ -80,6 +81,7 @@ namespace Bloodimir_Blitz
                 QMenu.Add("grab" + obj.ChampionName.ToLower(), new CheckBox("Grab " + obj.ChampionName));
             }
             QMenu.AddSeparator();
+            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
 
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
@@ -175,6 +177,7 @@ namespace Bloodimir_Blitz
 
         private static void Tick(EventArgs args)
         {
+            QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             SkinChange();
             Killsteal();
             Ascension();
@@ -207,8 +210,7 @@ namespace Bloodimir_Blitz
                         Ignite.Cast(source);
                         return;
                     }
-                if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue
-                   )
+                if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
                     foreach (
                         var enemy in
                             ObjectManager.Get<AIHeroClient>()
@@ -389,8 +391,26 @@ namespace Bloodimir_Blitz
         }
 
         private static
-            void Combo(bool useW, bool useQ, bool useR)
+            void Combo(bool useQ, bool useW, bool useR)
         {
+          if (useQ && Q.IsReady())
+            {
+                try
+                {
+                    var grabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+                    if (grabTarget.IsValidTarget(Q.Range))
+                    {
+                        if (Q.GetPrediction(grabTarget).HitChance >= QHitChance)
+                        {
+                            if (grabTarget.Distance(Blitz.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
+                            {
+                                if (QMenu["grab" + grabTarget.ChampionName].Cast<CheckBox>().CurrentValue)
+                                {
+                                    Q.Cast(grabTarget);
+                                }
+                            }
+                        }
+                   }
             if (useW && W.IsReady() && ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue)
             {
                 var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
@@ -400,36 +420,22 @@ namespace Bloodimir_Blitz
                     {
                         W.Cast();
                     }
-                    if (!Q.IsReady() && target.Distance(Blitz) < 425)
+                    if (target.Distance(Blitz) < 425)
                     {
                         W.Cast();
                     }
                 }
-
-                if (useQ && Q.IsReady() && ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue)
+                if (useR && R.IsReady())
                 {
-                    var grabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-                    if (grabTarget.IsValidTarget(Q.Range))
-                    {
-                        var q = Q.GetPrediction(grabTarget).CastPosition;
-                        {
-                            if (grabTarget.Distance(Blitz.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
-                            {
-                                if (QMenu["grab" + grabTarget.ChampionName].Cast<CheckBox>().CurrentValue)
-                                {
-                                    Q.Cast(q);
-                                }
-                            }
-                        }
-                    }
-                }
-                if (useR && R.IsReady() &&
-                    Blitz.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue &&
-                    ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
+                 if  (Blitz.CountEnemiesInRange(550) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
                 }
+                }
             }
+                }
+       catch {}
         }
+            } 
     }
-}
+    }

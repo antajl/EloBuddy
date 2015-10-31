@@ -43,7 +43,7 @@ namespace BloodimirVladimir
             Q = new Spell.Targeted(SpellSlot.Q, 600);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E, 610);
-            R = new Spell.Skillshot(SpellSlot.R, 899, SkillShotType.Circular, (int) 250f, (int) 1200f, (int) 150f);
+            R = new Spell.Skillshot(SpellSlot.R, 700, SkillShotType.Circular,250,1200,150);
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             Zhonia = new Item((int)ItemId.Zhonyas_Hourglass);

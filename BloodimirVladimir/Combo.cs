@@ -36,30 +36,26 @@ namespace BloodimirVladimir
             var ECHECK = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
             var EREADY = Program.E.IsReady();
-             
-            if (ECHECK && EREADY)
-            {
-                var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Magical);
 
-                if (enemy != null)
+            if (!ECHECK || !EREADY)
+            {
+                return;
+            }
+            {
+                var eenemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Magical);
+
+                if (eenemy != null)
                     Program.E.Cast();
                  }
-            if (QCHECK && QREADY)
+    
+        if (!QCHECK || !QREADY)
             {
-                var enemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
-
-                if (enemy != null)
-                    Program.Q.Cast(enemy);
+                return;
             }
+                var qenemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
 
-                if (Orbwalker.CanAutoAttack)
-            {
-                var enemy = (AIHeroClient) GetEnemy(Vladimir.GetAutoAttackRange(), GameObjectType.AIHeroClient);
-
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
+                if (qenemy != null)
+                    Program.Q.Cast(qenemy);
             }
-        }
-
     }
-    }
+}

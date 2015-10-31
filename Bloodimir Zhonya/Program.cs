@@ -24,7 +24,7 @@ namespace Bloodimir_Zhonya
             Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
             ZhonyaMenu = MainMenu.AddMenu("Zhonya", "zhonyamenu");
             ZhonyaMenu.Add("zhonya", new CheckBox("Use Zhonya"));
-            ZhonyaMenu.Add("zhealth", new Slider("Auto Zhonia Health %", 8));
+            ZhonyaMenu.Add("zhealth", new Slider("Auto Zhonia Health %", 28));
             Game.OnTick += Tick;
         }
 

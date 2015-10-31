@@ -2,6 +2,7 @@
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
+using Evelynn;
 
 namespace Evelynn
 {
@@ -25,9 +26,12 @@ namespace Evelynn
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-                default:
-                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                case GameObjectType.obj_AI_Minion:
+                return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                       default:
+                return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                    a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
 
@@ -38,7 +42,10 @@ namespace Evelynn
             var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
 
-            if (ECHECK && EREADY)
+            if (!ECHECK || !EREADY)
+            {
+                return;
+            }
             {
                 var enemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
@@ -46,7 +53,11 @@ namespace Evelynn
                     Program.E.Cast(enemy);
             }
 
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
+            {
+                return;
+                
+            }
             {
                 var enemy = GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 

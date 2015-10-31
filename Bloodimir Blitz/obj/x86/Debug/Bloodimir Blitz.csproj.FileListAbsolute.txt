@@ -8,3 +8,4 @@ c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Bl
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\bin\x86\Debug\Newtonsoft.Json.dll
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\obj\x86\Debug\Bloodimir Blitz.exe
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\obj\x86\Debug\Bloodimir Blitz.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Blitz\Bloodimir Blitz\obj\x86\Debug\Bloodimir Blitz.csprojResolveAssemblyReference.cache

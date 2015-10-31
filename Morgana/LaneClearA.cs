@@ -24,6 +24,9 @@ namespace Morgana
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
@@ -34,7 +37,10 @@ namespace Morgana
             var WCHECK = Program.LaneClear["LCW"].Cast<CheckBox>().CurrentValue;
             var WREADY = Program.W.IsReady();
 
-            if (WCHECK && WREADY)
+            if (!WCHECK || !WREADY)
+            {
+                return;
+            }
             {
                 var wenemy =
                     (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);

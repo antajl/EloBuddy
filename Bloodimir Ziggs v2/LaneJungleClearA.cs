@@ -25,6 +25,9 @@ namespace Bloodimir_Ziggs_v2
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
@@ -37,7 +40,10 @@ namespace Bloodimir_Ziggs_v2
             var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var eready = Program.E.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready)
+            {
+                return;
+            }
             {
                 var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
@@ -46,7 +52,10 @@ namespace Bloodimir_Ziggs_v2
                         var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
                         Program.Q.Cast(predQ);
                     }
-                if (echeck && eready)
+                if (!echeck || !eready)
+                {
+                    return;
+                }
                 {
                 var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
                 if (eminion != null)

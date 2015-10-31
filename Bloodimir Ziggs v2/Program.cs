@@ -497,8 +497,6 @@ namespace Bloodimir_Ziggs_v2
         {
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                try
-                {
                     foreach (
                         var qtarget in
                             EntityManager.Heroes.Enemies.Where(
@@ -528,11 +526,8 @@ namespace Bloodimir_Ziggs_v2
                         }
                     }
                 }
-                catch
-                {
-                }
             }
-        }
+        
 
         public static
             void Flee

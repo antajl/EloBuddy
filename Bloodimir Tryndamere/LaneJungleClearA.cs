@@ -24,6 +24,9 @@ namespace Bloodimir_Tryndamere
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
@@ -35,7 +38,10 @@ namespace Bloodimir_Tryndamere
             var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var EREADY = Program.E.IsReady();
 
-            if (ECHECK && EREADY)
+            if (!ECHECK || !EREADY)
+            {
+                return;
+            }
             {
                 var aenemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 

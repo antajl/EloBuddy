@@ -80,13 +80,6 @@ namespace Kennen
                     }
                 }
             }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var enemy = (Obj_AI_Minion) GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
-            }
         }
     }
 }

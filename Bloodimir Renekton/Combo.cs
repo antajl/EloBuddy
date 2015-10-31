@@ -20,25 +20,32 @@ namespace Bloodimir_Renekton
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+       public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
+        
 
         public static void RenekCombo()
         {
             var qcheck = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready)
+            {
+                return;
+            }
             {
                 var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Physical);
 

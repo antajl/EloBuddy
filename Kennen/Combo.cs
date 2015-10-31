@@ -20,7 +20,10 @@ namespace Kennen
             var QREADY = Program.Q.IsReady();
             var WREADY = Program.W.IsReady();
 
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
+            {
+                return;
+            }
             {
                 var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
 
@@ -28,7 +31,10 @@ namespace Kennen
                     Program.Q.Cast(enemy.ServerPosition);
             }
 
-            if (WCHECK && WREADY)
+            if (!WCHECK || !WREADY)
+            {
+                return;
+            }
             { 
                 var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
                 if (wenemy != null)

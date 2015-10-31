@@ -9,7 +9,8 @@ namespace Evelynn
     {
         public enum AttackSpell
         {
-            Q
+            Q,
+            E
         };
 
         public static AIHeroClient Evelynn
@@ -24,7 +25,6 @@ namespace Evelynn
                 new float[] {0, 35, 40, 45, 50, 55}[Program.Q.Level]/100*Player.Instance.FlatMagicDamageMod +
                 new float[] {0, 50, 55, 60, 65, 70}[Program.Q.Level]/100*Player.Instance.FlatPhysicalDamageMod);
         }
-
         public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)

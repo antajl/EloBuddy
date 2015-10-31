@@ -113,7 +113,7 @@ namespace Evelynn
                 }
                 if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
                 {
-                    Drawing.DrawCircle(Eve.Position, E.Range, Color.Red);
+                    Drawing.DrawCircle(Eve.Position, E.Range, Color.Green);
                 }
             }
         }

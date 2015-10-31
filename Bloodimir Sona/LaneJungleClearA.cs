@@ -24,6 +24,9 @@ namespace Bloodimir_Sona
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
@@ -34,7 +37,7 @@ namespace Bloodimir_Sona
             var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
 
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
             {
                 var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 

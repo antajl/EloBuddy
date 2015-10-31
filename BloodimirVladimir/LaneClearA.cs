@@ -25,6 +25,9 @@ namespace BloodimirVladimir
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
@@ -37,7 +40,10 @@ namespace BloodimirVladimir
             var EREADY = Program.E.IsReady();
             var QCHECK = Program.LaneClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var QREADY = Program.Q.IsReady();
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
+            {
+                return;
+            }
             {
                 var enemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
@@ -45,7 +51,10 @@ namespace BloodimirVladimir
                     Program.Q.Cast(enemy);
             }
 
-            if (ECHECK && EREADY)
+            if (!ECHECK || !EREADY)
+            {
+                return;
+            }
             {
                 var enemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 

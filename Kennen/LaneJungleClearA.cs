@@ -25,32 +25,13 @@ namespace Kennen
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                case GameObjectType.obj_AI_Minion:
+                    return EntityManager.MinionsAndMonsters.GetJungleMonsters().OrderBy(a => a.Health).FirstOrDefault(
+                            a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
-        }
-
-        public static Obj_AI_Base GetEnemy(GameObjectType type, AttackSpell spell)
-        {
-            if (spell == AttackSpell.Q)
-            {
-                return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                                   && a.Type == type
-                                                                                                   &&
-                                                                                                   a.Distance(Kennen) <=
-                                                                                                   Program.Q.Range
-                                                                                                   && !a.IsDead
-                                                                                                   && !a.IsInvulnerable
-                                                                                                   &&
-                                                                                                   a.IsValidTarget(
-                                                                                                       Program.Q.Range)
-                                                                                                   &&
-                                                                                                   a.Health <=
-                                                                                                   Misc.Qcalc(a));
-            }
-
-            return null;
         }
 
         public static void LaneClear()
@@ -60,7 +41,10 @@ namespace Kennen
             var WCHECK = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
             var WREADY = Program.W.IsReady();
 
-            if (QCHECK && QREADY)
+            if (!QCHECK || !QREADY)
+            {
+                return;
+            }
             {
                 var enemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 

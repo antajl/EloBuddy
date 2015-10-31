@@ -24,7 +24,7 @@ namespace Bloodimir_Tryndamere
             var WREADY = Program.W.IsReady();
             var EREADY = Program.E.IsReady();
 
-            if (ECHECK && EREADY)
+            if (!ECHECK || !EREADY)
             {
                 var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
                 if (enemy != null)
@@ -34,7 +34,10 @@ namespace Bloodimir_Tryndamere
                     }
             }
 
-            if (WCHECK && WREADY)
+            if (!WCHECK || !WREADY)
+            {
+                return;
+            }
             {
                 var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
                 {

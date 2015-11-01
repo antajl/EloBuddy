@@ -117,7 +117,7 @@ namespace Bloodimir_Shen
             MiscMenu.Add("randuin", new CheckBox("Use Randuin"));
             MiscMenu.Add("autow", new CheckBox("Auto W"));
             MiscMenu.AddSeparator();
-            MiscMenu.Add("EHPPercent", new Slider("Auto W HP %", 45));
+            MiscMenu.Add("WHPPercent", new Slider("Auto W HP %", 45));
             MiscMenu.AddSeparator();
             MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells", false));
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
@@ -137,6 +137,7 @@ namespace Bloodimir_Shen
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnTick += Tick;
             Drawing.OnDraw += OnDraw;
+            Gapcloser.OnGapcloser += OnGapClose;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Obj_AI_Base.OnProcessSpellCast += Auto_WOnProcessSpell;
             Core.DelayAction(FlashE, 1);
@@ -151,10 +152,24 @@ namespace Bloodimir_Shen
                     E.Cast(intTarget.ServerPosition);
             }
         }
-
+        private static
+            void OnGapClose
+            (AIHeroClient Sender, Gapcloser.GapcloserEventArgs gapcloser)
+        {
+            if (!gapcloser.Sender.IsEnemy)
+                return;
+            var gapclose = MiscMenu["gapclose"].Cast<CheckBox>().CurrentValue;
+            if (!gapclose)
+                return;
+                if (E.IsReady()
+                    && E.IsInRange(gapcloser.Start))
+                {
+                    E.Cast(MousePos);
+                }
+            }
         private static void Auto_WOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            var shieldHealthPercent = MiscMenu["EHPPercent"].Cast<Slider>().CurrentValue;
+            var shieldHealthPercent = MiscMenu["WHPPercent"].Cast<Slider>().CurrentValue;
             var shieldSelf = MiscMenu["autow"].Cast<CheckBox>().CurrentValue;
             if (shieldSelf)
             {

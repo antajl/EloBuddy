@@ -1,5 +1,6 @@
 ﻿using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Menu.Values;
 using Kennen;
 
@@ -12,7 +13,10 @@ namespace Kennen
             Q,
             W,
         };
-
+        public static AIHeroClient Kennen
+        {
+            get { return ObjectManager.Player; }
+        }
         public static void KennenCombo()
         {
             var QCHECK = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
@@ -23,13 +27,20 @@ namespace Kennen
             if (!QCHECK || !QREADY)
             {
                 return;
-            }
-            {
-                var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
-
-                if (enemy != null)
-                    Program.Q.Cast(enemy.ServerPosition);
-            }
+            }    
+                try
+                {
+                    var qTarget = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
+                    if (qTarget.IsValidTarget(Program.Q.Range))
+                    {
+                        if (Program.Q.GetPrediction(qTarget).HitChance >= HitChance.High)
+                        {
+                                    Program.Q.Cast(qTarget);
+                                }
+                            }}
+                    catch
+                    {                      
+                    }
 
             if (!WCHECK || !WREADY)
             {

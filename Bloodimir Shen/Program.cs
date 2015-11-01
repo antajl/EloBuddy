@@ -225,9 +225,9 @@ namespace Bloodimir_Shen
                 foreach (
                     var ally in
                         EntityManager.Heroes.Allies.Where(
-                            x => x.IsValidTarget(R.Range) && x.HealthPercent < 5)
+                            x => x.IsValidTarget(R.Range) && x.HealthPercent < 7)
                     )
-                    if (ally != null && R.IsReady() && ally.CountEnemiesInRange(625) >= 1)
+                    if (ally != null && R.IsReady() && ally.CountEnemiesInRange(650) >= 1)
                     {
                         R.Cast(ally);
                     }

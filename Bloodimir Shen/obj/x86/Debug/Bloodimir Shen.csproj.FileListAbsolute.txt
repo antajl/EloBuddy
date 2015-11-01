@@ -1,0 +1,10 @@
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\Bloodimir Shen.exe.config
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\Bloodimir Shen.exe
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\Bloodimir Shen.pdb
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\EloBuddy.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\EloBuddy.SDK.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\SharpDX.Direct3D9.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\SharpDX.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\x86\Debug\Newtonsoft.Json.dll
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.exe
+c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.pdb

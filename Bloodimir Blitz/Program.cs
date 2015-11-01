@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -6,8 +7,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
 using SharpDX;
-using Color = System.Drawing.Color;
 
 namespace Bloodimir_Blitz
 {
@@ -41,7 +42,7 @@ namespace Bloodimir_Blitz
             if (Player.Instance.ChampionName != "Blitzcrank")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 950, SkillShotType.Linear, 250, 1800, 70);
+            Q = new Spell.Skillshot(SpellSlot.Q, 925, SkillShotType.Linear, 250, 1800, 70);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
             R = new Spell.Active(SpellSlot.R, 550);
@@ -66,7 +67,7 @@ namespace Bloodimir_Blitz
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
+            ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
             ComboMenu.AddSeparator();
             ComboMenu.Add("flashq", new KeyBind("Flash Q", false, KeyBind.BindTypes.HoldActive, 'Y'));
 
@@ -83,6 +84,7 @@ namespace Bloodimir_Blitz
             QMenu.AddSeparator();
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
+            QMenu.AddSeparator();
 
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -126,15 +128,71 @@ namespace Bloodimir_Blitz
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
             DrawMenu.Add("drawr", new CheckBox("Draw R"));
             DrawMenu.Add("drawfq", new CheckBox("Draw FlashQ"));
+            DrawMenu.Add("predictions", new CheckBox("Visualize prediction"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnTick += Tick;
-            Drawing.OnDraw += OnDraw;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
             Core.DelayAction(FlashQ, 1);
-        }
+            Drawing.OnDraw += delegate
+            {
+                 if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+                {
+                    Drawing.DrawCircle(Blitz.Position, R.Range, System.Drawing.Color.LightBlue);
+                }
+                if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+                {
+                    Drawing.DrawCircle(Blitz.Position, 850 + 425, System.Drawing.Color.DarkBlue);
+                }
+                var predictedPositions = new Dictionary<int, Tuple<int, PredictionResult>>();
+                var predictions = DrawMenu["predictions"].Cast<CheckBox>().CurrentValue;
+                var qRange = DrawMenu["drawq"].Cast<CheckBox>().CurrentValue;
 
+                foreach (
+                    var enemy in
+                        EntityManager.Heroes.Enemies.Where(
+                            enemy => QMenu["grab" + enemy.ChampionName].Cast<CheckBox>().CurrentValue &&
+                                     enemy.IsValidTarget(Q.Range + 150) &&
+                                     !enemy.HasBuffOfType(BuffType.SpellShield)))
+                {
+                    var predictionsq = Q.GetPrediction(enemy);
+                    predictedPositions[enemy.NetworkId] = new Tuple<int, PredictionResult>(Environment.TickCount,
+                        predictionsq);
+                    if (qRange && Q.IsLearned)
+                    {
+                        Circle.Draw(Q.IsReady() ? Color.Blue : Color.Red, Q.Range, Player.Instance.Position);
+                    }
+
+                    if (!predictions)
+                    {
+                        return;
+                    }
+
+                    foreach (var prediction in predictedPositions.ToArray())
+                    {
+                        if (Environment.TickCount - prediction.Value.Item1 > 2000)
+                        {
+                            predictedPositions.Remove(prediction.Key);
+                            continue;
+                        }
+
+                        Circle.Draw(Color.Red, 75, prediction.Value.Item2.CastPosition);
+                        Line.DrawLine(System.Drawing.Color.GreenYellow, Player.Instance.Position,
+                            prediction.Value.Item2.CastPosition);
+                        Line.DrawLine(System.Drawing.Color.CornflowerBlue,
+                            EntityManager.Heroes.Enemies.Find(o => o.NetworkId == prediction.Key).Position,
+                            prediction.Value.Item2.CastPosition);
+                        Drawing.DrawText(prediction.Value.Item2.CastPosition.WorldToScreen() + new Vector2(0, -20),
+                            System.Drawing.Color.LimeGreen,
+                            string.Format("Hitchance: {0}%", Math.Ceiling(prediction.Value.Item2.HitChancePercent)),
+                            10);
+                    }
+                }
+                ;
+            };
+        }
+        
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
         {
@@ -142,28 +200,8 @@ namespace Bloodimir_Blitz
             {
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
                     Q.Cast(intTarget.ServerPosition);
-            }
-        }
-
-        private static void OnDraw(EventArgs args)
-        {
-            if (!Blitz.IsDead)
-            {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Blitz.Position, Q.Range, Color.Red);
-                }
-                if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
-                {
-                    Drawing.DrawCircle(Blitz.Position, R.Range, Color.LightBlue);
-                }
-                if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Blitz.Position, 800 + 425, Color.DarkBlue);
-                }
-            }
-        }
-
+            }}
+     
         public static
             void Flee
             ()
@@ -172,8 +210,8 @@ namespace Bloodimir_Blitz
             {
                 Orbwalker.MoveTo(Game.CursorPos);
                 W.Cast();
-            }
-        }
+                }}
+   
 
         private static void Tick(EventArgs args)
         {
@@ -198,7 +236,7 @@ namespace Bloodimir_Blitz
                 FlashQ();
             }
             {
-              if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue)
+              if (ComboMenu["useignite"].Cast<CheckBox>().CurrentValue)
                     foreach (
                         var source in
                             ObjectManager.Get<AIHeroClient>()
@@ -229,6 +267,7 @@ namespace Bloodimir_Blitz
                     }
             }
         }
+        
         private static void Ascension()
         {
 
@@ -261,14 +300,14 @@ namespace Bloodimir_Blitz
         private static void FlashQ()
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
-            var ftarget = TargetSelector.GetTarget(825 + 425, DamageType.Magical);
+            var ftarget = TargetSelector.GetTarget(850 + 425, DamageType.Magical);
             if (ftarget == null) return;
-            var xpos = ftarget.Position.Extend(ftarget, 825);
+            var xpos = ftarget.Position.Extend(ftarget, 850);
             var predqpos = Q.GetPrediction(ftarget).CastPosition;
             if (ComboMenu["flashq"].Cast<KeyBind>().CurrentValue)
             {
                 if (Q.IsReady() && Flash.IsReady())
-                    if (ftarget.IsValidTarget(825 + 425))
+                    if (ftarget.IsValidTarget(850 + 425))
                     {
                         Flash.Cast((Vector3) xpos);
                         Q.Cast(predqpos);
@@ -385,7 +424,7 @@ namespace Bloodimir_Blitz
                 var eminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
                 if (eminion != null)
                 {
-                    E.Cast(eminion);
+                    E.Cast();
                 }
             }
         }
@@ -427,7 +466,7 @@ namespace Bloodimir_Blitz
                 }
                 if (useR && R.IsReady())
                 {
-                 if  (Blitz.CountEnemiesInRange(550) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+                 if  (Blitz.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
                 }

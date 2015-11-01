@@ -19,6 +19,8 @@ namespace Bloodimir_Shen
         public static Spell.Skillshot E, Flash;
         public static Item Randuin;
         public static Menu ShenMenu, ComboMenu, UltMenu, MiscMenu, EMenu, DrawMenu, SkinMenu;
+        public static int[] AbilitySequence;
+        public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
         public static HitChance EHitChance;
 
         private static Vector3 MousePos
@@ -51,6 +53,7 @@ namespace Bloodimir_Shen
             var FlashSlot = Shen.GetSpellSlotFromName("summonerflash");
             Flash = new Spell.Skillshot(FlashSlot, 32767, SkillShotType.Linear);
             Randuin = new Item((int) ItemId.Randuins_Omen);
+            AbilitySequence = new int[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
 
             ShenMenu = MainMenu.AddMenu("BloodimirShen", "bloodimirshen");
             ShenMenu.AddGroupLabel("Bloodimir Shen");
@@ -116,6 +119,7 @@ namespace Bloodimir_Shen
             MiscMenu.AddSeparator();
             MiscMenu.Add("EHPPercent", new Slider("Auto W HP %", 45));
             MiscMenu.AddSeparator();
+            MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells", false));
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
                 MiscMenu.Add(source.ChampionName + "exhaust",
@@ -222,6 +226,7 @@ namespace Bloodimir_Shen
             Killsteal();
             RanduinU();
             HighestAuthority();
+            if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo(useW: ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
@@ -297,7 +302,25 @@ namespace Bloodimir_Shen
                 }
             }
         }
-
+        private static void LevelUpSpells()
+        {
+            var qL = Shen.Spellbook.GetSpell(SpellSlot.Q).Level + QOff;
+            var wL = Shen.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
+            var eL = Shen.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
+            var rL = Shen.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
+            if (qL + wL + eL + rL < ObjectManager.Player.Level)
+            {
+                int[] level = { 0, 0, 0, 0 };
+                for (var i = 0; i < ObjectManager.Player.Level; i++)
+                {
+                    level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+                }
+                if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+                if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+                if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+                if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+            }
+        }
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||

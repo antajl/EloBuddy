@@ -12,21 +12,15 @@ namespace Evelynn
 {
     internal class Program
     {
-        public static Spell.Active Q;
-        public static Spell.Active W;
+        public static Spell.Active Q, W;
         public static Spell.Targeted E;
         public static Spell.Skillshot R;
-        public static Spell.Targeted Ignite;
         public static Menu EveMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHitMenu;
         public static AIHeroClient Eve = ObjectManager.Player;
+
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
-        }
-
-        public static bool HasSpell(string s)
-        {
-            return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
 
         private static void OnLoaded(EventArgs args)
@@ -38,9 +32,6 @@ namespace Evelynn
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Targeted(SpellSlot.E, 225);
             R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, 250, 1200, 150);
-            if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-
 
             EveMenu = MainMenu.AddMenu("BloodimirEve", "bloodimireve");
             EveMenu.AddGroupLabel("Bloodimir.Evelynn");
@@ -81,7 +72,6 @@ namespace Evelynn
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS using Q"));
             MiscMenu.Add("asw", new CheckBox("Auto/Smart W"));
-
 
             SkinMenu = EveMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
@@ -133,6 +123,7 @@ namespace Evelynn
                 W.Cast();
             }
         }
+
         private static void Tick(EventArgs args)
         {
             Killsteal();
@@ -157,21 +148,6 @@ namespace Evelynn
                 {
                     LastHitA.LastHitB();
                 }
-                {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20*Eve.Level - (a.HPRegenRate/5*3)))
-                    {
-                        Ignite.Cast(source);
-                        return;
-                    }
-                }
             }
         }
 
@@ -188,7 +164,6 @@ namespace Evelynn
 
         private static void Killsteal()
         {
-            var qenemy = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
                 try

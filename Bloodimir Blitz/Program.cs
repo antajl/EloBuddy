@@ -17,7 +17,7 @@ namespace Bloodimir_Blitz
         public static Spell.Skillshot Q, Flash;
         public static Spell.Active W, E, R;
         public static Spell.Targeted Ignite, Exhaust;
-        public static Menu MorgMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu;
+        public static Menu BlitzMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu;
         public static AIHeroClient Blitz = ObjectManager.Player;
         public static Item Talisman;
         public static HitChance QHitChance;
@@ -53,12 +53,12 @@ namespace Bloodimir_Blitz
             Flash = new Spell.Skillshot(FlashSlot, 32767, SkillShotType.Linear);
             Talisman = new Item((int)ItemId.Talisman_of_Ascension);
 
-            MorgMenu = MainMenu.AddMenu("BloodimirBlitz", "bloodimirblitz");
-            MorgMenu.AddGroupLabel("Bloodimir Blitzcrank");
-            MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Blitzcrank v1.0.2.0");
+            BlitzMenu = MainMenu.AddMenu("BloodimirBlitz", "bloodimirblitz");
+            BlitzMenu.AddGroupLabel("Bloodimir Blitzcrank");
+            BlitzMenu.AddSeparator();
+            BlitzMenu.AddLabel("Bloodimir Blitzcrank v1.0.2.0");
 
-            ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
+            ComboMenu = BlitzMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
@@ -71,7 +71,7 @@ namespace Bloodimir_Blitz
             ComboMenu.AddSeparator();
             ComboMenu.Add("flashq", new KeyBind("Flash Q", false, KeyBind.BindTypes.HoldActive, 'Y'));
 
-            QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
+            QMenu = BlitzMenu.AddSubMenu("Q Settings", "qsettings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
             QMenu.Add("qmin", new Slider("Min Range", 125, 0, (int) Q.Range));
@@ -86,7 +86,7 @@ namespace Bloodimir_Blitz
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
             QMenu.AddSeparator();
 
-            SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
+            SkinMenu = BlitzMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
             var skinchange = SkinMenu.Add("sID", new Slider("Skin", 4, 0, 8));
@@ -102,7 +102,7 @@ namespace Bloodimir_Blitz
                     sender.DisplayName = sID[changeArgs.NewValue];
                 };
 
-            MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
+            MiscMenu = BlitzMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("Misc");
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
@@ -122,7 +122,7 @@ namespace Bloodimir_Blitz
             }
 
 
-            DrawMenu = MorgMenu.AddSubMenu("Drawings", "drawings");
+            DrawMenu = BlitzMenu.AddSubMenu("Drawings", "drawings");
             DrawMenu.AddGroupLabel("Drawings");
             DrawMenu.AddSeparator();
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));

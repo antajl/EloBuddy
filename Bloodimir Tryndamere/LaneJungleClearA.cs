@@ -32,13 +32,10 @@ namespace Bloodimir_Tryndamere
 
         public static void LaneClearA()
         {
-            var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
-            var EREADY = Program.E.IsReady();
+            var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
+            var eready = Program.E.IsReady();
 
-            if (!ECHECK || !EREADY)
-            {
-                return;
-            }
+            if (echeck && eready)
             {
                 var aenemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 

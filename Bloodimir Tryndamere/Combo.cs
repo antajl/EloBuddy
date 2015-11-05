@@ -24,7 +24,7 @@ namespace Bloodimir_Tryndamere
             var WREADY = Program.W.IsReady();
             var EREADY = Program.E.IsReady();
 
-            if (!ECHECK || !EREADY)
+            if (ECHECK && EREADY)
             {
                 var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
                 if (enemy != null)
@@ -34,23 +34,13 @@ namespace Bloodimir_Tryndamere
                     }
             }
 
-            if (!WCHECK || !WREADY)
-            {
-                return;
-            }
+            if (WCHECK && WREADY)
             {
                 var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
                 {
                     if (!wenemy.IsFacing(Program.Tryndamere))
                     {
                         Program.W.Cast();
-                    }
-                    if (Orbwalker.CanAutoAttack)
-                    {
-                        var enemy = TargetSelector.GetTarget(Player.Instance.GetAutoAttackRange(), DamageType.Physical);
-
-                        if (enemy != null)
-                            Orbwalker.ForcedTarget = enemy;
                     }
                 }
             }

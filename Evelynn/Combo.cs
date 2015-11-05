@@ -15,17 +15,14 @@ namespace Evelynn
 
         public static void EveCombo()
         {
-            var QCHECK = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
-            var ECHECK = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
-            var WCHECK = Program.ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var WREADY = Program.W.IsReady();
-            var EREADY = Program.E.IsReady();
+            var qcheck = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
+            var echeck = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
+            var wcheck = Program.ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var wready = Program.W.IsReady();
+            var eready = Program.E.IsReady();
 
-            if (QCHECK || QREADY)
-            {
-                return;
-            }
+            if (qcheck && qready)
             {
                 var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
 
@@ -33,29 +30,16 @@ namespace Evelynn
                     Program.Q.Cast();
             }
 
-            if (!ECHECK || !EREADY)
-            {
-                return;
-            }
+            if (echeck && eready)
             {
                 var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
 
                 if (enemy != null)
                     Program.E.Cast(enemy);
             }
-            if (!WCHECK || !WREADY)
-            {
-                return;
-            }
+            if (wcheck && wready)
             {
                 Program.W.Cast();
-            }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var enemy = TargetSelector.GetTarget(Player.Instance.GetAutoAttackRange(), DamageType.Physical);
-
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
             }
         }
     }

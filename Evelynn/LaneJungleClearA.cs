@@ -19,7 +19,7 @@ namespace Evelynn
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        public static Obj_AI_Base GetLcEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -34,34 +34,49 @@ namespace Evelynn
 
         public static void LaneClearB()
         {
-            var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
-            var EREADY = Program.E.IsReady();
-            var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
+            var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
+            var eready = Program.E.IsReady();
+            var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
 
-            if (!ECHECK || !EREADY)
+            if (echeck && eready)
             {
-                return;
-            }
-            {
-                var enemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+                var enemy = (Obj_AI_Minion)GetLcEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.E.Cast(enemy);
             }
 
-            if (!QCHECK || !QREADY)
+            if (qcheck && qready)
             {
-                return;
-                
-            }
-            {
-                var enemy = GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+                var enemy = GetLcEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.Q.Cast();
             }
         }
+        public static void JungleClearB()
+        {
+                      foreach (Obj_AI_Minion minion in EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Monster))
+                      {
+                          var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
+                          var eready = Program.E.IsReady();
+                          var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+                          var qready = Program.Q.IsReady();
 
+            if (echeck && eready)
+            {
+
+                if (minion != null)
+                    Program.E.Cast(minion);
+            }
+
+            if (qcheck && qready)
+            {
+                if (minion != null)
+                    Program.Q.Cast();
+            }
+        }
+    }
     }
 }

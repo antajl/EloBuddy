@@ -45,18 +45,16 @@ namespace Evelynn
 
         public static void LastHitB()
         {
-            var QCHECK = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            if (!QCHECK || !QREADY)
-            {
-                return;
-            }
-
+            var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            if (qcheck && qready)
+            { 
             var minion = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (minion != null)
             {
                 Program.Q.Cast();
             }
         }
+    }
     }
 }

@@ -16,7 +16,6 @@ namespace Bloodimir_Blitz
     {
         public static Spell.Skillshot Q, Flash;
         public static Spell.Active W, E, R;
-        public static Spell.Targeted Ignite, Exhaust;
         public static Menu BlitzMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu;
         public static AIHeroClient Blitz = ObjectManager.Player;
         public static Item Talisman;
@@ -46,9 +45,6 @@ namespace Bloodimir_Blitz
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
             R = new Spell.Active(SpellSlot.R, 550);
-            if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-            Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             var FlashSlot = Blitz.GetSpellSlotFromName("summonerflash");
             Flash = new Spell.Skillshot(FlashSlot, 32767, SkillShotType.Linear);
             Talisman = new Item((int)ItemId.Talisman_of_Ascension);
@@ -65,7 +61,6 @@ namespace Bloodimir_Blitz
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
             ComboMenu.AddSeparator();
@@ -112,14 +107,7 @@ namespace Bloodimir_Blitz
             MiscMenu.Add("support", new CheckBox("Support Mode"));
             MiscMenu.Add("fleew", new CheckBox("Use W Flee"));
             MiscMenu.AddSeparator();
-            MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
             MiscMenu.Add("talisman", new CheckBox("Use Talisman of Ascension"));
-            MiscMenu.AddSeparator();
-            foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
-            {
-                MiscMenu.Add(source.ChampionName + "exhaust",
-                    new CheckBox("Exhaust " + source.ChampionName, false));
-            }
 
 
             DrawMenu = BlitzMenu.AddSubMenu("Drawings", "drawings");
@@ -234,37 +222,6 @@ namespace Bloodimir_Blitz
             if (ComboMenu["flashq"].Cast<KeyBind>().CurrentValue)
             {
                 FlashQ();
-            }
-            {
-              if (ComboMenu["useignite"].Cast<CheckBox>().CurrentValue)
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20*Blitz.Level - (a.HPRegenRate/5*3)))
-                    {
-                        Ignite.Cast(source);
-                        return;
-                    }
-                if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
-                    foreach (
-                        var enemy in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
-                                .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
-                    {
-                        if (enemy.IsFacing(Blitz))
-                        {
-                            if (!(Blitz.HealthPercent < 50)) continue;
-                            Exhaust.Cast(enemy);
-                            return;
-                        }
-                        if (!(enemy.HealthPercent < 50)) continue;
-                        Exhaust.Cast(enemy);
-                        return;
-                    }
             }
         }
         

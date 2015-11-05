@@ -33,25 +33,20 @@ namespace Kennen
 
         public static void LaneClear()
         {
-            var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var WCHECK = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
-            var WREADY = Program.W.IsReady();
+            var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var wcheck = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
+            var wready = Program.W.IsReady();
 
-            if (!QCHECK || !QREADY)
-            {
-                return;
-            }
+            if (qcheck && qready)
             {
                 var enemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.Q.Cast(enemy.ServerPosition);
             }
-            if (!WCHECK || !WREADY)
+            if (wcheck && wready)
             {
-                return;
-            }
             var wminion = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
             if (wminion != null)
             {
@@ -59,14 +54,8 @@ namespace Kennen
                 {
                     Program.W.Cast();
                 }
-                if (Orbwalker.CanAutoAttack)
-                {
-                    var enemy = (Obj_AI_Minion) GetEnemy(Kennen.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                    if (enemy != null)
-                        Orbwalker.ForcedTarget = enemy;
-                }
             }
         }
+    }
     }
 }

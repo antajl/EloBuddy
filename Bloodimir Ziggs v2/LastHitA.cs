@@ -34,10 +34,7 @@ namespace Bloodimir_Ziggs_v2
         {
             var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
-            if (!qcheck || !qready)
-            {
-                return;
-            }
+            if (qcheck && qready)
             {
                 var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy != null)

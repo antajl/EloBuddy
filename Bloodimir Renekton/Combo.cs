@@ -39,22 +39,14 @@ namespace Bloodimir_Renekton
             var qcheck = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
 
-            if (!qcheck || !qready)
+            if (qcheck && qready)
             {
-                return;
-            }
             {
                 var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Physical);
 
                 if (enemy != null)
                     Program.Q.Cast();
             }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var cenemy = (AIHeroClient) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.AIHeroClient);
-
-                if (cenemy != null)
-                    Orbwalker.ForcedTarget = cenemy;
             }
         }
 

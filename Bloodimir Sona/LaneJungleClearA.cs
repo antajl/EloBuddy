@@ -31,10 +31,10 @@ namespace Bloodimir_Sona
         }
         public static void LaneClear()
         {
-            var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
+            var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
 
-            if (!QCHECK || !QREADY)
+            if (qcheck && qready)
             {
                 var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 

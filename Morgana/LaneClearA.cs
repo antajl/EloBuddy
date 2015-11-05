@@ -31,13 +31,10 @@ namespace Morgana
         }
         public static void LaneClear()
         {
-            var WCHECK = Program.LaneClear["LCW"].Cast<CheckBox>().CurrentValue;
-            var WREADY = Program.W.IsReady();
+            var wcheck = Program.LaneClear["LCW"].Cast<CheckBox>().CurrentValue;
+            var wready = Program.W.IsReady();
 
-            if (!WCHECK || !WREADY)
-            {
-                return;
-            }
+            if (wready && wcheck)
             {
                 var wenemy =
                     (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);

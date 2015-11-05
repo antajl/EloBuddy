@@ -522,14 +522,13 @@ namespace Bloodimir_Shen
         {
             var qcheck = MiscMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Q.IsReady();
-            if (!qcheck || !qready)
-            {
-                return;
-            }
+            if (qcheck && qready)
+            { 
             var qminion = (Obj_AI_Minion) GetEnemy(Q.Range, GameObjectType.obj_AI_Minion);
             if (qminion != null)
             {
                 Q.Cast(qminion);
+            }
             }
         }
 
@@ -538,14 +537,13 @@ namespace Bloodimir_Shen
         {
             var qcheck = MiscMenu["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = Q.IsReady();
-            if (!qcheck || !qready)
-            {
-                return;
-            }
+            if (qcheck && qready)
+            { 
             var qminion = (Obj_AI_Minion) GetEnemy(Q.Range, GameObjectType.obj_AI_Minion);
             if (qminion != null)
             {
                 Q.Cast(qminion);
+            }
             }
         }
 

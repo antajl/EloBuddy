@@ -42,17 +42,16 @@ namespace Bloodimir_Annie
 
         public static void LastHitB()
         {
-            var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            if (!QCHECK || !QREADY)
+            var qcheck = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            if (qcheck && qready)
             {
-                return;
-            }
             var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
             {
                 Program.Q.Cast(minion);
             }
         }
+    }
     }
 }

@@ -63,25 +63,23 @@ namespace Bloodimir_Renekton
             var QREADY = Program.Q.IsReady();
             var WREADY = Program.W.IsReady();
 
-            if (!QCHECK || !QREADY)
+            if (QCHECK && QREADY)
             {
-                return;
-            }
             var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
             {
                 Program.Q.Cast();
             }
-                if (WCHECK || WREADY)
+                if (WCHECK && WREADY)
                 {
-                    return;
-                }
                     var wminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
                     if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.W) >= wminion.Health)
                     {
                         Program.W.Cast();
                     }
                 }
+             }
+        }
             
      
         public static

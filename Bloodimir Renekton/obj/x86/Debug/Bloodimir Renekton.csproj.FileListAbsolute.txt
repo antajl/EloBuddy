@@ -8,3 +8,4 @@ C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir
 C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\x86\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.exe
 C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\obj\x86\Debug\Bloodimir Renekton.csprojResolveAssemblyReference.cache

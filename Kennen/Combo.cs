@@ -19,15 +19,12 @@ namespace Kennen
         }
         public static void KennenCombo()
         {
-            var QCHECK = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
-            var WCHECK = Program.ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var WREADY = Program.W.IsReady();
+            var qcheck = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
+            var wcheck = Program.ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var wready = Program.W.IsReady();
 
-            if (!QCHECK || !QREADY)
-            {
-                return;
-            }    
+            if (qcheck && qready)   
                 try
                 {
                     var qTarget = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
@@ -42,10 +39,7 @@ namespace Kennen
                     {                      
                     }
 
-            if (!WCHECK || !WREADY)
-            {
-                return;
-            }
+            if (wcheck && wready)
             { 
                 var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
                 if (wenemy != null)

@@ -49,16 +49,13 @@ namespace Kennen
 
         public static void LastHitB()
         {
-            var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var WCHECK = Program.LastHit["LHW"].Cast<CheckBox>().CurrentValue;
-            var WREADY = Program.W.IsReady();
+            var qcheck = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var wcheck = Program.LastHit["LHW"].Cast<CheckBox>().CurrentValue;
+            var wready = Program.W.IsReady();
 
-            if (!QCHECK || !QREADY)
+            if (qcheck && qready)
             {
-                return;
-            }
-
             var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
             {
@@ -67,10 +64,8 @@ namespace Kennen
                     Program.Q.Cast(minion.ServerPosition);
                 }
                 
-                if (!WCHECK || !WREADY)
+                if (wcheck && wready)
                 {
-                    return;
-                }
                 var wminion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.W);
                 if (wminion != null)
                 {
@@ -82,4 +77,5 @@ namespace Kennen
             }
         }
     }
-}
+    }
+}}

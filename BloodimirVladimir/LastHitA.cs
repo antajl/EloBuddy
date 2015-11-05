@@ -17,7 +17,7 @@ namespace BloodimirVladimir
 			get { return ObjectManager.Player; }
 		}
 
-		public static Obj_AI_Base MinionLH(GameObjectType type, AttackSpell spell)
+		public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
 		{
             return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
 			                                                                                   && a.Type == type
@@ -35,18 +35,15 @@ namespace BloodimirVladimir
 
 		public static void LastHitB()
 		{
-			var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
-			var QREADY = Program.Q.IsReady();
-			if (!QCHECK || !QREADY)
+			var qcheck = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
+			var qready = Program.Q.IsReady();
+			if (qcheck && qready)
 			{
-				return;
-			}
-
-			var minion = (Obj_AI_Minion) MinionLH(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+			var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
 			if (minion != null)
 			{
 				Program.Q.Cast(minion);
 			}
 		}
 	}
-}
+}	}

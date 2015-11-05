@@ -37,10 +37,7 @@ namespace BloodimirVladimir
             var QREADY = Program.Q.IsReady();
             var EREADY = Program.E.IsReady();
 
-            if (!ECHECK || !EREADY)
-            {
-                return;
-            }
+            if (ECHECK && EREADY)
             {
                 var eenemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Magical);
 
@@ -48,14 +45,13 @@ namespace BloodimirVladimir
                     Program.E.Cast();
                  }
     
-        if (!QCHECK || !QREADY)
+        if (QCHECK && QREADY)
             {
-                return;
-            }
                 var qenemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
 
                 if (qenemy != null)
                     Program.Q.Cast(qenemy);
             }
+    }
     }
 }

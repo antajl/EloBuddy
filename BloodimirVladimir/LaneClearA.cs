@@ -33,14 +33,11 @@ namespace BloodimirVladimir
 
         public static void LaneClear()
         {
-            var ECHECK = Program.LaneClear["LCE"].Cast<CheckBox>().CurrentValue;
-            var EREADY = Program.E.IsReady();
-            var QCHECK = Program.LaneClear["LCQ"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            if (!QCHECK || !QREADY)
-            {
-                return;
-            }
+            var echeck = Program.LaneClear["LCE"].Cast<CheckBox>().CurrentValue;
+            var eready = Program.E.IsReady();
+            var qcheck = Program.LaneClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            if (qcheck && qready)
             {
                 var enemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
@@ -48,22 +45,12 @@ namespace BloodimirVladimir
                     Program.Q.Cast(enemy);
             }
 
-            if (!ECHECK || !EREADY)
-            {
-                return;
-            }
+            if (echeck && eready)
             {
                 var enemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.E.Cast();
-            }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var enemy = (Obj_AI_Minion)GetEnemy(Vladimir.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                if (enemy != null)
-                    Orbwalker.ForcedTarget = enemy;
             }
         }
     }

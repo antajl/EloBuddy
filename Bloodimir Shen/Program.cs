@@ -135,7 +135,7 @@ namespace Bloodimir_Shen
             DrawMenu.Add("drawfq", new CheckBox("Draw FlashQ"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
             Gapcloser.OnGapcloser += OnGapClose;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;

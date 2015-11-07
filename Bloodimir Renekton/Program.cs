@@ -122,7 +122,7 @@ namespace Bloodimir_Renekton
                     sender.DisplayName = sid[changeArgs.NewValue];
                 };
 
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;

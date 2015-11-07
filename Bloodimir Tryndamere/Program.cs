@@ -109,7 +109,7 @@ namespace Bloodimir_Tryndamere
                     Chat.Print("skin-changed");
                 }
             };
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
         }
 

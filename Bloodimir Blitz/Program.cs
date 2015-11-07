@@ -119,7 +119,7 @@ namespace Bloodimir_Blitz
             DrawMenu.Add("predictions", new CheckBox("Visualize prediction"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
             Core.DelayAction(FlashQ, 1);

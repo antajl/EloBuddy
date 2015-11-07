@@ -151,7 +151,7 @@ namespace Bloodimir_Annie
                     sender.DisplayName = skinid[changeArgs.NewValue];
                 };
             Interrupter.OnInterruptableSpell += Interruptererer;
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
             Gapcloser.OnGapcloser += OnGapClose;
             Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessCastSpell;

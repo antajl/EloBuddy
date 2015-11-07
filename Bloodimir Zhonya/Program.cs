@@ -25,7 +25,7 @@ namespace Bloodimir_Zhonya
             ZhonyaMenu = MainMenu.AddMenu("Zhonya", "zhonyamenu");
             ZhonyaMenu.Add("zhonya", new CheckBox("Use Zhonya"));
             ZhonyaMenu.Add("zhealth", new Slider("Auto Zhonia Health %", 28));
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
         }
 
         private static void Zhonya()

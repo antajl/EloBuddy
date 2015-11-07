@@ -125,7 +125,7 @@ namespace Bloodimir_Sona
                 {
                     sender.DisplayName = sID[changeArgs.NewValue];
                 };
-            Game.OnTick += Game_OnTick;
+            Game.OnUpdate += Game_OnTick;
             Interrupter.OnInterruptableSpell += Interruptererer;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Game.OnWndProc += Game_OnWndProc;

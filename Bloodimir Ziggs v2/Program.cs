@@ -158,7 +158,7 @@ namespace Bloodimir_Ziggs_v2
                 {
                     sender.DisplayName = sID[changeArgs.NewValue];
                 };
-            Game.OnTick += Game_OnTick;
+            Game.OnUpdate += Game_OnTick;
             Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
             Interrupter.OnInterruptableSpell += Interruptererer;
             Game.OnWndProc += Game_OnWndProc;

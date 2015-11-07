@@ -147,7 +147,7 @@ namespace Morgana
             LastHit.Add("LHQ", new CheckBox("Use Q"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessSpell;

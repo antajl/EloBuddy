@@ -103,7 +103,7 @@ namespace Kennen
                 }
             };
             Interrupter.OnInterruptableSpell += Interruptererer;
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
         }
 

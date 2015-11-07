@@ -8,3 +8,4 @@ C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Tryndamere\Bloodim
 C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\x86\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\obj\x86\Debug\Bloodimir Tryndamere.exe
 C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\obj\x86\Debug\Bloodimir Tryndamere.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\obj\x86\Debug\Bloodimir Tryndamere.csprojResolveAssemblyReference.cache

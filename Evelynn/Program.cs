@@ -85,7 +85,7 @@ namespace Evelynn
                     sender.DisplayName = sid[changeArgs.NewValue];
                 };
 
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
         }
 

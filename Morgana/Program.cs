@@ -51,8 +51,8 @@ namespace Morgana
             if (Player.Instance.ChampionName != "Morgana")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, (int) 250f, (int) 1200f, (int) 80f);
-            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, (int) 250f, (int) 2200f, (int) 400f);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, 250,1200,80);
+            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 250,2200,400);
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);

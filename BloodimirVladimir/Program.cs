@@ -115,7 +115,7 @@ namespace BloodimirVladimir
                     sender.DisplayName = sID[changeArgs.NewValue];
                 };
 
-            Game.OnTick += Tick;
+            Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
             Gapcloser.OnGapcloser += Gapcloser_OnGapCloser;
         }

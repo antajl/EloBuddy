@@ -74,7 +74,7 @@ namespace Bloodimir_Shen
             var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 6));
             var sID = new[]
             {
-                "Default", "Yellow Jacket", "Frozen", "Surgeon", "Blood Moon", "Warlord", "TPA"
+                "Default", "Frozen", "Yellow Jacket", "Surgeon", "Blood Moon", "Warlord", "TPA"
             };
             skinchange.DisplayName = sID[skinchange.CurrentValue];
             skinchange.OnValueChange +=
@@ -598,10 +598,10 @@ namespace Bloodimir_Shen
                 case "Default":
                     Player.SetSkinId(0);
                     break;
-                case "Yellow Jacket":
+                case "Frozen":
                     Player.SetSkinId(1);
                     break;
-                case "Frozen":
+                case "Yellow Jacket":
                     Player.SetSkinId(2);
                     break;
                 case "Surgeon":

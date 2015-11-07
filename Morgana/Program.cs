@@ -1,22 +1,27 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
+using EloBuddy.SDK.Constants;
 using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
+using SharpDX;
+using Color = System.Drawing.Color;
 
 namespace Morgana
 {
     internal class Program
     {
-        public static Spell.Skillshot Q;
-        public static Spell.Skillshot W;
-        public static Spell.Targeted E;
+        public static Spell.Skillshot Q, W;
         public static Spell.Active R;
-        public static Spell.Targeted Ignite, Exhaust;
+        public static Spell.Targeted E, Ignite, Exhaust;
+        public static Item Talisman, Zhonia, Randuin;
+        public static int[] AbilitySequence;
+        public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
 
         public static Menu MorgMenu,
             ComboMenu,
@@ -24,14 +29,12 @@ namespace Morgana
             SkinMenu,
             MiscMenu,
             QMenu,
-            WMenu,
             AutoCastMenu,
             LaneClear,
             LastHit;
 
         public static AIHeroClient Me = ObjectManager.Player;
         public static HitChance QHitChance;
-        public static HitChance WHitChance;
 
         private static void Main(string[] args)
         {
@@ -55,11 +58,15 @@ namespace Morgana
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+            Talisman = new Item((int) ItemId.Talisman_of_Ascension);
+            Randuin = new Item((int) ItemId.Randuins_Omen);
+            Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
+            AbilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
 
             MorgMenu = MainMenu.AddMenu("B.Morgana", "bloodimirmorgana");
             MorgMenu.AddGroupLabel("Bloodimir.Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Morgana v1.0.5.0");
+            MorgMenu.AddLabel("Bloodimir Morgana v2.0.0.0");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -67,7 +74,7 @@ namespace Morgana
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
-            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
+            ComboMenu.Add("wcc", new CheckBox("Use W only if enemy is CC'ed", false));
 
             AutoCastMenu = MorgMenu.AddSubMenu("Auto Cast", "ac");
             AutoCastMenu.AddGroupLabel("Auto Cast");
@@ -75,8 +82,9 @@ namespace Morgana
             AutoCastMenu.Add("qd", new CheckBox("Auto Q Dashing"));
             AutoCastMenu.Add("qi", new CheckBox("Auto Q Immobile"));
             AutoCastMenu.Add("ar", new CheckBox("Auto R"));
+            AutoCastMenu.Add("immow", new CheckBox("W on Immobile"));
             AutoCastMenu.Add("rslider", new Slider("Minimum people for Auto R", 2, 0, 5));
-            
+
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
@@ -92,27 +100,17 @@ namespace Morgana
             QMenu.AddSeparator();
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
 
-            WMenu = MorgMenu.AddSubMenu("W Settings", "wsettings");
-            WMenu.AddGroupLabel("W Settings");
-            WMenu.AddSeparator();
-            WMenu.Add("wmax", new Slider("Max Range", (int) W.Range, 0, (int) W.Range));
-            WMenu.Add("wmin", new Slider("Min Range", 40, 0, (int) W.Range));
-            WMenu.AddSeparator();
-            WMenu.Add("mediumpred", new CheckBox("MEDIUM Soil Hitchance Prediction / Disabled = High"));
-            WMenu.AddSeparator();
-            WMenu.Add("immow", new CheckBox("W on Immobile"));
-
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
             var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 6));
-            var sID = new[]
+            var sid = new[]
             {"Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
-            skinchange.DisplayName = sID[skinchange.CurrentValue];
+            skinchange.DisplayName = sid[skinchange.CurrentValue];
             skinchange.OnValueChange +=
                 delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
                 {
-                    sender.DisplayName = sID[changeArgs.NewValue];
+                    sender.DisplayName = sid[changeArgs.NewValue];
                 };
 
             MiscMenu = MorgMenu.AddSubMenu("Misc", "misc");
@@ -120,9 +118,17 @@ namespace Morgana
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
             MiscMenu.Add("peel", new CheckBox("Peel from Melee Champions"));
+            MiscMenu.Add("antigapcloser", new CheckBox("Anti Gapcloser"));
+            MiscMenu.Add("talisman", new CheckBox("Use Talisman of Ascension"));
+            MiscMenu.Add("randuin", new CheckBox("Use Randuin"));
+            MiscMenu.Add("szhonya", new CheckBox("Smart Zhonya"));
+            MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells", false));
             MiscMenu.AddSeparator();
-            MiscMenu.Add("ELowAllies", new CheckBox("Use E on % Hp Allies", false));
-            MiscMenu.Add("EHPPercent", new Slider("Ally HP %", 45));
+            MiscMenu.Add("EAllies", new CheckBox("Auto E"));
+            foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team == Me.Team))
+            {
+                MiscMenu.Add("shield" + obj.ChampionName.ToLower(), new CheckBox("Shield " + obj.ChampionName));
+            }
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
@@ -137,6 +143,10 @@ namespace Morgana
             DrawMenu.AddSeparator();
             DrawMenu.Add("drawq", new CheckBox("Draw Q"));
             DrawMenu.Add("draww", new CheckBox("Draw W"));
+            DrawMenu.Add("drawe", new CheckBox("Draw E"));
+            DrawMenu.Add("drawr", new CheckBox("Draw R"));
+            DrawMenu.Add("drawaa", new CheckBox("Draw AA"));
+            DrawMenu.Add("predictions", new CheckBox("Visualize Q Prediction"));
 
             LaneClear = MorgMenu.AddSubMenu("Lane Clear", "laneclear");
             LaneClear.AddGroupLabel("Lane Clear Settings");
@@ -147,10 +157,79 @@ namespace Morgana
             LastHit.Add("LHQ", new CheckBox("Use Q"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
-            Game.OnUpdate += Tick;
-            Drawing.OnDraw += OnDraw;
+            Game.OnUpdate += OnUpdate;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessSpell;
+            Gapcloser.OnGapcloser += Gapcloser_OnGapcloser;
+            Drawing.OnDraw += delegate
+            {
+                if (!Me.IsDead)
+                {
+                    if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+                    {
+                        Drawing.DrawCircle(Me.Position, 626, Color.Red);
+                    }
+                    if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
+                    {
+                        Drawing.DrawCircle(Me.Position, W.Range, Color.Purple);
+                    }
+                    if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+                    {
+                        Drawing.DrawCircle(Me.Position, E.Range, Color.Green);
+                    }
+                    if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawCircle(Me.Position, 512, Color.Blue);
+                    }
+                    var predictedPositions = new Dictionary<int, Tuple<int, PredictionResult>>();
+                    var predictions = DrawMenu["predictions"].Cast<CheckBox>().CurrentValue;
+                    var qRange = DrawMenu["drawq"].Cast<CheckBox>().CurrentValue;
+
+                    foreach (
+                        var enemy in
+                            EntityManager.Heroes.Enemies.Where(
+                                enemy => QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue &&
+                                         enemy.IsValidTarget(Q.Range + 150) &&
+                                         !enemy.HasBuffOfType(BuffType.SpellShield)))
+                    {
+                        var predictionsq = Q.GetPrediction(enemy);
+                        predictedPositions[enemy.NetworkId] = new Tuple<int, PredictionResult>(Environment.TickCount,
+                            predictionsq);
+                        if (qRange && Q.IsLearned)
+                        {
+                            Circle.Draw(Q.IsReady() ? SharpDX.Color.Blue : SharpDX.Color.Red, Q.Range,
+                                Player.Instance.Position);
+                        }
+
+                        if (!predictions)
+                        {
+                            return;
+                        }
+
+                        foreach (var prediction in predictedPositions.ToArray())
+                        {
+                            if (Environment.TickCount - prediction.Value.Item1 > 2000)
+                            {
+                                predictedPositions.Remove(prediction.Key);
+                                continue;
+                            }
+
+                            Circle.Draw(SharpDX.Color.Red, 75, prediction.Value.Item2.CastPosition);
+                            Line.DrawLine(Color.GreenYellow, Player.Instance.Position,
+                                prediction.Value.Item2.CastPosition);
+                            Line.DrawLine(Color.CornflowerBlue,
+                                EntityManager.Heroes.Enemies.Find(o => o.NetworkId == prediction.Key).Position,
+                                prediction.Value.Item2.CastPosition);
+                            Drawing.DrawText(prediction.Value.Item2.CastPosition.WorldToScreen() + new Vector2(0, -20),
+                                Color.LimeGreen,
+                                string.Format("Hitchance: {0}%", Math.Ceiling(prediction.Value.Item2.HitChancePercent)),
+                                10);
+                        }
+                    }
+                    ;
+                }
+                ;
+            };
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
@@ -182,49 +261,140 @@ namespace Morgana
 
         private static void Auto_EOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            var shieldAllies = MiscMenu["ELowAllies"].Cast<CheckBox>().CurrentValue;
-            var shieldHealthPercent = MiscMenu["EHPPercent"].Cast<Slider>().CurrentValue;
-
-            if (shieldAllies)
-                if (sender.IsEnemy)
-                {
-                    var ally =
-                        EntityManager.Heroes.Allies.Where(
-                            x => x.IsValidTarget(W.Range) && x.HealthPercent < shieldHealthPercent)
-                            .FirstOrDefault();
-                    if (ally != null && ally.CountEnemiesInRange(650) >= 1)
-                    {
-                        E.Cast(ally);
-                    }
-                }
-        }
-
-        private static void OnDraw(EventArgs args)
-        {
-            if (!Me.IsDead)
+            string[] nonskillshots =
             {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+                "ShenShadowDash", "Pulverize", "GragasE", "FizzPiercingStrike", "reksaiqburrowed",
+                "RunePrison", "Fling", "NocturneUnspeakableHorror", "SejuaniArcticAssault", "ShyvanaTransformCast",
+                "PantheonW", "Ice Blast", "Terrify", "GalioIdolOfDurand","GnarR","JaxCounterStrike","BlindMonkRKick","UFSlash","JayceThunderingBlow","ZacR","StaticField","GarenQ","TalonCutthroat","ViR"
+            };
+
+            string[] skillShots =
+            {
+                "AhriSeduce","AhriOrbofDeception", "BraumQ", "RocketGrab", "JavelinToss","BrandBlazeMissile","CaitlynEntrapment","EvelynnR", "QuinnQ", "yasuoq3w", "RengarEFinal","ZiggsW","ZyraGraspingRoots","ZyraBrambleZone","Dazzle","FiddlesticksDarkWind","FeralScream","ZiggsW","ViktorChaosStorm","AlZaharCalloftheVoid",
+                "RumbleCarpetBombMissile", "ThreshQ", "ThreshE", "NamiQ", "DarkBindingMissile", "OrianaDetonateCommand",
+                "NautilusAnchorDrag",
+                "SejuaniGlacialPrisonCast", "SonaR", "VarusR", "rivenizunablade", "EnchantedCrystalArrow", "BardR","InfernalGuardian",
+                "CassiopeiaPetrifyingGaze",
+                "BraumRWrapper", "FizzMarinerDoomMissile", "ViktorDeathRay", "ViktorDeathRay3", "XerathMageSpear","GragasR","HecarimUlt","LeonaSolarFlare","LissandraR","LuxLightBinding","LuxMaliceCannon","JinxW","LuxLightStrikeKugel"
+            };
+            if (sender.Type != Me.Type || !E.IsReady() || !sender.IsEnemy ||
+                !MiscMenu["EAllies"].Cast<CheckBox>().CurrentValue)
+                return;
+            foreach (var ally in EntityManager.Heroes.Allies.Where(x => x.IsValidTarget(E.Range)))
+            {
+                var detectRange = ally.ServerPosition +
+                                  (args.End - ally.ServerPosition).Normalized()*ally.Distance(args.End);
+                if (detectRange.Distance(ally.ServerPosition) > ally.AttackRange - ally.BoundingRadius)
+                    continue;
                 {
-                    Drawing.DrawCircle(Me.Position, Q.Range, Color.Red);
-                }
-                if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Me.Position, W.Range, Color.Purple);
+                    if (!args.SData.IsAutoAttack())
+                    {
+                        foreach (var item in skillShots)
+                        {
+                            if (args.SData.Name == item &&
+                                (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                            {
+                                E.Cast(ally);
+                            }
+                        }
+                    }
+                    for (var i = 0; i <= 4; i++)
+                    {
+                        if (args.SData.Name == nonskillshots[i])
+                        {
+                            if (ally.Distance(args.End) < 325 &&
+                                (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                            {
+                                E.Cast(ally);
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        private static void Tick(EventArgs args)
+        private static void RanduinU()
+        {
+            if (Randuin.IsReady() && Randuin.IsOwned())
+            {
+                var randuin = MiscMenu["randuin"].Cast<CheckBox>().CurrentValue;
+                if (randuin && Me.HealthPercent <= 15 && Me.CountEnemiesInRange(Randuin.Range) >= 1 ||
+                    Me.CountEnemiesInRange(Randuin.Range) >= 2)
+                {
+                    Randuin.Cast();
+                }
+            }
+        }
+
+        private static void Ascension()
+        {
+            if (Talisman.IsReady() && Talisman.IsOwned())
+            {
+                var ascension = MiscMenu["talisman"].Cast<CheckBox>().CurrentValue;
+                if (ascension && Me.HealthPercent <= 15 && Me.CountEnemiesInRange(800) >= 1 ||
+                    Me.CountEnemiesInRange(Q.Range) >= 3)
+                {
+                    Talisman.Cast();
+                }
+            }
+        }
+
+        private static void ZhonyaU()
+        {
+            var zhoniaon = MiscMenu["szhonya"].Cast<CheckBox>().CurrentValue;
+
+            if (zhoniaon && Zhonia.IsReady() && Zhonia.IsOwned())
+            {
+                if (Me.CountEnemiesInRange(R.Range) >= 4)
+                {
+                    R.Cast();
+                    Zhonia.Cast();
+                }
+                else
+                {
+                    if (Me.HealthPercent <= 10 && Me.CountEnemiesInRange(E.Range) >= 1)
+                    {
+                        Zhonia.Cast();
+                    }
+                }
+            }
+        }
+
+        private static void LevelUpSpells()
+        {
+            var qL = Me.Spellbook.GetSpell(SpellSlot.Q).Level + QOff;
+            var wL = Me.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
+            var eL = Me.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
+            var rL = Me.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
+            if (qL + wL + eL + rL < ObjectManager.Player.Level)
+            {
+                int[] level = {0, 0, 0, 0};
+                for (var i = 0; i < ObjectManager.Player.Level; i++)
+                {
+                    level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+                }
+                if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+                if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+                if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+                if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+            }
+        }
+
+        private static void OnUpdate(EventArgs args)
         {
             QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
-            WHitChance = WMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
             Killsteal();
             SkinChange();
+            Ascension();
+            RanduinU();
+            ZhonyaU();
+            if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             AutoCast(immobile: AutoCastMenu["qi"].Cast<CheckBox>().CurrentValue,
                 dashing: AutoCastMenu["qd"].Cast<CheckBox>().CurrentValue);
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                    Combo(useQ: ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue, useW: ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue);
+                    Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
+                UseW(ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue);
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
@@ -249,26 +419,23 @@ namespace Morgana
                     Ignite.Cast(source);
                     return;
                 }
-                if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue ||
-                ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                    return;
-                foreach (
-                    var enemy in
-                        ObjectManager.Get<AIHeroClient>()
-                            .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
-                            .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
-                {
-                    if (enemy.IsFacing(Me))
+                if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
+                    foreach (
+                        var enemy in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
+                                .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
                     {
-                        if (!(Me.HealthPercent < 50)) continue;
+                        if (enemy.IsFacing(Me))
+                        {
+                            if (!(Me.HealthPercent < 50)) continue;
+                            Exhaust.Cast(enemy);
+                            return;
+                        }
+                        if (!(enemy.HealthPercent < 50)) continue;
                         Exhaust.Cast(enemy);
                         return;
                     }
-                    if (!(enemy.HealthPercent < 50)) continue;
-                    Exhaust.Cast(enemy);
-                    return;
-                }
             }
         }
 
@@ -290,29 +457,50 @@ namespace Morgana
             }
         }
 
+        private static void Gapcloser_OnGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs a)
+        {
+            var agapcloser = MiscMenu["antigapcloser"].Cast<CheckBox>().CurrentValue;
+            var antigapc = E.IsReady() && agapcloser;
+            if (antigapc)
+            {
+                if (sender.IsMe)
+                {
+                    var gap = a.Sender;
+                    if (gap.IsValidTarget(4000))
+                    {
+                        E.Cast(Me);
+                    }
+                }
+            }
+        }
+
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        {
+            switch (t)
+            {
+                default:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
+        }
+
         private static void Killsteal()
         {
             if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                try
+                foreach (
+                    var qtarget in
+                        EntityManager.Heroes.Enemies.Where(
+                            hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                 {
-                    foreach (
-                        var qtarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                    if (Me.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                     {
-                        if (Me.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
+                        var poutput = Q.GetPrediction(qtarget);
+                        if (poutput.HitChance >= HitChance.Medium)
                         {
-                            var poutput = Q.GetPrediction(qtarget);
-                            if (poutput.HitChance >= HitChance.Medium)
-                            {
-                                Q.Cast(poutput.CastPosition);
-                            }
+                            Q.Cast(poutput.CastPosition);
                         }
                     }
-                }
-                catch
-                {
                 }
             }
         }
@@ -374,55 +562,67 @@ namespace Morgana
             }
             if (R.IsReady())
             {
-                if (AutoCastMenu["ar"].Cast<CheckBox>().CurrentValue && Me.CountEnemiesInRange(R.Range) >= AutoCastMenu["rslider"].Cast<Slider>().CurrentValue)
+                if (AutoCastMenu["ar"].Cast<CheckBox>().CurrentValue &&
+                    Me.CountEnemiesInRange(R.Range) >= AutoCastMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     if (E.IsReady())
                         E.Cast(Me);
                     R.Cast();
                 }
+                if (AutoCastMenu["immow"].Cast<CheckBox>().CurrentValue)
+                {
+                    var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
+                    if (Q.GetPrediction(soilTarget).HitChance >= HitChance.Low)
+                        if (soilTarget.IsRooted ||
+                            soilTarget.IsStunned)
+                        {
+                            W.Cast(soilTarget);
+                        }
+                }
             }
         }
-        private static void Combo(bool useW, bool useQ)
+
+        private static void Combo(bool useQ)
         {
             if (useQ && Q.IsReady())
             {
-                try
+                var bindTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+                if (bindTarget.IsValidTarget(Q.Range))
                 {
-                    var bindTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-                    if (bindTarget.IsValidTarget(Q.Range))
+                    if (Q.GetPrediction(bindTarget).HitChance >= QHitChance)
                     {
-                        if (Q.GetPrediction(bindTarget).HitChance >= QHitChance)
+                        if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
                         {
-                            if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
+                            if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                             {
-                                if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
-                                {
-                                    Q.Cast(bindTarget);
-                                }
+                                Q.Cast(bindTarget);
                             }
-             if (useW && W.IsReady())
-            {
-                var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-                if (soilTarget.IsValidTarget(W.Range))
-                {
-                    if (W.GetPrediction(soilTarget).HitChance >= WHitChance)
-                    {
-                        if (soilTarget.Distance(Me.ServerPosition) > WMenu["wmin"].Cast<Slider>().CurrentValue && soilTarget.IsRooted || soilTarget.IsStunned)
-                        {
-                            W.Cast(soilTarget);
-
                         }
                     }
                 }
             }
-                        }
-                    
-                }    }         
-                catch
+        }
+
+        private static void UseW(bool useW)
+        {
+            if (useW && W.IsReady())
+            {
+                var wenemy =
+                    (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
+                if (wenemy != null)
                 {
+                    W.Cast(wenemy);
+                }
+            }
+            else if (ComboMenu["wcc"].Cast<CheckBox>().CurrentValue)
+            {
+                var wccenemy =
+                    (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
+                if (wccenemy.IsRooted || wccenemy.IsStunned)
+                {
+                    W.Cast(wccenemy);
                 }
             }
         }
     }
-    }
-
+}

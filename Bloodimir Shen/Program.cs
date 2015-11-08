@@ -21,7 +21,6 @@ namespace Bloodimir_Shen
         public static Menu ShenMenu, ComboMenu, UltMenu, MiscMenu, EMenu, DrawMenu, SkinMenu;
         public static int[] AbilitySequence;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
-        public static HitChance EHitChance;
 
         private static Vector3 MousePos
         {
@@ -94,7 +93,6 @@ namespace Bloodimir_Shen
             }
             EMenu.Add("flashe", new KeyBind("Flash E", false, KeyBind.BindTypes.HoldActive, 'Y'));
             EMenu.Add("e", new KeyBind("E", false, KeyBind.BindTypes.HoldActive, 'E'));
-            EMenu.Add("mediumpred", new CheckBox("MEDIUM E Hitchance | Disabled = High", false));
 
             UltMenu = ShenMenu.AddSubMenu("ULT", "ultmenu");
             UltMenu.AddGroupLabel("ULT");
@@ -135,12 +133,11 @@ namespace Bloodimir_Shen
             DrawMenu.Add("drawfq", new CheckBox("Draw FlashQ"));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
-            Game.OnUpdate += Tick;
+            Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
-            Gapcloser.OnGapcloser += OnGapClose;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
             Obj_AI_Base.OnProcessSpellCast += Auto_WOnProcessSpell;
-            Core.DelayAction(FlashE, 1);
+            Core.DelayAction(FlashE, 60);
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
@@ -151,21 +148,6 @@ namespace Bloodimir_Shen
                 if (E.IsReady() && sender.IsValidTarget(E.Range) && MiscMenu["inte"].Cast<CheckBox>().CurrentValue)
                     E.Cast(intTarget.ServerPosition);
             }
-        }
-        private static
-            void OnGapClose
-            (AIHeroClient Sender, Gapcloser.GapcloserEventArgs gapcloser)
-        {
-            if (!gapcloser.Sender.IsEnemy)
-                return;
-            var gapclose = MiscMenu["gapclose"].Cast<CheckBox>().CurrentValue;
-            if (!gapclose)
-                return;
-                if (E.IsReady()
-                    && E.IsInRange(gapcloser.Start))
-                {
-                    E.Cast(MousePos);
-                }
             }
         private static void Auto_WOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
@@ -192,9 +174,9 @@ namespace Bloodimir_Shen
                 {
                     Drawing.DrawCircle(Shen.Position, E.Range, Color.LightBlue);
                 }
-                if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && E.IsLearned && Flash.IsReady())
+                if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && E.IsLearned && Flash.IsReady() && E.IsReady())
                 {
-                    Drawing.DrawCircle(Shen.Position, 575 + 425, Color.DarkBlue);
+                    Drawing.DrawCircle(Shen.Position, E.Range + 425, Color.DarkBlue);
                 }
                 {
                     DrawAllyHealths();
@@ -213,7 +195,6 @@ namespace Bloodimir_Shen
             {
                 Orbwalker.MoveTo(Game.CursorPos);
                 E.Cast(MousePos);
-                W.Cast();
             }
         }
 
@@ -227,26 +208,29 @@ namespace Bloodimir_Shen
                         EntityManager.Heroes.Allies.Where(
                             x => x.IsValidTarget(R.Range) && x.HealthPercent < 7)
                     )
-                    if (ally != null && R.IsReady() && ally.CountEnemiesInRange(650) >= 1)
+                    if (R.IsReady() && ally.CountEnemiesInRange(650) >= 1)
                     {
                         R.Cast(ally);
                     }
             }
         }
 
-        private static void Tick(EventArgs args)
+        private static void OnUpdate(EventArgs args)
         {
-            EHitChance = EMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
+            if (EMenu["flashe"].Cast<KeyBind>().CurrentValue)
+            {
+                FlashE();
+            }
             SkinChange();
             Killsteal();
-            RanduinU();
+            if (MiscMenu["randuin"].Cast<CheckBox>().CurrentValue)  RanduinU();
             HighestAuthority();
             if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo(useW: ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
                         useE: ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue,
-                        useQ: ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
+                        useQ:ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
@@ -260,48 +244,13 @@ namespace Bloodimir_Shen
             {
                 Flee();
             }
-            if (EMenu["flashe"].Cast<KeyBind>().CurrentValue)
-            {
-                FlashE();
-            }
             if (EMenu["e"].Cast<KeyBind>().CurrentValue)
             {
-                EE();
+                Ee();
             }
             if (UltMenu["ult"].Cast<KeyBind>().CurrentValue)
             {
                 Ult();
-            }
-            {
-                if (ComboMenu["useignite"].Cast<CheckBox>().CurrentValue)
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20*Shen.Level - (a.HPRegenRate/5*3)))
-                    {
-                        Ignite.Cast(source);
-                        return;
-                    }
-                if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
-                    foreach (
-                        var enemy in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
-                                .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
-                    {
-                        if (enemy.IsFacing(Shen))
-                        {
-                            if (!(Shen.HealthPercent < 50)) continue;
-                            Exhaust.Cast(enemy);
-                            return;
-                        }
-                        if (!(enemy.HealthPercent < 50)) continue;
-                        Exhaust.Cast(enemy);
-                        return;
-                    }
             }
         }
 
@@ -352,25 +301,24 @@ namespace Bloodimir_Shen
                 }
             }
         }
-
         private static void FlashE()
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
-            var fetarget = TargetSelector.GetTarget(575 + 425, DamageType.Magical);
+            var fetarget = TargetSelector.GetTarget(E.Range + 425, DamageType.Magical);
             if (fetarget == null) return;
-            var xpos = fetarget.Position.Extend(fetarget, 575);
+            var xpos = fetarget.Position.Extend(fetarget, E.Range);
             var predepos = E.GetPrediction(fetarget).CastPosition;
             {
                 if (E.IsReady() && Flash.IsReady())
-                    if (fetarget.IsValidTarget(575 + 425))
+                    if (fetarget.IsValidTarget(E.Range + 425))
                     {
-                        Flash.Cast((Vector3) xpos);
-                        E.Cast(predepos);
+                      Flash.Cast((Vector3)xpos);
+                      E.Cast(predepos);
                     }
             }
         }
 
-        private static void EE()
+        private static void Ee()
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
             var etarget = TargetSelector.GetTarget(600, DamageType.Magical);
@@ -397,7 +345,7 @@ namespace Bloodimir_Shen
                         EntityManager.Heroes.Allies.Where(
                             x => x.IsValidTarget(R.Range) && x.HealthPercent < rslider)
                     )
-                    if (ally != null && R.IsReady() && ally.CountEnemiesInRange(850) >= 1)
+                    if (R.IsReady() && ally.CountEnemiesInRange(850) >= 1)
                     {
                         R.Cast(ally);
                     }
@@ -475,7 +423,7 @@ namespace Bloodimir_Shen
                     {
                         color = Color.LimeGreen;
                     }
-                    if (ally != null && ally.CountEnemiesInRange(850) >= 1 && R.IsReady())
+                    if (ally.CountEnemiesInRange(850) >= 1 && R.IsReady())
                     {
                         Drawing.DrawText(
                             Drawing.Width*0.4f, Drawing.Height*0.4f + i, color, " (" + champion + ")"
@@ -550,6 +498,14 @@ namespace Bloodimir_Shen
         private static
             void Combo(bool useE, bool useW, bool useQ)
         {
+                          if (useQ && Q.IsReady())
+            {
+                var qtarget = GetEnemy(Q.Range, GameObjectType.AIHeroClient);
+                if (qtarget.IsValidTarget(Q.Range))
+                {
+                    Q.Cast(qtarget);
+                }
+            }
             if (useE && E.IsReady())
             {
                 var eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
@@ -557,7 +513,7 @@ namespace Bloodimir_Shen
                 if (eTarget.IsValidTarget(E.Range))
                     if (EMenu["taunt" + eTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                         if (Shen.CountEnemiesInRange(E.Range) <= 1)
-                            if (E.GetPrediction(eTarget).HitChance >= EHitChance)
+                            if (E.GetPrediction(eTarget).HitChance >= HitChance.High)
                             {
                                 E.Cast(eTarget);
                             }
@@ -566,15 +522,6 @@ namespace Bloodimir_Shen
                             {
                                 E.Cast(predE);
                             }
-
-            if (useE && Q.IsReady())
-            {
-                var grabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-                if (grabTarget.IsValidTarget(Q.Range))
-                {
-                    Q.Cast(grabTarget);
-                }
-            }
             if (useW && W.IsReady())
             {
                 var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
@@ -585,11 +532,10 @@ namespace Bloodimir_Shen
                     {
                         W.Cast();
                     }
-                    }
-                }
-            }
+                        
+        }  }  } 
         }
-
+        
         private static void SkinChange()
         {
             var style = SkinMenu["sID"].DisplayName;
@@ -617,6 +563,8 @@ namespace Bloodimir_Shen
                     Player.SetSkinId(6);
                     break;
             }
-        }
-    }
+            }
+            }
 }
+        
+    

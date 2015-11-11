@@ -609,7 +609,7 @@ namespace Morgana
             {
                 var wenemy =
                     (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
-                if (wenemy != null)
+                if (wenemy != null && W.GetPrediction(wenemy).HitChance >= HitChance.Medium)
                 {
                     W.Cast(wenemy);
                 }
@@ -618,7 +618,7 @@ namespace Morgana
             {
                 var wccenemy =
                     (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
-                if (wccenemy.IsRooted || wccenemy.IsStunned)
+                if (wccenemy.IsRooted || wccenemy.IsStunned && W.GetPrediction(wccenemy).HitChance >= HitChance.Medium)
                 {
                     W.Cast(wccenemy);
                 }

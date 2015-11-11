@@ -572,7 +572,7 @@ namespace Morgana
                 if (AutoCastMenu["immow"].Cast<CheckBox>().CurrentValue)
                 {
                     var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-                    if (Q.GetPrediction(soilTarget).HitChance >= HitChance.Low)
+                    if (W.GetPrediction(soilTarget).HitChance >= HitChance.Medium)
                         if (soilTarget.IsRooted ||
                             soilTarget.IsStunned)
                         {

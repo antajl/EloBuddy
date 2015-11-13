@@ -10,13 +10,18 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Evelynn
 {
-    internal class Program
+    internal static class Program
     {
         public static Spell.Active Q, W;
         public static Spell.Targeted E;
-        public static Spell.Skillshot R;
-        public static Menu EveMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHitMenu;
-        public static AIHeroClient Eve = ObjectManager.Player;
+        private static Spell.Skillshot R;
+        private static Menu EveMenu;
+        public static Menu ComboMenu;
+        private static Menu DrawMenu;
+        private static Menu SkinMenu;
+        private static Menu MiscMenu;
+        public static Menu LaneJungleClear, LastHitMenu;
+        private static AIHeroClient Eve = ObjectManager.Player;
 
         private static void Main(string[] args)
         {
@@ -91,30 +96,28 @@ namespace Evelynn
 
         private static void OnDraw(EventArgs args)
         {
-            if (!Eve.IsDead)
+            if (Eve.IsDead) return;
+            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Eve.Position, Q.Range, Color.DarkBlue);
-                }
-                if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
-                {
-                    Drawing.DrawCircle(Eve.Position, R.Range, Color.Red);
-                }
-                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
-                {
-                    Drawing.DrawCircle(Eve.Position, E.Range, Color.Green);
-                }
+                Drawing.DrawCircle(Eve.Position, Q.Range, Color.DarkBlue);
+            }
+            if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+            {
+                Drawing.DrawCircle(Eve.Position, R.Range, Color.Red);
+            }
+            if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+            {
+                Drawing.DrawCircle(Eve.Position, E.Range, Color.Green);
             }
         }
 
-        public static void Flee()
+        private static void Flee()
         {
             Orbwalker.MoveTo(Game.CursorPos);
             W.Cast();
         }
 
-        public static void AutoW()
+        private static void AutoW()
         {
             var useW = MiscMenu["asw"].Cast<CheckBox>().CurrentValue;
 
@@ -154,59 +157,48 @@ namespace Evelynn
             }
         }
 
-        public static void Rincombo(bool useR)
+        private static void Rincombo(bool useR)
         {
-            if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                if (useR && R.IsReady() &&
-                    Eve.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
-                {
-                    var rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-                    R.Cast(rtarget.ServerPosition);
-                }
+            if (!ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue) return;
+            if (!useR || !R.IsReady() ||
+                Eve.CountEnemiesInRange(R.Range) < ComboMenu["rslider"].Cast<Slider>().CurrentValue) return;
+            var rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
+            R.Cast(rtarget.ServerPosition);
         }
 
         private static void Killsteal()
         {
-            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            try
             {
-                try
+                foreach (
+                    var qtarget in
+                        EntityManager.Heroes.Enemies.Where(
+                            hero =>
+                                hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                 {
-                    foreach (
-                        var qtarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero =>
-                                    hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                    if (Eve.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                     {
-                        if (Eve.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
+                        Q.Cast();
+                    }
+                    var eenemy = TargetSelector.GetTarget(E.Range, DamageType.Physical);
+                    if (!MiscMenu["kse"].Cast<CheckBox>().CurrentValue || !E.IsReady()) continue;
+                    try
+                    {
+                        foreach (var etarget in EntityManager.Heroes.Enemies.Where(
+                            hero =>
+                                hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie).Where(etarget => Eve.GetSpellDamage(qtarget, SpellSlot.E) >= etarget.Health))
                         {
-                            Q.Cast();
-                        }
-                        var eenemy = TargetSelector.GetTarget(E.Range, DamageType.Physical);
-                        if (MiscMenu["kse"].Cast<CheckBox>().CurrentValue && E.IsReady())
-                        {
-                            try
-                            {
-                                foreach (
-                                    var etarget in
-                                        EntityManager.Heroes.Enemies.Where(
-                                            hero =>
-                                                hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie))
-                                {
-                                    if (Eve.GetSpellDamage(qtarget, SpellSlot.E) >= etarget.Health)
-                                    {
-                                        E.Cast(eenemy);
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                            }
+                            E.Cast(eenemy);
                         }
                     }
+                    catch
+                    {
+                    }
                 }
-                catch
-                {
-                }
+            }
+            catch
+            {
             }
         }
 

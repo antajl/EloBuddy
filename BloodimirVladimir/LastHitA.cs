@@ -5,19 +5,19 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace BloodimirVladimir
 {
-	internal class LastHitA
+	internal static class LastHitA
 	{
-		public enum AttackSpell
+	    private enum AttackSpell
 		{
 			Q
 		};
 
-		public static AIHeroClient Vladimir
+	    private static AIHeroClient Vladimir
 		{
 			get { return ObjectManager.Player; }
 		}
 
-		public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
+	    private static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
 		{
             return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
 			                                                                                   && a.Type == type

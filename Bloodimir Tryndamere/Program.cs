@@ -10,18 +10,22 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Tryndamere
 {
-    internal class Program
+    internal static class Program
     {
-        public static Spell.Active Q;
+        private static Spell.Active Q;
         public static Spell.Active W;
         public static Spell.Skillshot E;
-        public static Spell.Active R;
-        public static Spell.Targeted Ignite;
-        public static Menu TrynMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear;
+        private static Spell.Active R;
+        private static Spell.Targeted Ignite;
+        private static Menu TrynMenu;
+        public static Menu ComboMenu;
+        private static Menu DrawMenu;
+        private static Menu SkinMenu;
+        public static Menu MiscMenu, LaneJungleClear;
         public static Item Tiamat, Hydra, Bilgewater, Youmuu, Botrk;
         public static AIHeroClient Tryndamere = ObjectManager.Player;
 
-        public static AIHeroClient _Player
+        private static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
         }
@@ -31,7 +35,7 @@ namespace Bloodimir_Tryndamere
             Loading.OnLoadingComplete += OnLoaded;
         }
 
-        public static bool HasSpell(string s)
+        private static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -113,7 +117,7 @@ namespace Bloodimir_Tryndamere
             Drawing.OnDraw += OnDraw;
         }
 
-        public static void AutoQ(bool useR)
+        private static void AutoQ(bool useR)
         {
             var autoQ = ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = ComboMenu["qhp"].Cast<Slider>().CurrentValue;
@@ -123,32 +127,29 @@ namespace Bloodimir_Tryndamere
             }
         }
 
-        public static void AutoUlt(bool useR)
+        private static void AutoUlt(bool useR)
         {
             var autoR = ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = ComboMenu["rslider"].Cast<Slider>().CurrentValue;
-            if (autoR && _Player.HealthPercent < healthAutoR)
-                if (
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(x => x.IsEnemy && x.Distance(Tryndamere.Position) <= 1100)
-                        .Count() >= 1)
-                {
-                    R.Cast();
-                }
+            if (!autoR || !(_Player.HealthPercent < healthAutoR)) return;
+            if (
+                ObjectManager
+                    .Get<AIHeroClient>().Any(x => x.IsEnemy && x.Distance(Tryndamere.Position) <= 1100))
+            {
+                R.Cast();
+            }
         }
 
         private static void OnDraw(EventArgs args)
         {
-            if (!Tryndamere.IsDead)
+            if (Tryndamere.IsDead) return;
+            if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
             {
-                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
-                {
-                    Drawing.DrawCircle(Tryndamere.Position, E.Range, Color.DarkBlue);
-                }
+                Drawing.DrawCircle(Tryndamere.Position, E.Range, Color.DarkBlue);
             }
         }
 
-        public static void Flee()
+        private static void Flee()
         {
             Orbwalker.MoveTo(Game.CursorPos);
             E.Cast(Game.CursorPos);
@@ -193,69 +194,43 @@ namespace Bloodimir_Tryndamere
 
         private static void Killsteal()
         {
-            if (MiscMenu["kse"].Cast<CheckBox>().CurrentValue && E.IsReady())
+            if (!MiscMenu["kse"].Cast<CheckBox>().CurrentValue || !E.IsReady()) return;
+            try
             {
-                try
+                foreach (var etarget in EntityManager.Heroes.Enemies.Where(
+                    hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie).Where(etarget => Tryndamere.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health))
                 {
-                    foreach (
-                        var etarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie))
                     {
-                        if (Tryndamere.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health)
+                        E.Cast(etarget.ServerPosition);
+                    }
+                    if ((!MiscMenu["ksbotrk"].Cast<CheckBox>().CurrentValue || !Botrk.IsReady()) &&
+                        !Bilgewater.IsReady() && !Tiamat.IsReady()) continue;
+                    {
+                        try
                         {
+                            foreach (var itarget in EntityManager.Heroes.Enemies.Where(
+                                hero =>
+                                    hero.IsValidTarget(Botrk.Range) && !hero.IsDead &&
+                                    !hero.IsZombie).Where(itarget => Tryndamere.GetItemDamage(itarget, ItemId.Blade_of_the_Ruined_King) >=
+                                                                     itarget.Health))
                             {
-                                E.Cast(etarget.ServerPosition);
-                            }
-                            if (MiscMenu["ksbotrk"].Cast<CheckBox>().CurrentValue && Botrk.IsReady() ||
-                                Bilgewater.IsReady() || Tiamat.IsReady())
-                            {
+                                {
+                                    Botrk.Cast(itarget);
+                                }
+                                if ((!MiscMenu["kshydra"].Cast<CheckBox>().CurrentValue ||
+                                     !Botrk.IsReady()) && !Bilgewater.IsReady() && !Tiamat.IsReady())
+                                    continue;
                                 {
                                     try
                                     {
-                                        foreach (
-                                            var itarget in
-                                                EntityManager.Heroes.Enemies.Where(
-                                                    hero =>
-                                                        hero.IsValidTarget(Botrk.Range) && !hero.IsDead &&
-                                                        !hero.IsZombie))
+                                        foreach (var htarget in EntityManager.Heroes.Enemies.Where(
+                                            hero =>
+                                                hero.IsValidTarget(Hydra.Range) &&
+                                                !hero.IsDead && !hero.IsZombie).Where(htarget => Tryndamere.GetItemDamage(htarget,
+                                                    ItemId.Ravenous_Hydra_Melee_Only) >=
+                                                                                                 htarget.Health))
                                         {
-                                            if (Tryndamere.GetItemDamage(itarget, ItemId.Blade_of_the_Ruined_King) >=
-                                                itarget.Health)
-                                            {
-                                                {
-                                                    Botrk.Cast(itarget);
-                                                }
-                                                if (MiscMenu["kshydra"].Cast<CheckBox>().CurrentValue && Botrk.IsReady() ||
-                                                    Bilgewater.IsReady() || Tiamat.IsReady())
-                                                {
-                                                    {
-                                                        try
-                                                        {
-                                                            foreach (
-                                                                var htarget in
-                                                                    EntityManager.Heroes.Enemies.Where(
-                                                                        hero =>
-                                                                            hero.IsValidTarget(Hydra.Range) &&
-                                                                            !hero.IsDead && !hero.IsZombie))
-                                                            {
-                                                                if (
-                                                                    Tryndamere.GetItemDamage(htarget,
-                                                                        ItemId.Ravenous_Hydra_Melee_Only) >=
-                                                                    htarget.Health)
-                                                                {
-                                                                    {
-                                                                        Hydra.Cast();
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        catch
-                                                        {
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                            Hydra.Cast();
                                         }
                                     }
                                     catch
@@ -264,11 +239,14 @@ namespace Bloodimir_Tryndamere
                                 }
                             }
                         }
+                        catch
+                        {
+                        }
                     }
                 }
-                catch
-                {
-                }
+            }
+            catch
+            {
             }
         }
 

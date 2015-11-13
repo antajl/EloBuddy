@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Renekton
 {
-    internal class LaneJungleClearA
+    internal static class LaneJungleClearA
     {
         public enum AttackSpell
         {
@@ -16,11 +16,12 @@ namespace Bloodimir_Renekton
             Hydra
         };
 
-        public static AIHeroClient Renekton
+        private static AIHeroClient Renekton
         {
             get { return ObjectManager.Player; }
         }
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -43,24 +44,21 @@ namespace Bloodimir_Renekton
             var QREADY = Program.Q.IsReady();
             var WREADY = Program.W.IsReady();
 
-            if (ECHECK && EREADY)
-            {
+            if (!ECHECK || !EREADY) return;
             {
                 var aenemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (aenemy != null)
                     Program.E.Cast(aenemy.ServerPosition);
             }
-            if (QCHECK && QREADY)
-            {
+            if (!QCHECK || !QREADY) return;
             {
                 var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (qenemy != null)
                     Program.Q.Cast();
             }
-            if (WCHECK && WREADY)
-            {
+            if (!WCHECK || !WREADY) return;
             {
                 var wenemy =
                     (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
@@ -68,16 +66,11 @@ namespace Bloodimir_Renekton
                 if (wenemy != null &&  Renekton.GetSpellDamage(wenemy, SpellSlot.Q) >= wenemy.Health)
                     Program.W.Cast();
             }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var cenemy = (Obj_AI_Minion) GetEnemy(Renekton.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            if (!Orbwalker.CanAutoAttack) return;
+            var cenemy = (Obj_AI_Minion) GetEnemy(Renekton.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
-                if (cenemy != null)
-                    Orbwalker.ForcedTarget = cenemy;
-            }
-            }
-            }
-            }
+            if (cenemy != null)
+                Orbwalker.ForcedTarget = cenemy;
         }
         public static
             void Items()
@@ -85,24 +78,18 @@ namespace Bloodimir_Renekton
             var ienemy =
                 (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange() + 335, GameObjectType.obj_AI_Minion);
 
-            if (ienemy != null)
+            if (ienemy == null) return;
+            if (!ienemy.IsValid || ienemy.IsZombie) return;
+            if (Program.LaneJungleClear["LCI"].Cast<CheckBox>().CurrentValue)
             {
-                if (ienemy.IsValid && !ienemy.IsZombie)
-                {
-                    if (Program.LaneJungleClear["LCI"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
-                            Program.Hydra.IsInRange(ienemy))
-                            Program.Hydra.Cast();
-                    }
-                    if (Program.LaneJungleClear["LCI"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
-                            Program.Tiamat.IsInRange(ienemy))
-                            Program.Tiamat.Cast();
-                    }
-                }
+                if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
+                    Program.Hydra.IsInRange(ienemy))
+                    Program.Hydra.Cast();
             }
+            if (!Program.LaneJungleClear["LCI"].Cast<CheckBox>().CurrentValue) return;
+            if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
+                Program.Tiamat.IsInRange(ienemy))
+                Program.Tiamat.Cast();
         }
     }
 }

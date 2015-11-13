@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Kennen
 {
-    internal class LaneJungleClearA
+    internal static class LaneJungleClearA
     {
         public enum AttackSpell
         {
@@ -18,7 +18,7 @@ namespace Kennen
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -45,17 +45,13 @@ namespace Kennen
                 if (enemy != null)
                     Program.Q.Cast(enemy.ServerPosition);
             }
-            if (wcheck && wready)
-            {
+            if (!wcheck || !wready) return;
             var wminion = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
-            if (wminion != null)
+            if (wminion == null) return;
+            if (wminion.HasBuff("kennenmarkofstorm"))
             {
-                if (wminion.HasBuff("kennenmarkofstorm"))
-                {
-                    Program.W.Cast();
-                }
+                Program.W.Cast();
             }
         }
-    }
     }
 }

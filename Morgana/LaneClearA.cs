@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Morgana
 {
-    internal class LaneClearA
+    internal static class LaneClearA
     {
         public enum AttackSpell
         {
@@ -17,7 +17,7 @@ namespace Morgana
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -34,15 +34,13 @@ namespace Morgana
             var wcheck = Program.LaneClear["LCW"].Cast<CheckBox>().CurrentValue;
             var wready = Program.W.IsReady();
 
-            if (wready && wcheck)
-            {
-                var wenemy =
-                    (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
+            if (!wready || !wcheck) return;
+            var wenemy =
+                (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
 
-                if (wenemy != null)
-                { 
-                        Program.W.Cast(wenemy);
-                    }
+            if (wenemy != null)
+            { 
+                Program.W.Cast(wenemy);
             }
         }
     }

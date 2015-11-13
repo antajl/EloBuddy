@@ -11,21 +11,34 @@ using Color = System.Drawing.Color;
 
 namespace BloodimirVladimir
 {
-    internal class Program
+    internal static class Program
     {
-        public static Spell.Active W, E;
-        public static Spell.Skillshot R, Flash;
-        public static Spell.Targeted Ignite, Q;
-        public static Item Zhonia;
-        public static Menu VladMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneClear, HarassMenu, LastHit;
-        public static AIHeroClient Vlad = ObjectManager.Player;
+        private static Spell.Active W;
+        public static Spell.Active E;
+        private static Spell.Skillshot R;
+
+        //Todo: Flash var not used
+        private static Spell.Skillshot Flash;
+
+        private static Spell.Targeted Ignite;
+        public static Spell.Targeted Q;
+        private static Item Zhonia;
+        private static Menu VladMenu;
+        public static Menu ComboMenu;
+        private static Menu DrawMenu;
+        private static Menu SkinMenu;
+        private static Menu MiscMenu;
+        public static Menu LaneClear;
+        private static Menu HarassMenu;
+        public static Menu LastHit;
+        private static AIHeroClient Vlad = ObjectManager.Player;
 
         private static Vector3 mousePos
         {
             get { return Game.CursorPos; }
         }
 
-        public static bool HasSpell(string s)
+        private static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -122,28 +135,26 @@ namespace BloodimirVladimir
 
         private static void OnDraw(EventArgs args)
         {
-            if (!Vlad.IsDead)
+            if (Vlad.IsDead) return;
+            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+                Drawing.DrawCircle(Vlad.Position, Q.Range, Color.Red);
+            }
+            {
+                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
                 {
-                    Drawing.DrawCircle(Vlad.Position, Q.Range, Color.Red);
+                    Drawing.DrawCircle(Vlad.Position, E.Range, Color.DarkGreen);
                 }
+                if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
                 {
-                    if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
-                    {
-                        Drawing.DrawCircle(Vlad.Position, E.Range, Color.DarkGreen);
-                    }
-                    if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
-                    {
-                        Drawing.DrawCircle(Vlad.Position, R.Range, Color.DarkMagenta);
-                    }
-                    }
-                if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
-                {
-                    Drawing.DrawCircle(Vlad.Position, 518, Color.DarkSlateGray);
-                }
+                    Drawing.DrawCircle(Vlad.Position, R.Range, Color.DarkMagenta);
                 }
             }
+            if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
+            {
+                Drawing.DrawCircle(Vlad.Position, 518, Color.DarkSlateGray);
+            }
+        }
 
         private static
             void Gapcloser_OnGapCloser
@@ -159,7 +170,7 @@ namespace BloodimirVladimir
             }
         }
 
-        public static void Flee()
+        private static void Flee()
         {
             Orbwalker.MoveTo(Game.CursorPos);
             W.Cast();
@@ -169,12 +180,12 @@ namespace BloodimirVladimir
             var zhoniaon = MiscMenu["zhonias"].Cast<CheckBox>().CurrentValue;
             var zhealth = MiscMenu["zhealth"].Cast<Slider>().CurrentValue;
 
-            if (zhoniaon && Zhonia.IsReady() && Zhonia.IsOwned())
-            {
-                if (Vlad.HealthPercent <= zhealth)
-                {
-                    Zhonia.Cast();
-                }}}
+             if (!zhoniaon || !Zhonia.IsReady() || !Zhonia.IsOwned()) return;
+             if (Vlad.HealthPercent <= zhealth)
+             {
+                 Zhonia.Cast();
+             }
+        }
         private static void Tick(EventArgs args)
         {
             Killsteal();
@@ -213,8 +224,8 @@ namespace BloodimirVladimir
                     return;
                 }
             }
-        
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -226,7 +237,8 @@ namespace BloodimirVladimir
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
-        public static void Harass()
+
+        private static void Harass()
         {
             Orbwalker.OrbwalkTo(mousePos);
             if (HarassMenu["he"].Cast<CheckBox>().CurrentValue)
@@ -236,15 +248,16 @@ namespace BloodimirVladimir
                 if (enemy != null)
                     E.Cast();
             }
-            if (HarassMenu["hq"].Cast<CheckBox>().CurrentValue)
+            if (!HarassMenu["hq"].Cast<CheckBox>().CurrentValue) return;
             {
                 var enemy = (AIHeroClient)GetEnemy(Q.Range, GameObjectType.AIHeroClient);
 
                 if (enemy != null)
                     Q.Cast(enemy);
             }
-            }
-        public static void AutoHarass()
+        }
+
+        private static void AutoHarass()
         {
             if (HarassMenu["autohe"].Cast<CheckBox>().CurrentValue)
             {
@@ -253,7 +266,7 @@ namespace BloodimirVladimir
                 if (enemy != null)
                     E.Cast();
             }
-            if (HarassMenu["autohq"].Cast<CheckBox>().CurrentValue)
+            if (!HarassMenu["autohq"].Cast<CheckBox>().CurrentValue) return;
             {
                 var enemy = (AIHeroClient)GetEnemy(Q.Range, GameObjectType.AIHeroClient);
 
@@ -261,7 +274,8 @@ namespace BloodimirVladimir
                     Q.Cast(enemy);
             }
         }
-        public static void Rincombo(bool useR)
+
+        private static void Rincombo(bool useR)
         {
             foreach (
                         var qtarget in
@@ -270,46 +284,38 @@ namespace BloodimirVladimir
                                 {
             if (Vlad.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health || (Vlad.GetSpellDamage(qtarget, SpellSlot.E) >= qtarget.Health))
                                     return;
-            if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                if (useR && R.IsReady() &&
-                    Vlad.CountEnemiesInRange(R.Width) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
-                {
-                    var rtarget = TargetSelector.GetTarget(1250, DamageType.Magical);
-                    R.Cast(rtarget.ServerPosition);
-                }
-        }
+                                    if (!ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue) continue;
+                                    if (!useR || !R.IsReady() ||
+                                        Vlad.CountEnemiesInRange(R.Width) <
+                                        ComboMenu["rslider"].Cast<Slider>().CurrentValue) continue;
+                                    var rtarget = TargetSelector.GetTarget(1250, DamageType.Magical);
+                                    R.Cast(rtarget.ServerPosition);
+                                }
             }
 
         private static void Killsteal()
         {
             var enemy = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            foreach (
+                var qtarget in
+                    EntityManager.Heroes.Enemies.Where(
+                        hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
             {
-                    foreach (
-                        var qtarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                if (Vlad.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health && qtarget.Distance(Vlad) <= Q.Range)
+                {
+                    Q.Cast(enemy);
+                }
+                if (MiscMenu["kse"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+                {
+                    foreach (var etarget in EntityManager.Heroes.Enemies.Where(
+                        hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie).Where(etarget => Vlad.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health && etarget.Distance(Vlad) <= E.Range))
                     {
-                        if (Vlad.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health && qtarget.Distance(Vlad) <= Q.Range)
-                        {
-                            Q.Cast(enemy);
-                        }
-                        if (MiscMenu["kse"].Cast<CheckBox>().CurrentValue && Q.IsReady())
-            {
-                    foreach (
-                        var etarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie))
-                    {
-                        if (Vlad.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health && etarget.Distance(Vlad) <= E.Range)
-                        {
-                           E.Cast();
-                        }
+                        E.Cast();
                     }
                 }
                 {
                 }
-            }
             }
         }
 
@@ -342,6 +348,8 @@ namespace BloodimirVladimir
                 case "Academy":
                     Player.SetSkinId(7);
                     break;
+
+                    //todo: add default case switch
             }
         }
     }

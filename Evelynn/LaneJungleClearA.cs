@@ -2,11 +2,10 @@
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
-using Evelynn;
 
 namespace Evelynn
 {
-    internal class LaneJungleClearA
+    internal static class LaneJungleClearA
     {
         public enum AttackSpell
         {
@@ -19,7 +18,7 @@ namespace Evelynn
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetLcEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetLcEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -47,7 +46,7 @@ namespace Evelynn
                     Program.E.Cast(enemy);
             }
 
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
                 var enemy = GetLcEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
@@ -57,7 +56,7 @@ namespace Evelynn
         }
         public static void JungleClearB()
         {
-                      foreach (Obj_AI_Minion minion in EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Monster))
+                      foreach (var minion in EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Monster))
                       {
                           var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
                           var eready = Program.E.IsReady();
@@ -71,12 +70,10 @@ namespace Evelynn
                     Program.E.Cast(minion);
             }
 
-            if (qcheck && qready)
-            {
-                if (minion != null)
-                    Program.Q.Cast();
-            }
-        }
+                          if (!qcheck || !qready) continue;
+                          if (minion != null)
+                              Program.Q.Cast();
+                      }
     }
     }
 }

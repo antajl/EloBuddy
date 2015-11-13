@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using Bloodimir_Ziggs_v2;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Ziggs_v2
 {
-    internal class LastHitA
+    internal static class LastHitA
     {
         public enum AttackSpell
         {
@@ -17,7 +16,8 @@ namespace Bloodimir_Ziggs_v2
         {
             get { return ObjectManager.Player; }
         }
-           public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -34,17 +34,13 @@ namespace Bloodimir_Ziggs_v2
         {
             var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
+            var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            if (qenemy == null) return;
             {
-                var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
-            if (qenemy != null)
-            {
-                {
-                    var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
-                    Program.Q.Cast(predQ);
-                }
+                var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
+                Program.Q.Cast(predQ);
             }
         }
-    }
     }
 }

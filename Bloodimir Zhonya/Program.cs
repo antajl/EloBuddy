@@ -7,12 +7,12 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Zhonya
 {
-    internal class Program
+    internal static class Program
 
     {
-        public static Menu ZhonyaMenu;
-        public static AIHeroClient Player = ObjectManager.Player;
-        public static Item Zhonia;
+        private static Menu ZhonyaMenu;
+        private static AIHeroClient Player = ObjectManager.Player;
+        private static Item Zhonia;
 
         private static void Main(string[] args)
         {
@@ -33,12 +33,10 @@ namespace Bloodimir_Zhonya
             var zhoniaon = ZhonyaMenu["zhonya"].Cast<CheckBox>().CurrentValue;
             var zhealth = ZhonyaMenu["zhealth"].Cast<Slider>().CurrentValue;
 
-            if (zhoniaon && Zhonia.IsReady() && Zhonia.IsOwned())
+            if (!zhoniaon || !Zhonia.IsReady() || !Zhonia.IsOwned()) return;
+            if (Player.HealthPercent <= zhealth)
             {
-                if (Player.HealthPercent <= zhealth)
-                {
-                    Zhonia.Cast();
-                }
+                Zhonia.Cast();
             }
         }
 

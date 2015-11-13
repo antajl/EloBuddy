@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Ziggs_v2
 {
-    internal class LaneJungleClearA
+    internal static class LaneJungleClearA
     {
         public enum AttackSpell
         {
@@ -18,7 +18,7 @@ namespace Bloodimir_Ziggs_v2
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -37,25 +37,19 @@ namespace Bloodimir_Ziggs_v2
             var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var eready = Program.E.IsReady();
 
-            if (qcheck && qready)
-            {
-                var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            if (!qcheck || !qready) return;
+            var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
-                if (qenemy != null)
-                    {
-                        var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
-                        Program.Q.Cast(predQ);
-                    }
-                if (echeck && eready)
-                {
-                var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
-                if (eminion != null)
-                    {
-                        var predE = Program.E.GetPrediction(eminion).CastPosition;
-                        Program.E.Cast(predE);
-                    }
+            if (qenemy != null)
+            {
+                var predQ = Program.Q.GetPrediction(qenemy).CastPosition;
+                Program.Q.Cast(predQ);
             }
+            if (!echeck || !eready) return;
+            var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+            if (eminion == null) return;
+            var predE = Program.E.GetPrediction(eminion).CastPosition;
+            Program.E.Cast(predE);
         }
-    }
     }
 }

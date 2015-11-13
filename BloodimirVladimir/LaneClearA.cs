@@ -18,7 +18,7 @@ namespace BloodimirVladimir
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -45,7 +45,7 @@ namespace BloodimirVladimir
                     Program.Q.Cast(enemy);
             }
 
-            if (echeck && eready)
+            if (!echeck || !eready) return;
             {
                 var enemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 

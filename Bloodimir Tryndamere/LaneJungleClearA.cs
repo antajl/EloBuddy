@@ -5,19 +5,19 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Tryndamere
 {
-    internal class LaneJungleClearA
+    internal static class LaneJungleClearA
     {
         public enum AttackSpell
         {
             E
         };
 
-        public static AIHeroClient Tryndamere
+        private static AIHeroClient Tryndamere
         {
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -55,13 +55,11 @@ namespace Bloodimir_Tryndamere
                     Program.Tiamat.IsInRange(benemy))
                     Program.Tiamat.Cast();
             }
-            if (Orbwalker.CanAutoAttack)
-            {
-                var cenemy = (Obj_AI_Minion)GetEnemy(Tryndamere.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            if (!Orbwalker.CanAutoAttack) return;
+            var cenemy = (Obj_AI_Minion)GetEnemy(Tryndamere.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
-                if (cenemy != null)
-                    Orbwalker.ForcedTarget = cenemy;
-            }
+            if (cenemy != null)
+                Orbwalker.ForcedTarget = cenemy;
         }
     }
 }

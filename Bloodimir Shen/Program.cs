@@ -11,15 +11,23 @@ using Color = System.Drawing.Color;
 
 namespace Bloodimir_Shen
 {
-    internal class Program
+    internal static class Program
     {
-        public static AIHeroClient Shen = ObjectManager.Player;
-        public static Spell.Targeted Q, R, Ignite, Exhaust;
-        public static Spell.Active W;
-        public static Spell.Skillshot E, Flash;
-        public static Item Randuin;
-        public static Menu ShenMenu, ComboMenu, UltMenu, MiscMenu, EMenu, DrawMenu, SkinMenu;
-        public static int[] AbilitySequence;
+        private static AIHeroClient Shen = ObjectManager.Player;
+        private static Spell.Targeted Q;
+        public static Spell.Targeted R, Ignite, Exhaust;
+        private static Spell.Active W;
+        private static Spell.Skillshot E;
+        private static Spell.Skillshot Flash;
+        private static Item Randuin;
+        public static Menu ShenMenu;
+        private static Menu ComboMenu;
+        private static Menu UltMenu;
+        public static Menu MiscMenu;
+        private static Menu EMenu;
+        public static Menu DrawMenu;
+        private static Menu SkinMenu;
+        private static int[] AbilitySequence;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
 
         private static Vector3 MousePos
@@ -27,7 +35,7 @@ namespace Bloodimir_Shen
             get { return Game.CursorPos; }
         }
 
-        public static bool HasSpell(string s)
+        private static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -153,66 +161,52 @@ namespace Bloodimir_Shen
         {
             var shieldHealthPercent = MiscMenu["WHPPercent"].Cast<Slider>().CurrentValue;
             var shieldSelf = MiscMenu["autow"].Cast<CheckBox>().CurrentValue;
-            if (shieldSelf)
+            if (!shieldSelf) return;
+            if (Shen.CountEnemiesInRange(850) >= 1 && Shen.HealthPercent < shieldHealthPercent)
             {
-                if (Shen.CountEnemiesInRange(850) >= 1 && Shen.HealthPercent < shieldHealthPercent)
-                {
-                    W.Cast();
-                }
+                W.Cast();
             }
         }
 
         private static void OnDraw(EventArgs args)
         {
-            if (!Shen.IsDead)
+            if (Shen.IsDead) return;
+            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Shen.Position, Q.Range, Color.Red);
-                }
-                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && R.IsLearned)
-                {
-                    Drawing.DrawCircle(Shen.Position, E.Range, Color.LightBlue);
-                }
-                if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && E.IsLearned && Flash.IsReady() && E.IsReady())
-                {
-                    Drawing.DrawCircle(Shen.Position, E.Range + 425, Color.DarkBlue);
-                }
-                {
-                    DrawAllyHealths();
-                }
-                {
-                    Danger();
-                }
+                Drawing.DrawCircle(Shen.Position, Q.Range, Color.Red);
+            }
+            if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+            {
+                Drawing.DrawCircle(Shen.Position, E.Range, Color.LightBlue);
+            }
+            if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && E.IsLearned && Flash.IsReady() && E.IsReady())
+            {
+                Drawing.DrawCircle(Shen.Position, E.Range + 425, Color.DarkBlue);
+            }
+            {
+                DrawAllyHealths();
+            }
+            {
+                Danger();
             }
         }
 
-        public static
+        private static
             void Flee
             ()
         {
-            if (EMenu["fleee"].Cast<CheckBox>().CurrentValue)
-            {
-                Orbwalker.MoveTo(Game.CursorPos);
-                E.Cast(MousePos);
-            }
+            if (!EMenu["fleee"].Cast<CheckBox>().CurrentValue) return;
+            Orbwalker.MoveTo(Game.CursorPos);
+            E.Cast(MousePos);
         }
 
-        public static void HighestAuthority()
+        private static void HighestAuthority()
         {
             var autoult = UltMenu["autoult"].Cast<CheckBox>().CurrentValue;
-            if (autoult)
-            {
-                foreach (
-                    var ally in
-                        EntityManager.Heroes.Allies.Where(
-                            x => x.IsValidTarget(R.Range) && x.HealthPercent < 7)
-                    )
-                    if (R.IsReady() && ally.CountEnemiesInRange(650) >= 1)
-                    {
-                        R.Cast(ally);
-                    }
-            }
+            if (!autoult) return;
+            foreach (var ally in EntityManager.Heroes.Allies.Where(
+                x => x.IsValidTarget(R.Range) && x.HealthPercent < 7).Where(ally => R.IsReady() && ally.CountEnemiesInRange(650) >= 1))
+                R.Cast(ally);
         }
 
         private static void OnUpdate(EventArgs args)
@@ -256,14 +250,12 @@ namespace Bloodimir_Shen
 
         private static void RanduinU()
         {
-            if (Randuin.IsReady() && Randuin.IsOwned())
+            if (!Randuin.IsReady() || !Randuin.IsOwned()) return;
+            var randuin = MiscMenu["randuin"].Cast<CheckBox>().CurrentValue;
+            if (randuin && Shen.HealthPercent <= 15 && Shen.CountEnemiesInRange(Randuin.Range) >= 1 ||
+                Shen.CountEnemiesInRange(Randuin.Range) >= 2)
             {
-                var randuin = MiscMenu["randuin"].Cast<CheckBox>().CurrentValue;
-                if (randuin && Shen.HealthPercent <= 15 && Shen.CountEnemiesInRange(Randuin.Range) >= 1 ||
-                    Shen.CountEnemiesInRange(Randuin.Range) >= 2)
-                {
-                    Randuin.Cast();
-                }
+                Randuin.Cast();
             }
         }
         private static void LevelUpSpells()
@@ -272,33 +264,27 @@ namespace Bloodimir_Shen
             var wL = Shen.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
             var eL = Shen.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
             var rL = Shen.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
-            if (qL + wL + eL + rL < ObjectManager.Player.Level)
+            if (qL + wL + eL + rL >= ObjectManager.Player.Level) return;
+            int[] level = { 0, 0, 0, 0 };
+            for (var i = 0; i < ObjectManager.Player.Level; i++)
             {
-                int[] level = { 0, 0, 0, 0 };
-                for (var i = 0; i < ObjectManager.Player.Level; i++)
-                {
-                    level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
-                }
-                if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
-                if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
-                if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
-                if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+                level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
             }
+            if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+            if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+            if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+            if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
         }
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) ||
-                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)) return;
+            var t = target as Obj_AI_Minion;
+            if (t == null) return;
             {
-                var t = target as Obj_AI_Minion;
-                if (t != null)
-                {
-                    {
-                        if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
-                            args.Process = false;
-                    }
-                }
+                if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
+                    args.Process = false;
             }
         }
         private static void FlashE()
@@ -309,12 +295,12 @@ namespace Bloodimir_Shen
             var xpos = fetarget.Position.Extend(fetarget, E.Range);
             var predepos = E.GetPrediction(fetarget).CastPosition;
             {
-                if (E.IsReady() && Flash.IsReady())
-                    if (fetarget.IsValidTarget(E.Range + 425))
-                    {
-                      Flash.Cast((Vector3)xpos);
-                      E.Cast(predepos);
-                    }
+                if (!E.IsReady() || !Flash.IsReady()) return;
+                if (fetarget.IsValidTarget(E.Range + 425))
+                {
+                    Flash.Cast((Vector3)xpos);
+                    E.Cast(predepos);
+                }
             }
         }
 
@@ -324,13 +310,11 @@ namespace Bloodimir_Shen
             var etarget = TargetSelector.GetTarget(600, DamageType.Magical);
             if (etarget == null) return;
             var predepos = E.GetPrediction(etarget).CastPosition;
-            if (EMenu["e"].Cast<KeyBind>().CurrentValue)
+            if (!EMenu["e"].Cast<KeyBind>().CurrentValue) return;
+            if (!E.IsReady()) return;
+            if (etarget.IsValidTarget(600))
             {
-                if (E.IsReady())
-                    if (etarget.IsValidTarget(600))
-                    {
-                        E.Cast(predepos);
-                    }
+                E.Cast(predepos);
             }
         }
 
@@ -338,18 +322,10 @@ namespace Bloodimir_Shen
         {
             var autoult = UltMenu["autoult"].Cast<CheckBox>().CurrentValue;
             var rslider = UltMenu["rslider"].Cast<Slider>().CurrentValue;
-            if (autoult && (UltMenu["ult"].Cast<KeyBind>().CurrentValue))
-            {
-                foreach (
-                    var ally in
-                        EntityManager.Heroes.Allies.Where(
-                            x => x.IsValidTarget(R.Range) && x.HealthPercent < rslider)
-                    )
-                    if (R.IsReady() && ally.CountEnemiesInRange(850) >= 1)
-                    {
-                        R.Cast(ally);
-                    }
-            }
+            if (!autoult || (!UltMenu["ult"].Cast<KeyBind>().CurrentValue)) return;
+            foreach (var ally in EntityManager.Heroes.Allies.Where(
+                x => x.IsValidTarget(R.Range) && x.HealthPercent < rslider).Where(ally => R.IsReady() && ally.CountEnemiesInRange(850) >= 1))
+                R.Cast(ally);
         }
 
         private static void DrawAllyHealths()
@@ -402,7 +378,7 @@ namespace Bloodimir_Shen
                         x => x.IsValidTarget(R.Range) && x.HealthPercent < rslider)
                 )
             {
-                float i = 0;
+                const float i = 0;
                 {
                     var champion = ally.ChampionName;
                     if (champion.Length > 12)
@@ -435,22 +411,15 @@ namespace Bloodimir_Shen
 
         private static void Killsteal()
         {
-            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            foreach (var qtarget in EntityManager.Heroes.Enemies.Where(
+                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(qtarget => Shen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health))
             {
-                foreach (
-                    var qtarget in
-                        EntityManager.Heroes.Enemies.Where(
-                            hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
-                {
-                    if (Shen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
-                    {
-                        Q.Cast(qtarget);
-                    }
-                }
+                Q.Cast(qtarget);
             }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -470,13 +439,11 @@ namespace Bloodimir_Shen
         {
             var qcheck = MiscMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Q.IsReady();
-            if (qcheck && qready)
-            { 
+            if (!qcheck || !qready) return;
             var qminion = (Obj_AI_Minion) GetEnemy(Q.Range, GameObjectType.obj_AI_Minion);
             if (qminion != null)
             {
                 Q.Cast(qminion);
-            }
             }
         }
 
@@ -485,13 +452,11 @@ namespace Bloodimir_Shen
         {
             var qcheck = MiscMenu["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = Q.IsReady();
-            if (qcheck && qready)
-            { 
+            if (!qcheck || !qready) return;
             var qminion = (Obj_AI_Minion) GetEnemy(Q.Range, GameObjectType.obj_AI_Minion);
             if (qminion != null)
             {
                 Q.Cast(qminion);
-            }
             }
         }
 
@@ -506,34 +471,29 @@ namespace Bloodimir_Shen
                     Q.Cast(qtarget);
                 }
             }
-            if (useE && E.IsReady())
-            {
-                var eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
-                var predE = E.GetPrediction(eTarget).CastPosition;
-                if (eTarget.IsValidTarget(E.Range))
-                    if (EMenu["taunt" + eTarget.ChampionName].Cast<CheckBox>().CurrentValue)
-                        if (Shen.CountEnemiesInRange(E.Range) <= 1)
-                            if (E.GetPrediction(eTarget).HitChance >= HitChance.High)
-                            {
-                                E.Cast(eTarget);
-                            }
-                            else if (Shen.CountEnemiesInRange(E.Width) >=
-                                     EMenu["eslider"].Cast<Slider>().CurrentValue)
-                            {
-                                E.Cast(predE);
-                            }
-            if (useW && W.IsReady())
-            {
-                var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
-                if (target.IsValidTarget(Q.Range))
-                {
-                    if (target.Distance(Shen) < Q.Range)
+            if (!useE || !E.IsReady()) return;
+            var eTarget = TargetSelector.GetTarget(E.Range, DamageType.Magical);
+            var predE = E.GetPrediction(eTarget).CastPosition;
+            if (eTarget.IsValidTarget(E.Range))
+                if (EMenu["taunt" + eTarget.ChampionName].Cast<CheckBox>().CurrentValue)
+                    if (Shen.CountEnemiesInRange(E.Range) <= 1)
+                        if (E.GetPrediction(eTarget).HitChance >= HitChance.High)
+                        {
+                            E.Cast(eTarget);
+                        }
+                        else if (Shen.CountEnemiesInRange(E.Width) >=
+                                 EMenu["eslider"].Cast<Slider>().CurrentValue)
+                        {
+                            E.Cast(predE);
+                        }
+            if (!useW || !W.IsReady()) return;
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            if (!target.IsValidTarget(Q.Range)) return;
+            if (target.Distance(Shen) < Q.Range)
 
-                    {
-                        W.Cast();
-                    }
-                        
-        }  }  } 
+            {
+                W.Cast();
+            }
         }
         
         private static void SkinChange()

@@ -5,9 +5,9 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Renekton
 {
-    internal class LastHitA
+    internal static class LastHitA
     {
-        public enum AttackSpell
+        private enum AttackSpell
         {
             Q,
             W,
@@ -15,19 +15,19 @@ namespace Bloodimir_Renekton
             Tiamat
         };
 
-        public static AIHeroClient Renekton
+        private static AIHeroClient Renekton
         {
             get { return ObjectManager.Player; }
         }
 
-        public static float Qcalc(Obj_AI_Base target)
+        private static float Qcalc(Obj_AI_Base target)
         {
             return Renekton.CalculateDamageOnUnit(target, DamageType.Physical,
                 (new float[] {0, 60, 90, 120, 150, 180}[Program.Q.Level] +
                  (0.80f*Renekton.FlatPhysicalDamageMod)));
         }
 
-        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
+        private static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
         {
             return ObjectManager.Get<Obj_AI_Base>().OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
                                                                                                && a.Type == type
@@ -43,7 +43,7 @@ namespace Bloodimir_Renekton
                                                                                                a.Health <= Qcalc(a));
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -63,22 +63,18 @@ namespace Bloodimir_Renekton
             var QREADY = Program.Q.IsReady();
             var WREADY = Program.W.IsReady();
 
-            if (QCHECK && QREADY)
-            {
+            if (!QCHECK || !QREADY) return;
             var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
             {
                 Program.Q.Cast();
             }
-                if (WCHECK && WREADY)
-                {
-                    var wminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-                    if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.W) >= wminion.Health)
-                    {
-                        Program.W.Cast();
-                    }
-                }
-             }
+            if (!WCHECK || !WREADY) return;
+            var wminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.W) >= wminion.Health)
+            {
+                Program.W.Cast();
+            }
         }
             
      
@@ -89,24 +85,18 @@ namespace Bloodimir_Renekton
                 (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange() + 335, GameObjectType.obj_AI_Minion);
 
 
-            if (ienemy != null)
+            if (ienemy == null) return;
+            if (!ienemy.IsValid || ienemy.IsZombie) return;
+            if (Program.LastHit["LHI"].Cast<CheckBox>().CurrentValue)
             {
-                if (ienemy.IsValid && !ienemy.IsZombie)
-                {
-                    if (Program.LastHit["LHI"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
-                            Program.Hydra.IsInRange(ienemy))
-                            Program.Hydra.Cast();
-                    }
-                    if (Program.LastHit["LHI"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
-                            Program.Tiamat.IsInRange(ienemy))
-                            Program.Tiamat.Cast();
-                    }
-                }
+                if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
+                    Program.Hydra.IsInRange(ienemy))
+                    Program.Hydra.Cast();
             }
+            if (!Program.LastHit["LHI"].Cast<CheckBox>().CurrentValue) return;
+            if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
+                Program.Tiamat.IsInRange(ienemy))
+                Program.Tiamat.Cast();
         }
     }
 }

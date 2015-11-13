@@ -4,7 +4,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Evelynn
 {
-    internal class Combo
+    internal static class Combo
     {
         public enum AttackSpell
         {

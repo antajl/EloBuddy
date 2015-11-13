@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace BloodimirVladimir
 {
-    internal class Combo
+    internal static class Combo
     {
         public enum AttackSpell
         {
@@ -17,7 +17,8 @@ namespace BloodimirVladimir
         {
             get { return ObjectManager.Player; }
         }
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -44,14 +45,12 @@ namespace BloodimirVladimir
                 if (eenemy != null)
                     Program.E.Cast();
                  }
-    
-        if (QCHECK && QREADY)
-            {
-                var qenemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
 
-                if (qenemy != null)
-                    Program.Q.Cast(qenemy);
-            }
-    }
+            if (!QCHECK || !QREADY) return;
+            var qenemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
+
+            if (qenemy != null)
+                Program.Q.Cast(qenemy);
+        }
     }
 }

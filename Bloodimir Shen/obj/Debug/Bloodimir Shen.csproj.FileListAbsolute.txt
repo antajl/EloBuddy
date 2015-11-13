@@ -1,1 +1,2 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\Debug\Bloodimir Shen.exe.config
+C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Shen\bin\Debug\Bloodimir Shen.exe.config

@@ -9,3 +9,5 @@ c:\users\asus\documents\visual studio 2013\Projects\Morgana\Morgana\bin\Debug\Ne
 c:\users\asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\Debug\Morgana.exe
 c:\users\asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\Debug\Morgana.pdb
 C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\Debug\Morgana.csprojResolveAssemblyReference.cache
+C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Morgana\bin\Debug\Morgana.exe.config
+C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Morgana\obj\Debug\Morgana.exe

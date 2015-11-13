@@ -4,7 +4,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Tryndamere
 {
-    internal class Combo
+    internal static class Combo
     {
         public enum AttackSpell
         {
@@ -12,7 +12,7 @@ namespace Bloodimir_Tryndamere
             W
         };
 
-        public static AIHeroClient Tryndamere
+        private static AIHeroClient Tryndamere
         {
             get { return ObjectManager.Player; }
         }
@@ -34,14 +34,12 @@ namespace Bloodimir_Tryndamere
                     }
             }
 
-            if (WCHECK && WREADY)
+            if (!WCHECK || !WREADY) return;
+            var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
             {
-                var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
+                if (!wenemy.IsFacing(Program.Tryndamere))
                 {
-                    if (!wenemy.IsFacing(Program.Tryndamere))
-                    {
-                        Program.W.Cast();
-                    }
+                    Program.W.Cast();
                 }
             }
         }
@@ -51,40 +49,34 @@ namespace Bloodimir_Tryndamere
         {
             var ienemy = TargetSelector.GetTarget(Player.Instance.GetAutoAttackRange() + 425,
                 DamageType.Physical);
-            if (ienemy != null)
+            if (ienemy == null) return;
+            if (!ienemy.IsValid || ienemy.IsZombie) return;
+            if (Program.MiscMenu["usebotrk"].Cast<CheckBox>().CurrentValue)
             {
-                if (ienemy.IsValid && !ienemy.IsZombie)
-                {
-                    if (Program.MiscMenu["usebotrk"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Botrk.IsOwned() && Program.Botrk.IsReady() &&
-                            Program.Botrk.IsInRange(ienemy))
-                            Program.Botrk.Cast(ienemy);
-                    }
-                    if (Program.MiscMenu["usebilge"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Bilgewater.IsOwned() && Program.Bilgewater.IsReady())
-                            Program.Bilgewater.Cast(ienemy);
-                    }
-                    if (Program.MiscMenu["usehydra"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
-                            Program.Hydra.IsInRange(ienemy))
-                            Program.Hydra.Cast();
-                    }
-                    if (Program.MiscMenu["usetiamat"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
-                            Program.Tiamat.IsInRange(ienemy))
-                            Program.Tiamat.Cast();
-                    }
-                    if (Program.MiscMenu["useyoumuu"].Cast<CheckBox>().CurrentValue)
-                    {
-                        if (Program.Youmuu.IsOwned() && Program.Youmuu.IsReady())
-                            Program.Youmuu.Cast();
-                    }
-                }
+                if (Program.Botrk.IsOwned() && Program.Botrk.IsReady() &&
+                    Program.Botrk.IsInRange(ienemy))
+                    Program.Botrk.Cast(ienemy);
             }
+            if (Program.MiscMenu["usebilge"].Cast<CheckBox>().CurrentValue)
+            {
+                if (Program.Bilgewater.IsOwned() && Program.Bilgewater.IsReady())
+                    Program.Bilgewater.Cast(ienemy);
+            }
+            if (Program.MiscMenu["usehydra"].Cast<CheckBox>().CurrentValue)
+            {
+                if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
+                    Program.Hydra.IsInRange(ienemy))
+                    Program.Hydra.Cast();
+            }
+            if (Program.MiscMenu["usetiamat"].Cast<CheckBox>().CurrentValue)
+            {
+                if (Program.Tiamat.IsOwned() && Program.Tiamat.IsReady() &&
+                    Program.Tiamat.IsInRange(ienemy))
+                    Program.Tiamat.Cast();
+            }
+            if (!Program.MiscMenu["useyoumuu"].Cast<CheckBox>().CurrentValue) return;
+            if (Program.Youmuu.IsOwned() && Program.Youmuu.IsReady())
+                Program.Youmuu.Cast();
         }
     }
 }

@@ -1,1 +1,2 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Zhonya\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.exe.config
+C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.exe.config

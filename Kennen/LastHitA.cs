@@ -6,7 +6,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Kennen
 {
-    internal class LastHitA
+    internal static class LastHitA
     {
         public enum AttackSpell
         {
@@ -14,7 +14,7 @@ namespace Kennen
             W
         };
 
-        public static AIHeroClient Kennen
+        private static AIHeroClient Kennen
         {
             get { return ObjectManager.Player; }
         }
@@ -31,7 +31,8 @@ namespace Kennen
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
-        public static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
+
+        private static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
         {
             return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
                                                                                                && a.Type == type

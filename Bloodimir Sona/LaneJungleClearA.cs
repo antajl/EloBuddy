@@ -5,19 +5,19 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Bloodimir_Sona
 {
-    internal class LaneJungleClearA
+    internal static class LaneJungleClearA
     {
         public enum AttackSpell
         {
             Q
         };
 
-        public static AIHeroClient Sona
+        private static AIHeroClient Sona
         {
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -34,22 +34,18 @@ namespace Bloodimir_Sona
             var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
+            var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+
+            if (qenemy != null)
             {
-                var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
-
-                if (qenemy != null)
-                    {
-                        Program.Q.Cast();
-                    }
-                if (Orbwalker.CanAutoAttack)
-                {
-                    var enemy = (Obj_AI_Minion)GetEnemy(Sona.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-
-                    if (enemy != null)
-                        Orbwalker.ForcedTarget = enemy;
-                }
+                Program.Q.Cast();
             }
+            if (!Orbwalker.CanAutoAttack) return;
+            var enemy = (Obj_AI_Minion)GetEnemy(Sona.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+
+            if (enemy != null)
+                Orbwalker.ForcedTarget = enemy;
         }
     }
 }

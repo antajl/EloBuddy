@@ -1,1 +1,2 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Ziggs v2\Bloodimir Ziggs v2\bin\Debug\Bloodimir Ziggs v2.exe.config
+C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Ziggs v2\bin\Debug\Bloodimir Ziggs v2.exe.config

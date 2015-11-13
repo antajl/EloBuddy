@@ -1,1 +1,2 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.exe.config
+C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.exe.config

@@ -10,23 +10,28 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Kennen
 {
-    internal class Program
+    internal static class Program
     {
         public static Spell.Skillshot Q;
         public static Spell.Active W;
         public static Spell.Active E;
-        public static Spell.Active R;
-        public static Spell.Targeted Ignite;
-        public static Menu KennenMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, LaneJungleClear, LastHit;
-        public static AIHeroClient Kennen = ObjectManager.Player;
-        public static int LastE = 0;
+        private static Spell.Active R;
+        private static Spell.Targeted Ignite;
+        private static Menu KennenMenu;
+        public static Menu ComboMenu;
+        private static Menu DrawMenu;
+        private static Menu SkinMenu;
+        private static Menu MiscMenu;
+        public static Menu LaneJungleClear, LastHit;
+        private static AIHeroClient Kennen = ObjectManager.Player;
+        private static int LastE = 0;
 
         public static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
         }
 
-        public static bool HasSpell(string s)
+        private static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -111,43 +116,39 @@ namespace Kennen
             Interrupter.InterruptableSpellEventArgs args)
         {
             var intTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (intTarget.HasBuff("kennenmarkofstorm"))
-            {
-                if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["int"].Cast<CheckBox>().CurrentValue)
-                    Q.Cast(intTarget.ServerPosition);
-                if (W.IsReady() && sender.IsValidTarget(W.Range))
-                    W.Cast();
-                if (E.IsReady() && sender.IsValidTarget(E.Range))
-                    E.Cast();
-                Orbwalker.DisableMovement = Kennen.HasBuff("KennenLightningRush");
-                Player.IssueOrder(GameObjectOrder.MoveTo, intTarget);
-            }
+            if (!intTarget.HasBuff("kennenmarkofstorm")) return;
+            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["int"].Cast<CheckBox>().CurrentValue)
+                Q.Cast(intTarget.ServerPosition);
+            if (W.IsReady() && sender.IsValidTarget(W.Range))
+                W.Cast();
+            if (E.IsReady() && sender.IsValidTarget(E.Range))
+                E.Cast();
+            Orbwalker.DisableMovement = Kennen.HasBuff("KennenLightningRush");
+            Player.IssueOrder(GameObjectOrder.MoveTo, intTarget);
         }
 
         private static void OnDraw(EventArgs args)
         {
-            if (!Kennen.IsDead)
+            if (Kennen.IsDead) return;
+            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Kennen.Position, Q.Range, Color.DarkBlue);
-                }
-                if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Kennen.Position, W.Range, Color.DarkGreen);
-                }
+                Drawing.DrawCircle(Kennen.Position, Q.Range, Color.DarkBlue);
+            }
+            if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+            {
+                Drawing.DrawCircle(Kennen.Position, W.Range, Color.DarkGreen);
             }
         }
 
-        public static void Flee()
+        private static void Flee()
         {
             Orbwalker.MoveTo(Game.CursorPos);
             E.Cast();
-            if (Player.Instance.HasBuff("KennenLightingRushBuff"))
-                if (Environment.TickCount - LastE >= 1950)
-                {
-                    E.Cast();
-                }
+            if (!Player.Instance.HasBuff("KennenLightingRushBuff")) return;
+            if (Environment.TickCount - LastE >= 1950)
+            {
+                E.Cast();
+            }
         }
 
         private static void Tick(EventArgs args)
@@ -193,76 +194,60 @@ namespace Kennen
             }
         }
 
-        public static
+        private static
             void Rincombo
             (bool
                 useR)
         {
-            if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                if (useR && R.IsReady() &&
-                    Kennen.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
-                {
-                    R.Cast();
-                }
+            if (!ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue) return;
+            if (useR && R.IsReady() &&
+                Kennen.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+            {
+                R.Cast();
+            }
         }
 
-        public static
+        private static
             void Eincombo(bool useE)
         {
-            if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue)
-                if (useE && E.IsReady() && Kennen.CountEnemiesInRange(W.Range) >= 2)
-                {
-                    E.Cast();
-                }
+            if (!ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue) return;
+            if (useE && E.IsReady() && Kennen.CountEnemiesInRange(W.Range) >= 2)
+            {
+                E.Cast();
+            }
         }
 
         private static void Killsteal()
         {
-            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            try
             {
-                try
+                foreach (var poutput in from qtarget in EntityManager.Heroes.Enemies.Where(
+                    hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie) where Kennen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health select Q.GetPrediction(qtarget))
                 {
-                    foreach (
-                        var qtarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                    if (poutput.HitChance >= HitChance.Medium)
                     {
-                        if (Kennen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
+                        Q.Cast(poutput.CastPosition);
+                    }
+                    if (!MiscMenu["ksw"].Cast<CheckBox>().CurrentValue || !W.IsReady()) continue;
+                    {
+                        try
                         {
-                            var poutput = Q.GetPrediction(qtarget);
-                            if (poutput.HitChance >= HitChance.Medium)
+                            foreach (var wtarget in EntityManager.Heroes.Enemies.Where(
+                                hero =>
+                                    hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(wtarget => Kennen.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health).Where(wtarget => wtarget.HasBuff("kennenmarkofstorm")))
                             {
-                                Q.Cast(poutput.CastPosition);
+                                W.Cast();
                             }
-                            if (MiscMenu["ksw"].Cast<CheckBox>().CurrentValue && W.IsReady())
-                            {
-                                {
-                                    try
-                                    {
-                                        foreach (
-                                            var wtarget in
-                                                EntityManager.Heroes.Enemies.Where(
-                                                    hero =>
-                                                        hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
-                                        {
-                                            if (Kennen.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health)
-                                                if (wtarget.HasBuff("kennenmarkofstorm"))
-                                                {
-                                                    W.Cast();
-                                                }
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-                            }
+                        }
+                        catch
+                        {
                         }
                     }
                 }
-                catch
-                {
-                }
+            }
+            catch
+            {
             }
         }
 

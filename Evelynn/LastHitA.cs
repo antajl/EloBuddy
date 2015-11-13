@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace Evelynn
 {
-    internal class LastHitA
+    internal static class LastHitA
     {
         public enum AttackSpell
         {
@@ -13,12 +13,12 @@ namespace Evelynn
             E
         };
 
-        public static AIHeroClient Evelynn
+        private static AIHeroClient Evelynn
         {
             get { return ObjectManager.Player; }
         }
 
-        public static float Qcalc(Obj_AI_Base target)
+        private static float Qcalc(Obj_AI_Base target)
         {
             {
                 return Evelynn.CalculateDamageOnUnit(target, DamageType.Magical,
@@ -28,7 +28,7 @@ namespace Evelynn
             }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -47,14 +47,12 @@ namespace Evelynn
         {
             var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
-            if (qcheck && qready)
-            { 
+            if (!qcheck || !qready) return;
             var minion = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (minion != null)
             {
                 Program.Q.Cast();
             }
         }
-    }
     }
 }

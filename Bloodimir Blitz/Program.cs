@@ -12,14 +12,22 @@ using SharpDX;
 
 namespace Bloodimir_Blitz
 {
-    internal class Program
+    internal static class Program
     {
-        public static Spell.Skillshot Q, Flash;
-        public static Spell.Active W, E, R;
-        public static Menu BlitzMenu, ComboMenu, DrawMenu, SkinMenu, MiscMenu, QMenu;
-        public static AIHeroClient Blitz = ObjectManager.Player;
-        public static Item Talisman;
-        public static HitChance QHitChance;
+        private static Spell.Skillshot Q;
+        private static Spell.Skillshot Flash;
+        private static Spell.Active W;
+        private static Spell.Active E;
+        private static Spell.Active R;
+        private static Menu BlitzMenu;
+        private static Menu ComboMenu;
+        private static Menu DrawMenu;
+        private static Menu SkinMenu;
+        private static Menu MiscMenu;
+        private static Menu QMenu;
+        private static AIHeroClient Blitz = ObjectManager.Player;
+        private static Item Talisman;
+        private static HitChance QHitChance;
 
         private static Vector3 MousePos
         {
@@ -189,16 +197,15 @@ namespace Bloodimir_Blitz
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
                     Q.Cast(intTarget.ServerPosition);
             }}
-     
-        public static
+
+        private static
             void Flee
             ()
         {
-            if (MiscMenu["fleew"].Cast<CheckBox>().CurrentValue)
-            {
-                Orbwalker.MoveTo(Game.CursorPos);
-                W.Cast();
-                }}
+            if (!MiscMenu["fleew"].Cast<CheckBox>().CurrentValue) return;
+            Orbwalker.MoveTo(Game.CursorPos);
+            W.Cast();
+        }
    
 
         private static void Tick(EventArgs args)
@@ -227,30 +234,23 @@ namespace Bloodimir_Blitz
         
         private static void Ascension()
         {
-
-            if (Talisman.IsReady() && Talisman.IsOwned())
+            if (!Talisman.IsReady() || !Talisman.IsOwned()) return;
+            var ascension = MiscMenu["talisman"].Cast<CheckBox>().CurrentValue;
+            if (ascension && Blitz.HealthPercent <= 15 && Blitz.CountEnemiesInRange(800) >= 1 || Blitz.CountEnemiesInRange(Q.Range) >= 3)
             {
-                var ascension = MiscMenu["talisman"].Cast<CheckBox>().CurrentValue;
-                if (ascension && Blitz.HealthPercent <= 15 && Blitz.CountEnemiesInRange(800) >= 1 || Blitz.CountEnemiesInRange(Q.Range) >= 3)
-                {
-                    Talisman.Cast();
-                }
+                Talisman.Cast();
             }
         }
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) ||
-                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))
+            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)) return;
+            var t = target as Obj_AI_Minion;
+            if (t == null) return;
             {
-                var t = target as Obj_AI_Minion;
-                if (t != null)
-                {
-                    {
-                        if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
-                            args.Process = false;
-                    }
-                }
+                if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
+                    args.Process = false;
             }
         }
 
@@ -261,47 +261,30 @@ namespace Bloodimir_Blitz
             if (ftarget == null) return;
             var xpos = ftarget.Position.Extend(ftarget, 850);
             var predqpos = Q.GetPrediction(ftarget).CastPosition;
-            if (ComboMenu["flashq"].Cast<KeyBind>().CurrentValue)
-            {
-                if (Q.IsReady() && Flash.IsReady())
-                    if (ftarget.IsValidTarget(850 + 425))
-                    {
-                        Flash.Cast((Vector3) xpos);
-                        Q.Cast(predqpos);
-                    }
-            }
+            if (!ComboMenu["flashq"].Cast<KeyBind>().CurrentValue) return;
+            if (!Q.IsReady() || !Flash.IsReady()) return;
+            if (!ftarget.IsValidTarget(850 + 425)) return;
+            Flash.Cast((Vector3) xpos);
+            Q.Cast(predqpos);
         }
 
         private static void Killsteal()
         {
-            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            foreach (var poutput in from qtarget in EntityManager.Heroes.Enemies.Where(
+                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie) where Blitz.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health select Q.GetPrediction(qtarget))
             {
-                foreach (
-                    var qtarget in
-                        EntityManager.Heroes.Enemies.Where(
-                            hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                if (poutput.HitChance >= HitChance.Medium)
                 {
-                    if (Blitz.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
+                    Q.Cast(poutput.CastPosition);
+                }
+                if (!MiscMenu["ksr"].Cast<CheckBox>().CurrentValue || !R.IsReady()) continue;
+                {
+                    foreach (var rtarget in EntityManager.Heroes.Enemies.Where(
+                        hero =>
+                            hero.IsValidTarget(R.Range) && !hero.IsDead && !hero.IsZombie).Where(rtarget => Blitz.GetSpellDamage(rtarget, SpellSlot.R) >= rtarget.Health))
                     {
-                        var poutput = Q.GetPrediction(qtarget);
-                        if (poutput.HitChance >= HitChance.Medium)
-                        {
-                            Q.Cast(poutput.CastPosition);
-                        }
-                        if (MiscMenu["ksr"].Cast<CheckBox>().CurrentValue && R.IsReady())
-                        {
-                            {
-                                foreach (
-                                    var rtarget in
-                                        EntityManager.Heroes.Enemies.Where(
-                                            hero =>
-                                                hero.IsValidTarget(R.Range) && !hero.IsDead && !hero.IsZombie))
-                                {
-                                    if (Blitz.GetSpellDamage(rtarget, SpellSlot.R) >= rtarget.Health)
-                                        R.Cast();
-                                }
-                            }
-                        }
+                        R.Cast();
                     }
                 }
             }
@@ -344,21 +327,17 @@ namespace Bloodimir_Blitz
 
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+            var e = target as AIHeroClient;
+            if (!ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue || !E.IsReady() || !e.IsEnemy) return;
+            if (target == null) return;
+            if (e.IsValidTarget() && E.IsReady())
             {
-                var e = target as AIHeroClient;
-                if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue && E.IsReady() && e.IsEnemy)
-                    if (target != null)
-                    {
-                        if (e.IsValidTarget() && E.IsReady())
-                        {
-                            E.Cast();
-                        }
-                    }
+                E.Cast();
             }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -376,39 +355,35 @@ namespace Bloodimir_Blitz
         {
             var echeck = MiscMenu["LHE"].Cast<CheckBox>().CurrentValue;
             var eready = E.IsReady();
-            if (echeck || eready)
+            if (!echeck && !eready) return;
+            var eminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            if (eminion != null)
             {
-                var eminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
-                if (eminion != null)
-                {
-                    E.Cast();
-                }
+                E.Cast();
             }
         }
 
         private static
             void Combo(bool useQ, bool useW, bool useR)
         {
-          if (useQ && Q.IsReady())
+            if (!useQ || !Q.IsReady()) return;
+            try
             {
-                try
+                var grabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+                if (grabTarget.IsValidTarget(Q.Range))
                 {
-                    var grabTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-                    if (grabTarget.IsValidTarget(Q.Range))
+                    if (Q.GetPrediction(grabTarget).HitChance >= QHitChance)
                     {
-                        if (Q.GetPrediction(grabTarget).HitChance >= QHitChance)
+                        if (grabTarget.Distance(Blitz.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
                         {
-                            if (grabTarget.Distance(Blitz.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
+                            if (QMenu["grab" + grabTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                             {
-                                if (QMenu["grab" + grabTarget.ChampionName].Cast<CheckBox>().CurrentValue)
-                                {
-                                    Q.Cast(grabTarget);
-                                }
+                                Q.Cast(grabTarget);
                             }
                         }
-                   }
-            if (useW && W.IsReady() && ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue)
-            {
+                    }
+                }
+                if (!useW || !W.IsReady() || !ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue) return;
                 var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
                 if (target.IsValidTarget(Q.Range))
                 {
@@ -421,17 +396,13 @@ namespace Bloodimir_Blitz
                         W.Cast();
                     }
                 }
-                if (useR && R.IsReady())
-                {
-                 if  (Blitz.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+                if (!useR || !R.IsReady()) return;
+                if  (Blitz.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
                     R.Cast();
                 }
-                }
             }
-                }
-       catch {}
+            catch {}
         }
-            } 
     }
     }

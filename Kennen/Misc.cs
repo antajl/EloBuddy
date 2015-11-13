@@ -3,7 +3,7 @@ using EloBuddy.SDK;
 
 namespace Kennen
 {
-    internal class Misc
+    internal static class Misc
     {
         private static AIHeroClient Kennen
         {

@@ -1,10 +1,9 @@
 ﻿using EloBuddy;
 using EloBuddy.SDK;
-using EloBuddy.SDK.Menu.Values;
 
 namespace BloodimirVladimir
 {
-	internal class Misc
+	internal static class Misc
 	{
 		private static AIHeroClient Vladimir
 		{

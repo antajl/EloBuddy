@@ -10,21 +10,28 @@ using Color = System.Drawing.Color;
 
 namespace Bloodimir_Renekton
 {
-    internal class Program
+    internal static class Program
     {
         public static Spell.Active Q;
         public static Spell.Active W;
         public static Spell.Skillshot E;
-        public static Spell.Active R;
-        public static Spell.Targeted Ignite;
+        private static Spell.Active R;
+        private static Spell.Targeted Ignite;
         public static Item Hydra;
         public static Item Tiamat;
-        public static Menu RenekMenu, ComboMenu, SkinMenu, MiscMenu, DrawMenu, HarassMenu, LaneJungleClear, LastHit;
+        private static Menu RenekMenu;
+        public static Menu ComboMenu;
+        private static Menu SkinMenu;
+        private static Menu MiscMenu;
+        private static Menu DrawMenu;
+        private static Menu HarassMenu;
+        public static Menu LaneJungleClear, LastHit;
         public static Item Bilgewater, Youmuu, Botrk;
-        public static AIHeroClient Renek = ObjectManager.Player;
-        public static int[] AbilitySequence;
+        private static AIHeroClient Renek = ObjectManager.Player;
+        private static int[] AbilitySequence;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
-        public static AIHeroClient _Player
+
+        private static AIHeroClient _Player
         {
             get { return ObjectManager.Player; }
         }
@@ -34,7 +41,7 @@ namespace Bloodimir_Renekton
             Loading.OnLoadingComplete += OnLoaded;
         }
 
-        public static bool HasSpell(string s)
+        private static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -129,7 +136,7 @@ namespace Bloodimir_Renekton
             Gapcloser.OnGapcloser += OnGapClose;
         }
 
-        public static void Flee()
+        private static void Flee()
         {
             Orbwalker.MoveTo(Game.CursorPos);
             E.Cast(Game.CursorPos);
@@ -140,18 +147,16 @@ namespace Bloodimir_Renekton
             var wL = Renek.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
             var eL = Renek.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
             var rL = Renek.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
-            if (qL + wL + eL + rL < ObjectManager.Player.Level)
+            if (qL + wL + eL + rL >= ObjectManager.Player.Level) return;
+            int[] level = { 0, 0, 0, 0 };
+            for (var i = 0; i < ObjectManager.Player.Level; i++)
             {
-                int[] level = { 0, 0, 0, 0 };
-                for (var i = 0; i < ObjectManager.Player.Level; i++)
-                {
-                    level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
-                }
-                if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
-                if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
-                if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
-                if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+                level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
             }
+            if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+            if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+            if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+            if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
         }
          private static
             void OnGapClose
@@ -171,16 +176,14 @@ namespace Bloodimir_Renekton
             }
         private static void OnDraw(EventArgs args)
         {
-            if (!Renek.IsDead)
+            if (Renek.IsDead) return;
+            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
-                {
-                    Drawing.DrawCircle(Renek.Position, 225, Color.DarkGoldenrod);
-                }
-                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
-                {
-                    Drawing.DrawCircle(Renek.Position, E.Range, Color.DarkCyan);
-                }
+                Drawing.DrawCircle(Renek.Position, 225, Color.DarkGoldenrod);
+            }
+            if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+            {
+                Drawing.DrawCircle(Renek.Position, E.Range, Color.DarkCyan);
             }
         }
 
@@ -234,7 +237,7 @@ namespace Bloodimir_Renekton
             }
         }
 
-        public static void AutoUlt(bool useR)
+        private static void AutoUlt(bool useR)
         {
             var autoR = ComboMenu["autoult"].Cast<CheckBox>().CurrentValue;
             var healthAutoR = ComboMenu["rslider"].Cast<Slider>().CurrentValue;
@@ -255,58 +258,51 @@ namespace Bloodimir_Renekton
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
              }
-        public static void Harass()
+
+        private static void Harass()
         {
             var target = TargetSelector.GetTarget(E.Range, DamageType.Physical);
             if (target != null && Player.Instance.Distance(target.Position) < E.Range && !Renek.HasBuff(E2BuffName) && E.IsReady())
                 {
                     Player.CastSpell(SpellSlot.E, target.Position);
                 }
-        if (Renek.HasBuff(E2BuffName))
-        { 
+            if (!Renek.HasBuff(E2BuffName)) return;
             var qtarget = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
             if (qtarget.Distance(Renek.Position) <= 225 && Q.IsReady() && HarassMenu["hq"].Cast<CheckBox>().CurrentValue)
-            Q.Cast();
+                Q.Cast();
             var wtarget = TargetSelector.GetTarget(W.Range, DamageType.Physical);
             if (wtarget.Distance(Renek.Position) <= W.Range && HarassMenu["hw"].Cast<CheckBox>().CurrentValue)
-            W.Cast();
+                W.Cast();
             var itarget = TargetSelector.GetTarget(Hydra.Range, DamageType.Physical);
             if (itarget.Distance(Renek.Position) <= Hydra.Range && HarassMenu["hi"].Cast<CheckBox>().CurrentValue)
                 Hydra.Cast();
             if (itarget.Distance(Renek.Position) <= Tiamat.Range && HarassMenu["hi"].Cast<CheckBox>().CurrentValue)
                 Tiamat.Cast();
-            if (Renek.HasBuff(E2BuffName) && E.IsReady())
+            if (!Renek.HasBuff(E2BuffName) || !E.IsReady()) return;
+            if (!W.IsReady() || !Q.IsReady())
             {
-                if (!W.IsReady() || !Q.IsReady())
-                {
-                    Player.CastSpell(SpellSlot.E, qtarget.Position);
-                }
-            }
+                Player.CastSpell(SpellSlot.E, qtarget.Position);
             }
         }
         private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
         {
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) ||
-                (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
-                 (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))))
+            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
+                (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
+                 (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))) return;
+            var e = target as AIHeroClient;
+            if (!ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue || !W.IsReady() || !e.IsEnemy) return;
+            if (target == null) return;
+            if (e.IsValidTarget() && W.IsReady())
             {
-                var e = target as AIHeroClient;
-                if (ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue && W.IsReady() && e.IsEnemy)
-                    if (target != null)
-                    {
-                        if (e.IsValidTarget() && W.IsReady())
-                        {
-                            W.Cast();
-                        }
-                        if (e.IsValidTarget() && Hydra.IsReady())
-                        {
-                            Hydra.Cast();
-                        }
-                        if (e.IsValidTarget() && Tiamat.IsReady())
-                        {
-                            Tiamat.Cast();
-                        }
-                    }
+                W.Cast();
+            }
+            if (e.IsValidTarget() && Hydra.IsReady())
+            {
+                Hydra.Cast();
+            }
+            if (e.IsValidTarget() && Tiamat.IsReady())
+            {
+                Tiamat.Cast();
             }
         }
 
@@ -321,20 +317,14 @@ namespace Bloodimir_Renekton
 
         private static void Killsteal()
         {
-            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            foreach (var qtarget in EntityManager.Heroes.Enemies.Where(
+                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(qtarget => Renek.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health))
             {
-                    foreach (
-                        var qtarget in
-                            EntityManager.Heroes.Enemies.Where(
-                                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
-                    {
-                        if (Renek.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
-
-                            Q.Cast();
-                    }
-                }
+                Q.Cast();
             }
-        
+        }
+
 
         private static void SkinChange()
         {

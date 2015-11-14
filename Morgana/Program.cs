@@ -82,7 +82,6 @@ namespace Morgana
             AutoCastMenu.Add("qd", new CheckBox("Auto Q Dashing"));
             AutoCastMenu.Add("qi", new CheckBox("Auto Q Immobile"));
             AutoCastMenu.Add("ar", new CheckBox("Auto R"));
-            AutoCastMenu.Add("immow", new CheckBox("W on Immobile"));
             AutoCastMenu.Add("rslider", new Slider("Minimum people for Auto R", 2, 0, 5));
 
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
@@ -565,9 +564,9 @@ namespace Morgana
                 if (AutoCastMenu["ar"].Cast<CheckBox>().CurrentValue &&
                     Me.CountEnemiesInRange(R.Range) >= AutoCastMenu["rslider"].Cast<Slider>().CurrentValue)
                 {
+                    R.Cast();
                     if (E.IsReady())
                         E.Cast(Me);
-                    R.Cast();
                 }
                 }
             }

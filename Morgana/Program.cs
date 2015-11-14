@@ -63,10 +63,10 @@ namespace Morgana
             Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
             AbilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
 
-            MorgMenu = MainMenu.AddMenu("B.Morgana", "bloodimirmorgana");
-            MorgMenu.AddGroupLabel("Bloodimir.Morgana");
+            MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
+            MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Morgana v2.0.0.0");
+            MorgMenu.AddLabel("Bloodimir Morgana v2.0.1.0");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -74,7 +74,6 @@ namespace Morgana
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
-            ComboMenu.Add("wcc", new CheckBox("Use W only if enemy is CC'ed", false));
 
             AutoCastMenu = MorgMenu.AddSubMenu("Auto Cast", "ac");
             AutoCastMenu.AddGroupLabel("Auto Cast");
@@ -95,7 +94,7 @@ namespace Morgana
                 QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));
             }
             QMenu.AddSeparator();
-            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction / Disabled = High", false));
+            QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction", false));
             QMenu.AddSeparator();
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
 
@@ -269,7 +268,7 @@ namespace Morgana
 
             string[] skillShots =
             {
-                "AhriSeduce","AhriOrbofDeception", "BraumQ", "RocketGrab", "JavelinToss","BrandBlazeMissile","CaitlynEntrapment","EvelynnR", "QuinnQ", "yasuoq3w", "RengarEFinal","ZiggsW","ZyraGraspingRoots","ZyraBrambleZone","Dazzle","FiddlesticksDarkWind","FeralScream","ZiggsW","ViktorChaosStorm","AlZaharCalloftheVoid",
+                "AhriSeduce","AhriOrbofDeception", "BraumQ", "RocketGrab", "JavelinToss","BrandBlazeMissile", "Heimerdingerwm", "JannaQ", "JarvanIVEQ", "BandageToss","CaitlynEntrapment", "PhosphorusBomb", "MissileBarrage2", "DariusAxeGrabCone", "DianaArc", "DianaArcArc", "InfectedCleaverMissileCast", "DravenDoubleShot", "EkkoQ", "EkkoW", "EkkoR", "EliseHumanE", "GalioResoluteSmite", "GalioRighteousGust", "GalioIdolOfDurand",  "CurseoftheSadMummy", "FlashFrost", "EvelynnR", "QuinnQ", "yasuoq3w", "RengarEFinal","ZiggsW","ZyraGraspingRoots","ZyraBrambleZone","Dazzle","FiddlesticksDarkWind","FeralScream","ZiggsW","ViktorChaosStorm","AlZaharCalloftheVoid",
                 "RumbleCarpetBombMissile", "ThreshQ", "ThreshE", "NamiQ", "DarkBindingMissile", "OrianaDetonateCommand",
                 "NautilusAnchorDrag",
                 "SejuaniGlacialPrisonCast", "SonaR", "VarusR", "rivenizunablade", "EnchantedCrystalArrow", "BardR","InfernalGuardian",
@@ -603,15 +602,6 @@ namespace Morgana
                     W.Cast(wenemy);
                 }
             }
-            else if (ComboMenu["wcc"].Cast<CheckBox>().CurrentValue)
-            {
-                var wccenemy =
-                    (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
-                if (wccenemy.IsRooted || wccenemy.IsStunned && W.GetPrediction(wccenemy).HitChance >= HitChance.Medium)
-                {
-                    W.Cast(wccenemy);
-                }
             }
         }
     }
-}

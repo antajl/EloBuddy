@@ -14,45 +14,34 @@ using Color = System.Drawing.Color;
 
 namespace Morgana
 {
-    internal static class Program
+    internal class Program
     {
         public static Spell.Skillshot Q, W;
-        private static Spell.Active R;
-        private static Spell.Targeted E;
-        private static Spell.Targeted Ignite;
-        private static Spell.Targeted Exhaust;
-        private static Item Talisman;
-        private static Item Zhonia;
-        private static Item Randuin;
-        private static int[] AbilitySequence;
+        public static Spell.Active R;
+        public static Spell.Targeted E, Ignite, Exhaust;
+        public static Item Talisman, Zhonia, Randuin;
+        public static int[] AbilitySequence;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
 
-        private static Menu MorgMenu;
-
-        private static Menu ComboMenu;
-
-        private static Menu DrawMenu;
-
-        private static Menu SkinMenu;
-
-        private static Menu MiscMenu;
-
-        private static Menu QMenu;
-
-        private static Menu AutoCastMenu;
-
-        public static Menu LaneClear,
+        public static Menu MorgMenu,
+            ComboMenu,
+            DrawMenu,
+            SkinMenu,
+            MiscMenu,
+            QMenu,
+            AutoCastMenu,
+            LaneClear,
             LastHit;
 
-        private static AIHeroClient Me = ObjectManager.Player;
-        private static HitChance QHitChance;
+        public static AIHeroClient Me = ObjectManager.Player;
+        public static HitChance QHitChance;
 
         private static void Main(string[] args)
         {
             Loading.OnLoadingComplete += OnLoaded;
         }
 
-        private static bool HasSpell(string s)
+        public static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -252,19 +241,21 @@ namespace Morgana
                     Q.Cast(intTarget.ServerPosition);
             }
 
-            if (!MiscMenu["peel"].Cast<CheckBox>().CurrentValue) return;
-            foreach (var pos in from enemy in ObjectManager.Get<Obj_AI_Base>()
-                where
-                    enemy.IsValidTarget() &&
-                    enemy.Distance(ObjectManager.Player) <=
-                    enemy.BoundingRadius + enemy.AttackRange + ObjectManager.Player.BoundingRadius &&
-                    enemy.IsMelee
-                let direction =
-                    (enemy.ServerPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
-                let pos = ObjectManager.Player.ServerPosition.To2D()
-                select pos + Math.Min(200, Math.Max(50, enemy.Distance(ObjectManager.Player)/2))*direction)
+            if (MiscMenu["peel"].Cast<CheckBox>().CurrentValue)
             {
-                Q.Cast(pos.To3D());
+                foreach (var pos in from enemy in ObjectManager.Get<Obj_AI_Base>()
+                    where
+                        enemy.IsValidTarget() &&
+                        enemy.Distance(ObjectManager.Player) <=
+                        enemy.BoundingRadius + enemy.AttackRange + ObjectManager.Player.BoundingRadius &&
+                        enemy.IsMelee
+                    let direction =
+                        (enemy.ServerPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
+                    let pos = ObjectManager.Player.ServerPosition.To2D()
+                    select pos + Math.Min(200, Math.Max(50, enemy.Distance(ObjectManager.Player)/2))*direction)
+                {
+                    Q.Cast(pos.To3D());
+                }
             }
         }
 
@@ -289,24 +280,34 @@ namespace Morgana
             if (sender.Type != Me.Type || !E.IsReady() || !sender.IsEnemy ||
                 !MiscMenu["EAllies"].Cast<CheckBox>().CurrentValue)
                 return;
-            foreach (var ally in from ally in EntityManager.Heroes.Allies.Where(x => x.IsValidTarget(E.Range)) let detectRange = ally.ServerPosition +
-                                                                                                                                 (args.End - ally.ServerPosition).Normalized()*ally.Distance(args.End) where !(detectRange.Distance(ally.ServerPosition) > ally.AttackRange - ally.BoundingRadius) select ally)
+            foreach (var ally in EntityManager.Heroes.Allies.Where(x => x.IsValidTarget(E.Range)))
             {
-                if (!args.SData.IsAutoAttack())
+                var detectRange = ally.ServerPosition +
+                                  (args.End - ally.ServerPosition).Normalized()*ally.Distance(args.End);
+                if (detectRange.Distance(ally.ServerPosition) > ally.AttackRange - ally.BoundingRadius)
+                    continue;
                 {
-                    foreach (var item in skillShots.Where(item => args.SData.Name == item &&
-                                                                  (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue)))
+                    if (!args.SData.IsAutoAttack())
                     {
-                        E.Cast(ally);
+                        foreach (var item in skillShots)
+                        {
+                            if (args.SData.Name == item &&
+                                (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                            {
+                                E.Cast(ally);
+                            }
+                        }
                     }
-                }
-                for (var i = 0; i <= 4; i++)
-                {
-                    if (args.SData.Name != nonskillshots[i]) continue;
-                    if (ally.Distance(args.End) < 325 &&
-                        (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                    for (var i = 0; i <= 4; i++)
                     {
-                        E.Cast(ally);
+                        if (args.SData.Name == nonskillshots[i])
+                        {
+                            if (ally.Distance(args.End) < 325 &&
+                                (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                            {
+                                E.Cast(ally);
+                            }
+                        }
                     }
                 }
             }
@@ -314,23 +315,27 @@ namespace Morgana
 
         private static void RanduinU()
         {
-            if (!Randuin.IsReady() || !Randuin.IsOwned()) return;
-            var randuin = MiscMenu["randuin"].Cast<CheckBox>().CurrentValue;
-            if (randuin && Me.HealthPercent <= 15 && Me.CountEnemiesInRange(Randuin.Range) >= 1 ||
-                Me.CountEnemiesInRange(Randuin.Range) >= 2)
+            if (Randuin.IsReady() && Randuin.IsOwned())
             {
-                Randuin.Cast();
+                var randuin = MiscMenu["randuin"].Cast<CheckBox>().CurrentValue;
+                if (randuin && Me.HealthPercent <= 15 && Me.CountEnemiesInRange(Randuin.Range) >= 1 ||
+                    Me.CountEnemiesInRange(Randuin.Range) >= 2)
+                {
+                    Randuin.Cast();
+                }
             }
         }
 
         private static void Ascension()
         {
-            if (!Talisman.IsReady() || !Talisman.IsOwned()) return;
-            var ascension = MiscMenu["talisman"].Cast<CheckBox>().CurrentValue;
-            if (ascension && Me.HealthPercent <= 15 && Me.CountEnemiesInRange(800) >= 1 ||
-                Me.CountEnemiesInRange(Q.Range) >= 3)
+            if (Talisman.IsReady() && Talisman.IsOwned())
             {
-                Talisman.Cast();
+                var ascension = MiscMenu["talisman"].Cast<CheckBox>().CurrentValue;
+                if (ascension && Me.HealthPercent <= 15 && Me.CountEnemiesInRange(800) >= 1 ||
+                    Me.CountEnemiesInRange(Q.Range) >= 3)
+                {
+                    Talisman.Cast();
+                }
             }
         }
 
@@ -338,17 +343,19 @@ namespace Morgana
         {
             var zhoniaon = MiscMenu["szhonya"].Cast<CheckBox>().CurrentValue;
 
-            if (!zhoniaon || !Zhonia.IsReady() || !Zhonia.IsOwned()) return;
-            if (Me.CountEnemiesInRange(R.Range) >= 4)
+            if (zhoniaon && Zhonia.IsReady() && Zhonia.IsOwned())
             {
-                R.Cast();
-                Zhonia.Cast();
-            }
-            else
-            {
-                if (Me.HealthPercent <= 10 && Me.CountEnemiesInRange(E.Range) >= 1)
+                if (Me.CountEnemiesInRange(R.Range) >= 4)
                 {
+                    R.Cast();
                     Zhonia.Cast();
+                }
+                else
+                {
+                    if (Me.HealthPercent <= 10 && Me.CountEnemiesInRange(E.Range) >= 1)
+                    {
+                        Zhonia.Cast();
+                    }
                 }
             }
         }
@@ -359,16 +366,18 @@ namespace Morgana
             var wL = Me.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
             var eL = Me.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
             var rL = Me.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
-            if (qL + wL + eL + rL >= ObjectManager.Player.Level) return;
-            int[] level = {0, 0, 0, 0};
-            for (var i = 0; i < ObjectManager.Player.Level; i++)
+            if (qL + wL + eL + rL < ObjectManager.Player.Level)
             {
-                level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+                int[] level = {0, 0, 0, 0};
+                for (var i = 0; i < ObjectManager.Player.Level; i++)
+                {
+                    level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+                }
+                if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+                if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+                if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+                if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
             }
-            if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
-            if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
-            if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
-            if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
         }
 
         private static void OnUpdate(EventArgs args)
@@ -410,8 +419,7 @@ namespace Morgana
                     Ignite.Cast(source);
                     return;
                 }
-                if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue) return;
-                {
+                if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
                     foreach (
                         var enemy in
                             ObjectManager.Get<AIHeroClient>()
@@ -428,21 +436,24 @@ namespace Morgana
                         Exhaust.Cast(enemy);
                         return;
                     }
-                }
             }
         }
 
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
-            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) &&
-                (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) &&
-                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear))) return;
-            var t = target as Obj_AI_Minion;
-            if (t == null) return;
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) ||
+                (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) ||
+                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)))
             {
-                if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
-                    args.Process = false;
+                var t = target as Obj_AI_Minion;
+                if (t != null)
+                {
+                    {
+                        if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
+                            args.Process = false;
+                    }
+                }
             }
         }
 
@@ -450,16 +461,20 @@ namespace Morgana
         {
             var agapcloser = MiscMenu["antigapcloser"].Cast<CheckBox>().CurrentValue;
             var antigapc = E.IsReady() && agapcloser;
-            if (!antigapc) return;
-            if (!sender.IsMe) return;
-            var gap = a.Sender;
-            if (gap.IsValidTarget(4000))
+            if (antigapc)
             {
-                E.Cast(Me);
+                if (sender.IsMe)
+                {
+                    var gap = a.Sender;
+                    if (gap.IsValidTarget(4000))
+                    {
+                        E.Cast(Me);
+                    }
+                }
             }
         }
 
-        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -471,11 +486,22 @@ namespace Morgana
 
         private static void Killsteal()
         {
-            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
-            foreach (var poutput in EntityManager.Heroes.Enemies.Where(
-                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(qtarget => Me.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health).Select(qtarget => Q.GetPrediction(qtarget)).Where(poutput => poutput.HitChance >= HitChance.Medium))
+            if (MiscMenu["ksq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                Q.Cast(poutput.CastPosition);
+                foreach (
+                    var qtarget in
+                        EntityManager.Heroes.Enemies.Where(
+                            hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
+                {
+                    if (Me.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
+                    {
+                        var poutput = Q.GetPrediction(qtarget);
+                        if (poutput.HitChance >= HitChance.Medium)
+                        {
+                            Q.Cast(poutput.CastPosition);
+                        }
+                    }
+                }
             }
         }
 
@@ -534,35 +560,36 @@ namespace Morgana
                     }
                 }
             }
-            if (!R.IsReady()) return;
-            if (AutoCastMenu["ar"].Cast<CheckBox>().CurrentValue &&
-                Me.CountEnemiesInRange(R.Range) >= AutoCastMenu["rslider"].Cast<Slider>().CurrentValue)
+            if (R.IsReady())
             {
-                if (E.IsReady())
-                    E.Cast(Me);
-                R.Cast();
+                if (AutoCastMenu["ar"].Cast<CheckBox>().CurrentValue &&
+                    Me.CountEnemiesInRange(R.Range) >= AutoCastMenu["rslider"].Cast<Slider>().CurrentValue)
+                {
+                    if (E.IsReady())
+                        E.Cast(Me);
+                    R.Cast();
+                }
+                }
             }
-            if (!AutoCastMenu["immow"].Cast<CheckBox>().CurrentValue) return;
-            var soilTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (W.GetPrediction(soilTarget).HitChance < HitChance.Medium) return;
-            if (soilTarget.IsRooted ||
-                soilTarget.IsStunned)
-            {
-                W.Cast(soilTarget);
-            }
-        }
 
         private static void Combo(bool useQ)
         {
-            if (!useQ || !Q.IsReady()) return;
-            var bindTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-            if (!bindTarget.IsValidTarget(Q.Range)) return;
-            if (Q.GetPrediction(bindTarget).HitChance < QHitChance) return;
-            if (!(bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue))
-                return;
-            if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
+            if (useQ && Q.IsReady())
             {
-                Q.Cast(bindTarget);
+                var bindTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
+                if (bindTarget.IsValidTarget(Q.Range))
+                {
+                    if (Q.GetPrediction(bindTarget).HitChance >= QHitChance)
+                    {
+                        if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
+                        {
+                            if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
+                            {
+                                Q.Cast(bindTarget);
+                            }
+                        }
+                    }
+                }
             }
         }
 

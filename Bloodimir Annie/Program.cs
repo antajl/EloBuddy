@@ -92,6 +92,7 @@ namespace Bloodimir_Annie
             ComboMenu.Add("usecomboe", new CheckBox("Use E "));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
+            ComboMenu.Add("pilot", new CheckBox("Auto Pilot Tibbers"));
             ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
@@ -292,7 +293,6 @@ namespace Bloodimir_Annie
             Zhonya();
             Killsteal();
             SkinChange();
-            MoveTibbers();
             if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
@@ -301,6 +301,7 @@ namespace Bloodimir_Annie
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 Combo();
+                MoveTibbers();
             }
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
@@ -475,6 +476,9 @@ namespace Bloodimir_Annie
 
         private static void MoveTibbers()
         {
+            if (!ComboMenu["pilot"].Cast<CheckBox>().CurrentValue)
+                return;
+
             var target = TargetSelector.GetTarget(2000, DamageType.Magical);
 
             if (Player.HasBuff("infernalguardiantime"))

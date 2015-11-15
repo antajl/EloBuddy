@@ -20,8 +20,8 @@ namespace Bloodimir_Annie
         private static float Qcalc(Obj_AI_Base target)
         {
             return Annie.CalculateDamageOnUnit(target, DamageType.Magical,
-                (new float[] {0, 80, 115, 150, 185, 220}[Program.Q.Level] +
-                 (0.80f*Annie.FlatMagicDamageMod)));
+                (new float[] { 0, 80, 115, 150, 185, 220 }[Program.Q.Level] +
+                 (0.80f * Annie.FlatMagicDamageMod)));
         }
 
         private static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
@@ -45,7 +45,7 @@ namespace Bloodimir_Annie
             var qcheck = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
             if (!qcheck || !qready) return;
-            var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+            var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
             {
                 Program.Q.Cast(minion);

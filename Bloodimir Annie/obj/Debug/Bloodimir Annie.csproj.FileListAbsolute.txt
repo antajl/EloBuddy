@@ -1,3 +1,2 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\bin\Debug\Bloodimir Annie.exe.config
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Annie\Bloodimir Annie\obj\Debug\Bloodimir Annie.csprojResolveAssemblyReference.cache
-C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Annie\bin\Debug\Bloodimir Annie.exe.config

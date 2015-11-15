@@ -39,13 +39,13 @@ namespace Bloodimir_Annie
             var wready = Program.W.IsReady();
 
             if (!qcheck || !qready) return;
-            var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy != null)
             {
                 Program.Q.Cast(qenemy);
             }
             if (!wcheck || !wready) return;
-            var wminion = (Obj_AI_Minion) GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
+            var wminion = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
             if (wminion != null)
             {
                 Program.W.Cast(wminion.ServerPosition);

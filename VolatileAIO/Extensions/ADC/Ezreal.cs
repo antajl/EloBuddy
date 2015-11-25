@@ -9,6 +9,7 @@ using EloBuddy.SDK.Menu.Values;
 using SharpDX;
 using VolatileAIO.Organs;
 using VolatileAIO.Organs.Brain;
+using VolatileAIO.Organs.Brain.Data;
 using VolatileAIO.Organs._Test;
 
 namespace VolatileAIO.Extensions.ADC
@@ -19,7 +20,7 @@ namespace VolatileAIO.Extensions.ADC
 
         public static Spell.Skillshot Q;
         public static Spell.Skillshot W;
-        public static Spell.Skillshot E;
+        public static Spell.Active E;
         public static Spell.Skillshot R;
 
         public static Menu SpellMenu;
@@ -30,9 +31,15 @@ namespace VolatileAIO.Extensions.ADC
 
         public Ezreal()
         {
-            InitializeSpells();
+            PlayerData.Spells = new Initialize().Spells(Initialize.Type.Skillshot, Initialize.Type.Skillshot, Initialize.Type.Active, Initialize.Type.Skillshot);
+            Q = (Spell.Skillshot)PlayerData.Spells[0];
+            W = (Spell.Skillshot)PlayerData.Spells[1];
+            E = (Spell.Active)PlayerData.Spells[2];
+            R = (Spell.Skillshot)PlayerData.Spells[3];
+            W.AllowedCollisionCount = int.MaxValue;
+            R.AllowedCollisionCount = int.MaxValue;
+
             InitializeMenu();
-            DrawManager.UpdateValues(Q, W, E, R);
         }
 
         private static void InitializeMenu()
@@ -70,38 +77,12 @@ namespace VolatileAIO.Extensions.ADC
             }
         }
 
-        public static void InitializeSpells()
-        {
-            var qdata = SpellDatabase.Spells.Find(s => string.Equals(s.ChampionName, Player.ChampionName, StringComparison.CurrentCultureIgnoreCase) && s.Slot == SpellSlot.Q);
-            var wdata = SpellDatabase.Spells.Find(s => string.Equals(s.ChampionName, Player.ChampionName, StringComparison.CurrentCultureIgnoreCase) && s.Slot == SpellSlot.W);
-            var rdata = SpellDatabase.Spells.Find(s => string.Equals(s.ChampionName, Player.ChampionName, StringComparison.CurrentCultureIgnoreCase) && s.Slot == SpellSlot.R);
-
-            Q = new Spell.Skillshot(SpellSlot.Q, (uint)qdata.Range, qdata.Type, qdata.Delay, qdata.MissileSpeed, qdata.Radius)
-            {
-                AllowedCollisionCount = 0
-            };
-            W = new Spell.Skillshot(SpellSlot.W, (uint)wdata.Range, wdata.Type, wdata.Delay, wdata.MissileSpeed, wdata.Radius)
-            {
-                AllowedCollisionCount = int.MaxValue
-            };
-            E = new Spell.Skillshot(SpellSlot.E, 475, SkillShotType.Circular, 250, 1600, 80)
-            {
-                AllowedCollisionCount = int.MaxValue
-            };
-            R = new Spell.Skillshot(SpellSlot.R, (uint)rdata.Range, rdata.Type, rdata.Delay, rdata.MissileSpeed, rdata.Radius)
-            {
-                AllowedCollisionCount = int.MaxValue
-            };
-        }
-
         #endregion
 
         protected override void Volatile_OnHeartBeat(EventArgs args)
         {
-            TickManager.Tick();
             if (Player.IsDead) return;
             AutoCastSpells();
-            ManaManager.SetMana();
             Stack();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
@@ -110,6 +91,18 @@ namespace VolatileAIO.Extensions.ADC
             else if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Harass)
             {
                 Harass();
+            }
+            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+            {
+                LaneClear();
+            }
+        }
+
+        private static void LaneClear()
+        {
+            if (SpellMenu["UseQTL"].Cast<CheckBox>().CurrentValue)
+            {
+                CastManager.Cast.Line.Farm(Q);
             }
         }
 
@@ -246,7 +239,6 @@ namespace VolatileAIO.Extensions.ADC
         protected override void Volatile_AntiGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (SpellMenu["etosafe"].Cast<CheckBox>().CurrentValue && E.IsReady() && sender.IsEnemy &&
-                Player.Mana > ManaManager.ManaQ + ManaManager.ManaR &&
                 Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(400) < 3)
             {
                 if (sender.IsValidTarget(E.Range))

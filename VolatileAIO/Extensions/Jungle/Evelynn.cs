@@ -8,17 +8,76 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using VolatileAIO.Organs;
 using VolatileAIO.Organs.Brain;
+using VolatileAIO.Organs.Brain.Data;
 
 namespace VolatileAIO.Extensions.Jungle
 {
     internal class Evelynn : Heart
     {
+
+        #region Spell and Menu Declaration
+
+        public static int Mode;
+        public static bool IsAutoAttacking;
+
+        public static Spell.Active Q;
+        public static Spell.Active W;
+        public static Spell.Targeted E;
+        public static Spell.Skillshot R;
+
+        public static Menu SpellMenu;
+
+        #endregion
+
+        #region Spell and Menu Loading
+
+        public Evelynn()
+        {
+            InitializeSpells();
+            InitializeMenu();
+        }
+
+        private static void InitializeMenu()
+        {
+            SpellMenu = VolatileMenu.AddSubMenu("Spell Menu", "spellmenu");
+
+            SpellMenu.AddGroupLabel("Q Settings");
+            SpellMenu.Add("qtc", new CheckBox("Use Q in Combo"));
+            SpellMenu.Add("useQTL", new CheckBox("Use Q in farm"));
+            SpellMenu.Add("qon", new CheckBox("Auto Q if enemy is near"));
+
+            SpellMenu.AddGroupLabel("W Settings");
+            SpellMenu.Add("wtc", new CheckBox("Use W in Combo"));
+            SpellMenu.Add("wtosafe", new CheckBox("Anti-Gapcloser W"));
+            SpellMenu.Add("wt2", new CheckBox("Auto W if at least 2 enemy is near"));
+
+            SpellMenu.AddGroupLabel("E Settings");
+            SpellMenu.Add("useETL", new CheckBox("Use E in farm"));
+            SpellMenu.Add("etc", new CheckBox("Use E in Combo"));
+
+            SpellMenu.AddGroupLabel("R Settings");
+            SpellMenu.Add("rtc", new CheckBox("Use R in Combo"));
+            SpellMenu.AddSeparator();
+            SpellMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
+        }
+
+        public void InitializeSpells()
+        {
+            PlayerData.Spells = new Initialize().Spells(Initialize.Type.Active, Initialize.Type.Active,
+                Initialize.Type.Targeted, Initialize.Type.Skillshot);
+            Q = (Spell.Active) PlayerData.Spells[0];
+            W = (Spell.Active) PlayerData.Spells[1];
+            E = (Spell.Targeted) PlayerData.Spells[2];
+            R = (Spell.Skillshot) PlayerData.Spells[3];
+            R.AllowedCollisionCount = int.MaxValue;
+        }
+
+        #endregion
+
         protected override void Volatile_OnHeartBeat(EventArgs args)
         {
-            TickManager.Tick();
             if (Player.IsDead) return;
             AutoCastSpells();
-            ManaManager.SetMana();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -35,7 +94,6 @@ namespace VolatileAIO.Extensions.Jungle
         protected override void Volatile_AntiGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs e)
         {
             if (SpellMenu["wtosafe"].Cast<CheckBox>().CurrentValue && W.IsReady() && sender.IsEnemy &&
-                Player.Mana > ManaManager.ManaQ + ManaManager.ManaR &&
                 Player.Position.Extend(Game.CursorPos, Q.Range).CountEnemiesInRange(400) < 3)
             {
                 if (sender.IsValidTarget(E.Range))
@@ -115,71 +173,12 @@ namespace VolatileAIO.Extensions.Jungle
                                 Player.CalculateDamageOnUnit(enemy, DamageType.Magical,
                                     Player.GetSpellDamage(Player, SpellSlot.R)))
                             {
-                                    CastManager.Cast.Circle.WujuStyle(R, DamageType.Magical, 0, SpellMenu["rslider"].Cast<Slider>().CurrentValue, HitChance.Medium, enemy);
+                                CastManager.Cast.Circle.Optimized(R, DamageType.Magical, 0,
+                                    SpellMenu["rslider"].Cast<Slider>().CurrentValue, HitChance.Medium, enemy);
                             }
                         }
                 }
             }
         }
-
-        #region Spell and Menu Declaration
-
-        public static int Mode;
-        public static bool IsAutoAttacking;
-
-        public static Spell.Active Q;
-        public static Spell.Active W;
-        public static Spell.Targeted E;
-        public static Spell.Skillshot R;
-
-        public static Menu SpellMenu;
-
-        #endregion
-
-        #region Spell and Menu Loading
-
-        public Evelynn()
-        {
-            InitializeSpells();
-            InitializeMenu();
-            DrawManager.UpdateValues(Q, W, E, R);
-        }
-
-        private static void InitializeMenu()
-        {
-            SpellMenu = VolatileMenu.AddSubMenu("Spell Menu", "spellmenu");
-
-            SpellMenu.AddGroupLabel("Q Settings");
-            SpellMenu.Add("qtc", new CheckBox("Use Q in Combo"));
-            SpellMenu.Add("useQTL", new CheckBox("Use Q in farm"));
-            SpellMenu.Add("qon", new CheckBox("Auto Q if enemy is near"));
-
-            SpellMenu.AddGroupLabel("W Settings");
-            SpellMenu.Add("wtc", new CheckBox("Use W in Combo"));
-            SpellMenu.Add("wtosafe", new CheckBox("Anti-Gapcloser W"));
-            SpellMenu.Add("wt2", new CheckBox("Auto W if at least 2 enemy is near"));
-
-            SpellMenu.AddGroupLabel("E Settings");
-            SpellMenu.Add("useETL", new CheckBox("Use E in farm"));
-            SpellMenu.Add("etc", new CheckBox("Use E in Combo"));
-
-            SpellMenu.AddGroupLabel("R Settings");
-            SpellMenu.Add("rtc", new CheckBox("Use R in Combo"));
-            SpellMenu.AddSeparator();
-            SpellMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
-        }
-
-        public static void InitializeSpells()
-        {
-            Q = new Spell.Active(SpellSlot.Q, 475);
-            W = new Spell.Active(SpellSlot.W);
-            E = new Spell.Targeted(SpellSlot.E, 225);
-            R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, 250, 1200, 150)
-            {
-                AllowedCollisionCount = int.MaxValue
-            };
-        }
-
-        #endregion
     }
 }

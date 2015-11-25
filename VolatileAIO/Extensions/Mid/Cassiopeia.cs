@@ -3,6 +3,7 @@ using EloBuddy;
 using EloBuddy.SDK;
 using VolatileAIO.Organs;
 using VolatileAIO.Organs.Brain;
+using VolatileAIO.Organs.Brain.Data;
 using VolatileAIO.Organs._Test;
 
 namespace VolatileAIO.Extensions.Mid
@@ -17,23 +18,22 @@ namespace VolatileAIO.Extensions.Mid
         public Cassiopeia()
         {
             InitializeSpells();
-            DrawManager.UpdateValues(Q, W, E, R);
         }
 
-        private static void InitializeSpells()
+        private void InitializeSpells()
         {
-            var qdata = SpellDatabase.Spells.Find(s => string.Equals(s.ChampionName, Player.ChampionName, StringComparison.CurrentCultureIgnoreCase) && s.Slot == SpellSlot.Q);
-            var wdata = SpellDatabase.Spells.Find(s => string.Equals(s.ChampionName, Player.ChampionName, StringComparison.CurrentCultureIgnoreCase) && s.Slot == SpellSlot.Q);
-            var rdata = SpellDatabase.Spells.Find(s => string.Equals(s.ChampionName, Player.ChampionName, StringComparison.CurrentCultureIgnoreCase) && s.Slot == SpellSlot.R);
-            Q = new Spell.Skillshot(SpellSlot.Q, (uint)qdata.Range, qdata.Type, qdata.Delay, qdata.MissileSpeed, qdata.Radius);
-            W = new Spell.Skillshot(SpellSlot.W, (uint)wdata.Range, wdata.Type, wdata.Delay, wdata.MissileSpeed, wdata.Radius);
-            E = new Spell.Targeted(SpellSlot.E, 550);
-            R = new Spell.Skillshot(SpellSlot.R, (uint)rdata.Range, rdata.Type, rdata.Delay, rdata.MissileSpeed, rdata.Radius);
+            PlayerData.Spells = new Initialize().Spells(Initialize.Type.Skillshot, Initialize.Type.Skillshot, Initialize.Type.Targeted, Initialize.Type.Skillshot);
+            Q = (Spell.Skillshot)PlayerData.Spells[0];
+            W = (Spell.Skillshot)PlayerData.Spells[1];
+            E = (Spell.Targeted)PlayerData.Spells[2];
+            R = (Spell.Skillshot)PlayerData.Spells[3];
+            Q.AllowedCollisionCount = int.MaxValue;
+            W.AllowedCollisionCount = int.MaxValue;
+            R.AllowedCollisionCount = int.MaxValue;
         }
 
         protected override void Volatile_OnHeartBeat(EventArgs args)
         {
-            TickManager.Tick();
             if (Orbwalker.ActiveModesFlags == Orbwalker.ActiveModes.Combo)
             {
                 Combo();
@@ -46,8 +46,8 @@ namespace VolatileAIO.Extensions.Mid
 
         private static void Combo()
         {
-            CastManager.Cast.Circle.WujuStyle(Q, DamageType.Magical);
-            CastManager.Cast.Circle.WujuStyle(W, DamageType.Magical, 0, 2);
+            CastManager.Cast.Circle.Optimized(Q, DamageType.Magical);
+            CastManager.Cast.Circle.Optimized(W, DamageType.Magical, 0, 2);
         }
 
         private static void LaneClear()

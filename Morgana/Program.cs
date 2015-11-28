@@ -66,7 +66,7 @@ namespace Morgana
             MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Morgana v2.0.1.0");
+            MorgMenu.AddLabel("Bloodimir Morgana v2.0.1.1");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -152,7 +152,7 @@ namespace Morgana
 
             LastHit = MorgMenu.AddSubMenu("Last Hit", "lasthit");
             LastHit.AddGroupLabel("Last Hit Settings");
-            LastHit.Add("LHQ", new CheckBox("Use Q"));
+            LastHit.Add("LHQ", new CheckBox("Use Q", false));
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnUpdate += OnUpdate;
@@ -268,7 +268,7 @@ namespace Morgana
 
             string[] skillShots =
             {
-                "AhriSeduce","AhriOrbofDeception", "BraumQ", "RocketGrab", "JavelinToss","BrandBlazeMissile", "Heimerdingerwm", "JannaQ", "JarvanIVEQ", "BandageToss","CaitlynEntrapment", "PhosphorusBomb", "MissileBarrage2", "DariusAxeGrabCone", "DianaArc", "DianaArcArc", "InfectedCleaverMissileCast", "DravenDoubleShot", "EkkoQ", "EkkoW", "EkkoR", "EliseHumanE", "GalioResoluteSmite", "GalioRighteousGust", "GalioIdolOfDurand",  "CurseoftheSadMummy", "FlashFrost", "EvelynnR", "QuinnQ", "yasuoq3w", "RengarEFinal","ZiggsW","ZyraGraspingRoots","ZyraBrambleZone","Dazzle","FiddlesticksDarkWind","FeralScream","ZiggsW","ViktorChaosStorm","AlZaharCalloftheVoid",
+                "AhriSeduce","AhriOrbofDeception", "SwainShadowGrasp", "BraumQ", "RocketGrab", "JavelinToss","BrandBlazeMissile", "Heimerdingerwm", "JannaQ", "JarvanIVEQ", "BandageToss","CaitlynEntrapment", "PhosphorusBomb", "MissileBarrage2", "DariusAxeGrabCone", "DianaArc", "DianaArcArc", "InfectedCleaverMissileCast", "DravenDoubleShot", "EkkoQ", "EkkoW", "EkkoR", "EliseHumanE", "GalioResoluteSmite", "GalioRighteousGust", "GalioIdolOfDurand",  "CurseoftheSadMummy", "FlashFrost", "EvelynnR", "QuinnQ", "yasuoq3w", "RengarEFinal","ZiggsW","ZyraGraspingRoots","ZyraBrambleZone","Dazzle","FiddlesticksDarkWind","FeralScream","ZiggsW","ViktorChaosStorm","AlZaharCalloftheVoid",
                 "RumbleCarpetBombMissile", "ThreshQ", "ThreshE", "NamiQ", "DarkBindingMissile", "OrianaDetonateCommand",
                 "NautilusAnchorDrag",
                 "SejuaniGlacialPrisonCast", "SonaR", "VarusR", "rivenizunablade", "EnchantedCrystalArrow", "BardR","InfernalGuardian",
@@ -534,8 +534,7 @@ namespace Morgana
 
         private static bool Immobile(Obj_AI_Base unit)
         {
-            return unit.HasBuffOfType(BuffType.Charm) || unit.HasBuffOfType(BuffType.Fear) ||
-                   unit.HasBuffOfType(BuffType.Flee) || unit.HasBuffOfType(BuffType.Stun) ||
+            return unit.HasBuffOfType(BuffType.Charm) || unit.HasBuffOfType(BuffType.Stun) ||
                    unit.HasBuffOfType(BuffType.Knockup) || unit.HasBuffOfType(BuffType.Snare) ||
                    unit.HasBuffOfType(BuffType.Taunt) || unit.HasBuffOfType(BuffType.Suppression);
         }
@@ -597,7 +596,7 @@ namespace Morgana
             {
                 var wenemy =
                     (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
-                if (wenemy != null && W.GetPrediction(wenemy).HitChance >= HitChance.Medium)
+                if (wenemy != null && W.GetPrediction(wenemy).HitChance >= HitChance.Medium && Immobile(wenemy))
                 {
                     W.Cast(wenemy);
                 }

@@ -15,15 +15,18 @@ namespace VolatileAIO.Organs.Brain
     {
         private static bool _loaded;
 
-        readonly internal List<Champion> _champions = new List<Champion>
+        readonly internal List<Champion> Champions = new List<Champion>
             {
                 new Champion("Alistar", State.FullyDeveloped, "turkey"),
                 new Champion("Annie", State.FullyDeveloped, "Bloodimir"),
                 new Champion("Blitzcrank", State.FullyDeveloped, "turkey"),
+                new Champion("Brand", State.BeingOptimized, "turkey"),
                 new Champion("Cassiopeia", State.Outdated, "turkey"),
                 new Champion("Evelynn", State.BeingOptimized, "Bloodimir"),
                 new Champion("Ezreal", State.FullyDeveloped, "turkey"),
-                new Champion("Tristana", State.FullyDeveloped, "turkey")
+                new Champion("Morgana", State.FullyDeveloped, "Bloodimir"),
+                new Champion("Tristana", State.FullyDeveloped, "turkey"),
+                new Champion("Ziggs", State.BeingOptimized, "Bloodimir")
             };
 
         internal struct Champion
@@ -53,7 +56,7 @@ namespace VolatileAIO.Organs.Brain
         {
             Chat.Print("<font color = \"#00FF00\">Succesfully loaded Extension: </font><font color = \"#FFFF00\">" +
                        ObjectManager.Player.ChampionName + "</font>");
-            var state = _champions.Find(c => c.Name == ObjectManager.Player.ChampionName).State;
+            var state = Champions.Find(c => c.Name == ObjectManager.Player.ChampionName).State;
             if ((int) state < 3)
                 Chat.Print("<font color = \"#FFCC00\">Please note:</font> <font color = \"#FFFF00\">" +
                            ObjectManager.Player.ChampionName +
@@ -64,7 +67,7 @@ namespace VolatileAIO.Organs.Brain
         public ExtensionLoader()
         {
             if (_loaded) return;
-            if (_champions.Any(c=>c.Name==ObjectManager.Player.ChampionName)) WelcomeChat();
+            if (Champions.Any(c=>c.Name==ObjectManager.Player.ChampionName)) WelcomeChat();
             switch (ObjectManager.Player.ChampionName.ToLower())
             {
                 case "alistar":
@@ -79,6 +82,10 @@ namespace VolatileAIO.Organs.Brain
                     new Blitzcrank();
                     _loaded = true;
                     break;
+                case "brand":
+                    new Brand();
+                    _loaded = true;
+                    break;
                 case "cassiopeia":
                     new Cassiopeia();
                     _loaded = true;
@@ -91,8 +98,16 @@ namespace VolatileAIO.Organs.Brain
                     new Ezreal();
                     _loaded = true;
                     break;
+                case "morgana":
+                    new Morgana();
+                    _loaded = true;
+                    break;
                 case "tristana":
                     new Tristana();
+                    _loaded = true;
+                    break;
+                case "ziggs":
+                    new Ziggs();
                     _loaded = true;
                     break;
                 default:

@@ -229,13 +229,11 @@ namespace Morgana
             };
         }
 
-        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
+          private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
         {
-            var intTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
-            {
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
-                    Q.Cast(intTarget.ServerPosition);
+                    Q.Cast(sender);
             }
 
         private static void Auto_EOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)

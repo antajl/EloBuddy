@@ -115,7 +115,6 @@ namespace Morgana
             MiscMenu.AddGroupLabel("Misc");
             MiscMenu.AddSeparator();
             MiscMenu.Add("ksq", new CheckBox("KS with Q"));
-            MiscMenu.Add("peel", new CheckBox("Peel from Melee Champions"));
             MiscMenu.Add("antigapcloser", new CheckBox("Anti Gapcloser"));
             MiscMenu.Add("talisman", new CheckBox("Use Talisman of Ascension"));
             MiscMenu.Add("randuin", new CheckBox("Use Randuin"));
@@ -238,24 +237,6 @@ namespace Morgana
                 if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
                     Q.Cast(intTarget.ServerPosition);
             }
-
-            if (MiscMenu["peel"].Cast<CheckBox>().CurrentValue)
-            {
-                foreach (var pos in from enemy in ObjectManager.Get<Obj_AI_Base>()
-                    where
-                        enemy.IsValidTarget() &&
-                        enemy.Distance(ObjectManager.Player) <=
-                        enemy.BoundingRadius + enemy.AttackRange + ObjectManager.Player.BoundingRadius &&
-                        enemy.IsMelee
-                    let direction =
-                        (enemy.ServerPosition.To2D() - ObjectManager.Player.ServerPosition.To2D()).Normalized()
-                    let pos = ObjectManager.Player.ServerPosition.To2D()
-                    select pos + Math.Min(200, Math.Max(50, enemy.Distance(ObjectManager.Player)/2))*direction)
-                {
-                    Q.Cast(pos.To3D());
-                }
-            }
-        }
 
         private static void Auto_EOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {

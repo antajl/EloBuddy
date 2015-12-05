@@ -72,7 +72,7 @@ namespace Bloodimir_Tryndamere
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
-            ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
+            ComboMenu.Add("rslider", new Slider("Minimum HP% for Ult", 20, 0, 95));
             ComboMenu.AddSeparator();
             ComboMenu.Add("qhp", new Slider("Q % HP", 25, 0, 95));
 

@@ -11,41 +11,34 @@ using Color = System.Drawing.Color;
 
 namespace Bloodimir_Sona
 {
-    internal static class Program
+    internal class Program
     {
         public static Spell.Active Q;
-        private static Spell.Active W;
-        private static Spell.Active E;
-        private static Spell.Skillshot R;
-        private static Spell.Targeted Ignite;
-        private static Spell.Targeted Exhaust;
-        private static AIHeroClient Sona = ObjectManager.Player;
-        private static Item FrostQueen;
+        public static Spell.Active W;
+        public static Spell.Active E;
+        public static Spell.Skillshot R;
+        public static Spell.Targeted Ignite;
+        public static Spell.Targeted Exhaust;
+        public static AIHeroClient Sona = ObjectManager.Player;
+        public static Item FrostQueen;
 
-        private static Menu SonaMenu;
+        public static Menu SonaMenu,
+            ComboMenu,
+            LaneJungleClear,
+            SkinMenu,
+            MiscMenu,
+            HarassMenu,
+            DrawMenu,
+            FleeMenu;
 
-        private static Menu ComboMenu;
-
-        public static Menu LaneJungleClear;
-
-        private static Menu SkinMenu;
-
-        private static Menu MiscMenu;
-
-        private static Menu HarassMenu;
-
-        private static Menu DrawMenu;
-
-        private static Menu FleeMenu;
-
-        private static AIHeroClient SelectedHero { get; set; }
+        public static AIHeroClient SelectedHero { get; set; }
 
         private static Vector3 mousePos
         {
             get { return Game.CursorPos; }
         }
 
-        private static bool HasSpell(string s)
+        public static bool HasSpell(string s)
         {
             return Player.Spells.FirstOrDefault(o => o.SData.Name.Contains(s)) != null;
         }
@@ -148,52 +141,54 @@ namespace Bloodimir_Sona
             var target = TargetSelector.GetTarget(1200, DamageType.Magical);
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 Combo();
-            if (target == null) return;
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
-                Harass();
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
-                LaneJungleClearA.LaneClear();
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
+            if (target != null)
             {
-            }
-            else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
-                Flee();
-            {
+                if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
+                    Harass();
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
+                    LaneJungleClearA.LaneClear();
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
                 {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20*Sona.Level - a.HPRegenRate/5*3))
+                }
+                else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
+                    Flee();
+                {
                     {
-                        Ignite.Cast(source);
-                        if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue || ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
-                            !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                            return;
+                        if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                            !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
                         foreach (
-                            var enemy in
+                            var source in
                                 ObjectManager.Get<AIHeroClient>()
-                                    .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
-                                    .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
+                                    .Where(
+                                        a =>
+                                            a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                            a.Health < 50 + 20*Sona.Level - (a.HPRegenRate/5*3)))
                         {
-                            if (enemy.IsFacing(Sona))
-                            {
-                                if (!(Sona.HealthPercent < 50)) continue;
-                                Exhaust.Cast(enemy);
-                                return;
-                            }
-                            if (!(enemy.HealthPercent < 50)) continue;
-                            Exhaust.Cast(enemy);
-                            return;
+                            Ignite.Cast(source);
+            if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue || ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                return;
+            foreach (
+                var enemy in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
+                        .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
+            {
+                if (enemy.IsFacing(Sona))
+                {
+                    if (!(Sona.HealthPercent < 50)) continue;
+                    Exhaust.Cast(enemy);
+                    return;
+                }
+                if (!(enemy.HealthPercent < 50)) continue;
+                Exhaust.Cast(enemy);
+                return;
+            }
+        }
                         }
                     }
                 }
             }
-        }
 
         private static
             void Interruptererer
@@ -210,53 +205,63 @@ namespace Bloodimir_Sona
 
         private static void OnDraw(EventArgs args)
         {
-            if (Sona.IsDead) return;
-            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+            if (!Sona.IsDead)
             {
-                Drawing.DrawCircle(Sona.Position, Q.Range, Color.Blue);
-            }
-            {
-                if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+                if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
-                    Drawing.DrawCircle(Sona.Position, E.Range, Color.MediumVioletRed);
+                    Drawing.DrawCircle(Sona.Position, Q.Range, Color.Blue);
                 }
-                if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
                 {
-                    Drawing.DrawCircle(Sona.Position, W.Range, Color.Green);
-                }
-                if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && W.IsLearned)
-                {
-                    Drawing.DrawCircle(Sona.Position, R.Range, Color.Yellow);
-                }
-                if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
-                {
-                    Drawing.DrawCircle(Sona.Position, Player.Instance.AttackRange, Color.DimGray);
+                    if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+                    {
+                        Drawing.DrawCircle(Sona.Position, E.Range, Color.MediumVioletRed);
+                    }
+                    if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
+                    {
+                        Drawing.DrawCircle(Sona.Position, W.Range, Color.Green);
+                    }
+                    if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && W.IsLearned)
+                    {
+                        Drawing.DrawCircle(Sona.Position, R.Range, Color.Yellow);
+                    }
+                    if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
+                    {
+                        Drawing.DrawCircle(Sona.Position, Player.Instance.AttackRange, Color.DimGray);
+                    }
                 }
             }
         }
 
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
-            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) && !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)) return;
-            var t = target as Obj_AI_Minion;
-            if (t == null) return;
+            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) ||
+                Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit) ||
+                (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) ||
+                 Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.JungleClear)))
             {
-                if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
-                    args.Process = false;
+                var t = target as Obj_AI_Minion;
+                if (t != null)
+                {
+                    {
+                        if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
+                            args.Process = false;
+                    }
+                }
             }
         }
 
-        private static
+        public static
             void Harass
             ()
         {
             var target = TargetSelector.GetTarget(650, DamageType.Magical);
             Orbwalker.OrbwalkTo(mousePos);
-            if (!HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
-            if (Q.IsInRange(target))
+            if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                Q.Cast();
+                if (Q.IsInRange(target))
+                {
+                    Q.Cast();
+                }
             }
         }
 
@@ -275,7 +280,7 @@ namespace Bloodimir_Sona
                     .OrderBy(h => h.Distance(Game.CursorPos, true)).FirstOrDefault();
         }
 
-        private static
+        public static
             void Combo
             ()
         {
@@ -299,9 +304,11 @@ namespace Bloodimir_Sona
                     if (target.CountEnemiesInRange(R.Width) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                         R.Cast(predR);
                 }
-            if (!ComboMenu["useitems"].Cast<CheckBox>().CurrentValue) return;
-            if (FrostQueen.IsOwned() && FrostQueen.IsReady())
-                FrostQueen.Cast(target.ServerPosition);
+            if (ComboMenu["useitems"].Cast<CheckBox>().CurrentValue)
+            {
+                if (FrostQueen.IsOwned() && FrostQueen.IsReady())
+                    FrostQueen.Cast(target.ServerPosition);
+            }
         }
 
         public static void UseESmart(Obj_AI_Base target)
@@ -328,31 +335,38 @@ namespace Bloodimir_Sona
             }
         }
 
-        private static int GetPassiveCount()
+        static int GetPassiveCount()
         {
-            return (from buff in Sona.Buffs where buff.Name == "sonapassivecount" select buff.Count).FirstOrDefault();
+            foreach (BuffInstance buff in Sona.Buffs)
+                if (buff.Name == "sonapassivecount") return buff.Count;
+            return 0;
         }
 
-        private static void Passive()
+          static void Passive()
         {
               var unit = TargetSelector.GetTarget(550, DamageType.Magical);
-            if (!Q.IsReady() || GetPassiveCount() != 2 || !(unit.Distance(Sona) <= 550)) return;
-            if (Q.IsReady()) Q.Cast();
-            Player.IssueOrder(GameObjectOrder.AttackUnit, unit);
+            if ((Q.IsReady() && GetPassiveCount() == 2 && unit.Distance(Sona) <= 550))
+            {
+                if (Q.IsReady()) Q.Cast();
+                Player.IssueOrder(GameObjectOrder.AttackUnit, unit);
+            }
         }
         private static void AutoW()
         {
             var healAllies = MiscMenu["HPLowAllies"].Cast<CheckBox>().CurrentValue;
             var healHealthPercent = MiscMenu["wslider"].Cast<Slider>().CurrentValue;
 
-            if (!healAllies) return;
-            var ally =
-                EntityManager.Heroes.Allies
-                    .FirstOrDefault(x => x.IsValidTarget(W.Range) && x.HealthPercent < healHealthPercent);
-
-            if (ally != null)
+            if (healAllies)
             {
-                W.Cast();
+                var ally =
+                    EntityManager.Heroes.Allies.Where(
+                        x => x.IsValidTarget(W.Range) && x.HealthPercent < healHealthPercent)
+                        .FirstOrDefault();
+
+                if (ally != null)
+                {
+                    W.Cast();
+                }
             }
         }
 
@@ -360,35 +374,44 @@ namespace Bloodimir_Sona
             void Killsteal
             ()
         {
-            if (!MiscMenu["ks"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
-            try
+            if (MiscMenu["ks"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
-                foreach (var qtarget in EntityManager.Heroes.Enemies.Where(
-                    hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(qtarget => Sona.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health))
+                try
                 {
+                    foreach (
+                        var qtarget in
+                            EntityManager.Heroes.Enemies.Where(
+                                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie))
                     {
-                        if (Q.IsInRange(qtarget) && (Q.IsReady() || GetPassiveCount() == 2 ))
+                        if (Sona.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                         {
-                            Q.Cast();
-                            Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
+                            {
+                                if (Q.IsInRange(qtarget) && (Q.IsReady() || GetPassiveCount() == 2 ))
+                                {
+                                    Q.Cast();
+                Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
+                                }
+                            }
+                            {
+                            }
                         }
                     }
-                    {
-                    }
                 }
-            }
-            catch
-            {
+                catch
+                {
+                }
             }
         }
 
-        private static
+        public static
             void Flee
             ()
         {
-            if (!FleeMenu["fleee"].Cast<CheckBox>().CurrentValue) return;
-            E.Cast();
-            Orbwalker.MoveTo(Game.CursorPos);
+            if (FleeMenu["fleee"].Cast<CheckBox>().CurrentValue)
+            {
+                E.Cast();
+                Orbwalker.MoveTo(Game.CursorPos);
+            }
         }
 
         private static void SkinChange()

@@ -1,2 +1,1 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Sona\Bloodimir Sona\bin\Debug\Bloodimir Sona.exe.config
-C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Sona\bin\Debug\Bloodimir Sona.exe.config

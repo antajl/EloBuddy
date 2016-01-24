@@ -166,7 +166,7 @@ namespace Bloodimir_Annie
             Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
             Gapcloser.OnGapcloser += OnGapClose;
-            Obj_AI_Base.OnProcessSpellCast += Auto_EOnProcessCastSpell;
+            Obj_AI_Base.OnBasicAttack += Auto_EOnBasicAttack;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Orbwalker.OnPreAttack += Support_Orbwalker;
             Core.DelayAction(Combo, 1);
@@ -353,7 +353,7 @@ namespace Bloodimir_Annie
             }
         }
 
-        private static void Auto_EOnProcessCastSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        private static void Auto_EOnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (_miscMenu["eaa"].Cast<CheckBox>().CurrentValue &&
                 sender.IsEnemy

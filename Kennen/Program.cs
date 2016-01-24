@@ -117,7 +117,7 @@ namespace Kennen
             Interrupter.InterruptableSpellEventArgs args)
         {
             var intTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (!intTarget.HasBuff("kennenmarkofstorm")) return;
+            if (!intTarget.HasBuff("kennenmarkofstorm") && intTarget.CountEnemiesInRange(500) >= 2) return;
             if (Q.IsReady() && sender.IsValidTarget(Q.Range) && _miscMenu["int"].Cast<CheckBox>().CurrentValue)
                 Q.Cast(intTarget.ServerPosition);
             if (W.IsReady() && sender.IsValidTarget(W.Range))

@@ -39,7 +39,7 @@ namespace Morgana
         {
             var qcheck = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
                 var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
                 if (minion != null)

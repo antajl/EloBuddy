@@ -5,7 +5,7 @@ using EloBuddy.SDK.Menu.Values;
 
 namespace BloodimirVladimir
 {
-    internal static class Combo
+    internal class Combo
     {
         public enum AttackSpell
         {
@@ -18,7 +18,7 @@ namespace BloodimirVladimir
             get { return ObjectManager.Player; }
         }
 
-        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -33,24 +33,26 @@ namespace BloodimirVladimir
 
         public static void VladCombo()
         {
-            var QCHECK = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
-            var ECHECK = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var EREADY = Program.E.IsReady();
+            var qcheck = Program.ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue;
+            var echeck = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var eready = Program.E.IsReady();
 
-            if (ECHECK && EREADY)
+            if (!echeck || !eready) return;
             {
                 var eenemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Magical);
 
                 if (eenemy != null)
                     Program.E.Cast();
-                 }
+            }
 
-            if (!QCHECK || !QREADY) return;
-            var qenemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
+            if (!qcheck || !qready) return;
+            {
+                var qenemy = (AIHeroClient) GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
 
-            if (qenemy != null)
-                Program.Q.Cast(qenemy);
+                if (qenemy != null)
+                    Program.Q.Cast(qenemy);
+            }
         }
     }
 }

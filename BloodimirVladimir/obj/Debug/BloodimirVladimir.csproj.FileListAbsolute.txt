@@ -1,2 +1,1 @@
 c:\users\asus\documents\visual studio 2013\Projects\BloodimirVladimir\BloodimirVladimir\bin\Debug\BloodimirVladimir.exe.config
-C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\BloodimirVladimir\bin\Debug\BloodimirVladimir.exe.config

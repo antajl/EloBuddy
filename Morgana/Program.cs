@@ -10,7 +10,6 @@ using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 using EloBuddy.SDK.Rendering;
 using SharpDX;
-using Color = System.Drawing.Color;
 
 namespace Morgana
 {
@@ -51,8 +50,8 @@ namespace Morgana
             if (Player.Instance.ChampionName != "Morgana")
                 return;
             Bootstrap.Init(null);
-            Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, 250,1200,80);
-            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 250,2200,400);
+            Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, 250, 1200, 80);
+            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 250, 2200, 400);
             E = new Spell.Targeted(SpellSlot.E, 750);
             R = new Spell.Active(SpellSlot.R, 600);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
@@ -164,19 +163,19 @@ namespace Morgana
                 {
                     if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
                     {
-                        Drawing.DrawCircle(Me.Position, 626, Color.Red);
+                        Circle.Draw(Color.Red, R.Range, Player.Instance.Position);
                     }
                     if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
                     {
-                        Drawing.DrawCircle(Me.Position, W.Range, Color.Purple);
+                        Circle.Draw(Color.Purple, W.Range, Player.Instance.Position);
                     }
                     if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
                     {
-                        Drawing.DrawCircle(Me.Position, E.Range, Color.Green);
+                        Circle.Draw(Color.Green, E.Range, Player.Instance.Position);
                     }
                     if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
                     {
-                        Drawing.DrawCircle(Me.Position, 512, Color.Blue);
+                        Circle.Draw(Color.Blue, Q.Range, Player.Instance.Position);
                     }
                     var predictedPositions = new Dictionary<int, Tuple<int, PredictionResult>>();
                     var predictions = DrawMenu["predictions"].Cast<CheckBox>().CurrentValue;
@@ -194,7 +193,7 @@ namespace Morgana
                             predictionsq);
                         if (qRange && Q.IsLearned)
                         {
-                            Circle.Draw(Q.IsReady() ? SharpDX.Color.Blue : SharpDX.Color.Red, Q.Range,
+                            Circle.Draw(Q.IsReady() ? Color.Blue : Color.Red, Q.Range,
                                 Player.Instance.Position);
                         }
 
@@ -211,14 +210,14 @@ namespace Morgana
                                 continue;
                             }
 
-                            Circle.Draw(SharpDX.Color.Red, 75, prediction.Value.Item2.CastPosition);
-                            Line.DrawLine(Color.GreenYellow, Player.Instance.Position,
+                            Circle.Draw(Color.Red, 75, prediction.Value.Item2.CastPosition);
+                            Line.DrawLine(System.Drawing.Color.GreenYellow, Player.Instance.Position,
                                 prediction.Value.Item2.CastPosition);
-                            Line.DrawLine(Color.CornflowerBlue,
+                            Line.DrawLine(System.Drawing.Color.CornflowerBlue,
                                 EntityManager.Heroes.Enemies.Find(o => o.NetworkId == prediction.Key).Position,
                                 prediction.Value.Item2.CastPosition);
                             Drawing.DrawText(prediction.Value.Item2.CastPosition.WorldToScreen() + new Vector2(0, -20),
-                                Color.LimeGreen,
+                                System.Drawing.Color.LimeGreen,
                                 string.Format("Hitchance: {0}%", Math.Ceiling(prediction.Value.Item2.HitChancePercent)),
                                 10);
                         }
@@ -229,12 +228,12 @@ namespace Morgana
             };
         }
 
-          private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
+        private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
         {
-                if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
-                    Q.Cast(sender);
-            }
+            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["intq"].Cast<CheckBox>().CurrentValue)
+                Q.Cast(sender);
+        }
 
         private static void Auto_EOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
@@ -242,17 +241,30 @@ namespace Morgana
             {
                 "ShenShadowDash", "Pulverize", "GragasE", "FizzPiercingStrike", "reksaiqburrowed",
                 "RunePrison", "Fling", "NocturneUnspeakableHorror", "SejuaniArcticAssault", "ShyvanaTransformCast",
-                "PantheonW", "Ice Blast", "Terrify", "GalioIdolOfDurand","GnarR","JaxCounterStrike","BlindMonkRKick","UFSlash","JayceThunderingBlow","ZacR","StaticField","GarenQ","TalonCutthroat","ViR"
+                "PantheonW", "Ice Blast", "Terrify", "GalioIdolOfDurand", "GnarR", "JaxCounterStrike", "BlindMonkRKick",
+                "UFSlash", "JayceThunderingBlow", "ZacR", "StaticField", "GarenQ", "TalonCutthroat", "ViR"
             };
 
             string[] skillShots =
             {
-                "AhriSeduce","AhriOrbofDeception", "SwainShadowGrasp", "syndrae5", "SyndraE", "TahmKenchQ", "VarusE", "VeigarBalefulStrike", "VeigarDarkMatter", "VeigarEventHorizon", "VelkozQ", "VelkozQSplit", "VelkozE", "Laser", "Vi-q", "xeratharcanopulse2", "XerathArcaneBarrage2", "XerathMageSpear", "xerathrmissilewrapper",  "BraumQ", "RocketGrab", "JavelinToss","BrandBlazeMissile", "Heimerdingerwm", "JannaQ", "JarvanIVEQ", "BandageToss","CaitlynEntrapment", "PhosphorusBomb", "MissileBarrage2", "DariusAxeGrabCone", "DianaArc", "DianaArcArc", "InfectedCleaverMissileCast", "DravenDoubleShot", "EkkoQ", "EkkoW", "EkkoR", "EliseHumanE", "GalioResoluteSmite", "GalioRighteousGust", "GalioIdolOfDurand",  "CurseoftheSadMummy", "FlashFrost", "EvelynnR", "QuinnQ", "yasuoq3w", "RengarEFinal","ZiggsW","ZyraGraspingRoots","ZyraBrambleZone","Dazzle","FiddlesticksDarkWind","FeralScream","ZiggsW","ViktorChaosStorm","AlZaharCalloftheVoid",
+                "AhriSeduce", "AhriOrbofDeception", "SwainShadowGrasp", "syndrae5", "SyndraE", "TahmKenchQ", "VarusE",
+                "VeigarBalefulStrike", "VeigarDarkMatter", "VeigarEventHorizon", "VelkozQ", "VelkozQSplit", "VelkozE",
+                "Laser", "Vi-q", "xeratharcanopulse2", "XerathArcaneBarrage2", "XerathMageSpear",
+                "xerathrmissilewrapper", "BraumQ", "RocketGrab", "JavelinToss", "BrandBlazeMissile", "Heimerdingerwm",
+                "JannaQ", "JarvanIVEQ", "BandageToss", "CaitlynEntrapment", "PhosphorusBomb", "MissileBarrage2",
+                "DariusAxeGrabCone", "DianaArc", "DianaArcArc", "InfectedCleaverMissileCast", "DravenDoubleShot",
+                "EkkoQ", "EkkoW", "EkkoR", "EliseHumanE", "GalioResoluteSmite", "GalioRighteousGust",
+                "GalioIdolOfDurand", "CurseoftheSadMummy", "FlashFrost", "EvelynnR", "QuinnQ", "yasuoq3w",
+                "RengarEFinal", "ZiggsW", "ZyraGraspingRoots", "ZyraBrambleZone", "Dazzle", "FiddlesticksDarkWind",
+                "FeralScream", "ZiggsW", "ViktorChaosStorm", "AlZaharCalloftheVoid",
                 "RumbleCarpetBombMissile", "ThreshQ", "ThreshE", "NamiQ", "DarkBindingMissile", "OrianaDetonateCommand",
                 "NautilusAnchorDrag",
-                "SejuaniGlacialPrisonCast", "SonaR", "VarusR", "rivenizunablade", "EnchantedCrystalArrow", "BardR","InfernalGuardian",
+                "SejuaniGlacialPrisonCast", "SonaR", "VarusR", "rivenizunablade", "EnchantedCrystalArrow", "BardR",
+                "InfernalGuardian",
                 "CassiopeiaPetrifyingGaze",
-                "BraumRWrapper", "FizzMarinerDoomMissile", "ViktorDeathRay", "ViktorDeathRay3", "XerathMageSpear","GragasR","HecarimUlt","LeonaSolarFlare","LissandraR","LuxLightBinding","LuxMaliceCannon","JinxW","LuxLightStrikeKugel"
+                "BraumRWrapper", "FizzMarinerDoomMissile", "ViktorDeathRay", "ViktorDeathRay3", "XerathMageSpear",
+                "GragasR", "HecarimUlt", "LeonaSolarFlare", "LissandraR", "LuxLightBinding", "LuxMaliceCannon", "JinxW",
+                "LuxLightStrikeKugel"
             };
             if (sender.Type != Me.Type || !E.IsReady() || !sender.IsEnemy ||
                 !MiscMenu["EAllies"].Cast<CheckBox>().CurrentValue)
@@ -545,8 +557,8 @@ namespace Morgana
                     if (E.IsReady())
                         E.Cast(Me);
                 }
-                }
             }
+        }
 
         private static void Combo(bool useQ)
         {
@@ -580,6 +592,6 @@ namespace Morgana
                     W.Cast(wenemy);
                 }
             }
-            }
         }
     }
+}

@@ -18,7 +18,7 @@ namespace BloodimirVladimir
             get { return ObjectManager.Player; }
         }
 
-        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
+        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
             {
@@ -37,9 +37,9 @@ namespace BloodimirVladimir
             var eready = Program.E.IsReady();
             var qcheck = Program.LaneClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
-                var enemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+                var enemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.Q.Cast(enemy);
@@ -47,7 +47,7 @@ namespace BloodimirVladimir
 
             if (!echeck || !eready) return;
             {
-                var enemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+                var enemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.E.Cast();

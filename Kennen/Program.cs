@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -7,6 +6,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
+using SharpDX;
 
 namespace Kennen
 {
@@ -15,16 +16,16 @@ namespace Kennen
         public static Spell.Skillshot Q;
         public static Spell.Active W;
         public static Spell.Active E;
-        private static Spell.Active R;
-        private static Spell.Targeted Ignite;
-        private static Menu KennenMenu;
+        private static Spell.Active _r;
+        private static Spell.Targeted _ignite;
+        private static Menu _kennenMenu;
         public static Menu ComboMenu;
-        private static Menu DrawMenu;
-        private static Menu SkinMenu;
-        private static Menu MiscMenu;
+        private static Menu _drawMenu;
+        private static Menu _skinMenu;
+        private static Menu _miscMenu;
         public static Menu LaneJungleClear, LastHit;
-        private static AIHeroClient Kennen = ObjectManager.Player;
-        private static int LastE = 0;
+        private static readonly AIHeroClient Kennen = ObjectManager.Player;
+        private static readonly int LastE = 0;
 
         public static AIHeroClient _Player
         {
@@ -49,16 +50,16 @@ namespace Kennen
             Q = new Spell.Skillshot(SpellSlot.Q, 1050, SkillShotType.Linear, 250, 1700, 50);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
-            R = new Spell.Active(SpellSlot.R, 565);
+            _r = new Spell.Active(SpellSlot.R, 565);
             if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
-            KennenMenu = MainMenu.AddMenu("BloodimirKennen", "bloodimirkennen");
-            KennenMenu.AddGroupLabel("Bloodimir.Kennen");
-            KennenMenu.AddSeparator();
-            KennenMenu.AddLabel("Bloodimir Kennen V1.0.1.0");
+            _kennenMenu = MainMenu.AddMenu("BloodimirKennen", "bloodimirkennen");
+            _kennenMenu.AddGroupLabel("Bloodimir.Kennen");
+            _kennenMenu.AddSeparator();
+            _kennenMenu.AddLabel("Bloodimir Kennen V1.0.1.0");
 
-            ComboMenu = KennenMenu.AddSubMenu("Combo", "sbtw");
+            ComboMenu = _kennenMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
@@ -70,39 +71,39 @@ namespace Kennen
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
 
-            DrawMenu = KennenMenu.AddSubMenu("Drawings", "drawings");
-            DrawMenu.AddGroupLabel("Drawings");
-            DrawMenu.AddSeparator();
-            DrawMenu.Add("drawq", new CheckBox("Draw Q"));
-            DrawMenu.Add("draww", new CheckBox("Draw W"));
+            _drawMenu = _kennenMenu.AddSubMenu("Drawings", "drawings");
+            _drawMenu.AddGroupLabel("Drawings");
+            _drawMenu.AddSeparator();
+            _drawMenu.Add("drawq", new CheckBox("Draw Q"));
+            _drawMenu.Add("draww", new CheckBox("Draw W"));
 
-            LaneJungleClear = KennenMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
+            LaneJungleClear = _kennenMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCW", new CheckBox("Use W"));
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
 
-            LastHit = KennenMenu.AddSubMenu("Last Hit", "lasthit");
+            LastHit = _kennenMenu.AddSubMenu("Last Hit", "lasthit");
             LastHit.AddGroupLabel("Last Hit Settings");
             LastHit.Add("LHQ", new CheckBox("Use Q"));
             LastHit.Add("LHW", new CheckBox("Use W"));
 
-            MiscMenu = KennenMenu.AddSubMenu("Misc Menu", "miscmenu");
-            MiscMenu.AddGroupLabel("KS");
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("ksq", new CheckBox("KS using Q"));
-            MiscMenu.Add("ksw", new CheckBox("KS using W"));
-            MiscMenu.Add("int", new CheckBox("TRY to Interrupt spells"));
+            _miscMenu = _kennenMenu.AddSubMenu("Misc Menu", "miscmenu");
+            _miscMenu.AddGroupLabel("KS");
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("ksq", new CheckBox("KS using Q"));
+            _miscMenu.Add("ksw", new CheckBox("KS using W"));
+            _miscMenu.Add("int", new CheckBox("TRY to Interrupt spells"));
 
-            SkinMenu = KennenMenu.AddSubMenu("Skin Changer", "skin");
-            SkinMenu.AddGroupLabel("Choose the desired skin");
+            _skinMenu = _kennenMenu.AddSubMenu("Skin Changer", "skin");
+            _skinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 1, 0, 5));
+            var skinchange = _skinMenu.Add("skinid", new Slider("Skin", 1, 0, 5));
             var skinid = new[] {"Default", "Deadly", "Swamp Master", "Karate", "Doctor", "Arctic Ops"};
             skinchange.DisplayName = skinid[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
             {
                 sender.DisplayName = skinid[changeArgs.NewValue];
-                if (MiscMenu["debug"].Cast<CheckBox>().CurrentValue)
+                if (_miscMenu["debug"].Cast<CheckBox>().CurrentValue)
                 {
                     Chat.Print("skin-changed");
                 }
@@ -117,7 +118,7 @@ namespace Kennen
         {
             var intTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             if (!intTarget.HasBuff("kennenmarkofstorm")) return;
-            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["int"].Cast<CheckBox>().CurrentValue)
+            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && _miscMenu["int"].Cast<CheckBox>().CurrentValue)
                 Q.Cast(intTarget.ServerPosition);
             if (W.IsReady() && sender.IsValidTarget(W.Range))
                 W.Cast();
@@ -130,13 +131,13 @@ namespace Kennen
         private static void OnDraw(EventArgs args)
         {
             if (Kennen.IsDead) return;
-            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+            if (_drawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                Drawing.DrawCircle(Kennen.Position, Q.Range, Color.DarkBlue);
+                Circle.Draw(Color.Red, Q.Range, Player.Instance.Position);
             }
-            if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+            if (_drawMenu["draww"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                Drawing.DrawCircle(Kennen.Position, W.Range, Color.DarkGreen);
+                Circle.Draw(Color.DarkGreen, W.Range, Player.Instance.Position);
             }
         }
 
@@ -184,10 +185,10 @@ namespace Kennen
                             ObjectManager.Get<AIHeroClient>()
                                 .Where(
                                     a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                        a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
                                         a.Health < 50 + 20*Kennen.Level - (a.HPRegenRate/5*3)))
                     {
-                        Ignite.Cast(source);
+                        _ignite.Cast(source);
                         return;
                     }
                 }
@@ -200,10 +201,10 @@ namespace Kennen
                 useR)
         {
             if (!ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue) return;
-            if (useR && R.IsReady() &&
-                Kennen.CountEnemiesInRange(R.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+            if (useR && _r.IsReady() &&
+                Kennen.CountEnemiesInRange(_r.Range) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
             {
-                R.Cast();
+                _r.Cast();
             }
         }
 
@@ -219,23 +220,27 @@ namespace Kennen
 
         private static void Killsteal()
         {
-            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            if (!_miscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
             try
             {
                 foreach (var poutput in from qtarget in EntityManager.Heroes.Enemies.Where(
-                    hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie) where Kennen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health select Q.GetPrediction(qtarget))
+                    hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie)
+                    where Kennen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health
+                    select Q.GetPrediction(qtarget))
                 {
                     if (poutput.HitChance >= HitChance.Medium)
                     {
                         Q.Cast(poutput.CastPosition);
                     }
-                    if (!MiscMenu["ksw"].Cast<CheckBox>().CurrentValue || !W.IsReady()) continue;
+                    if (!_miscMenu["ksw"].Cast<CheckBox>().CurrentValue || !W.IsReady()) continue;
                     {
                         try
                         {
                             foreach (var wtarget in EntityManager.Heroes.Enemies.Where(
                                 hero =>
-                                    hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(wtarget => Kennen.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health).Where(wtarget => wtarget.HasBuff("kennenmarkofstorm")))
+                                    hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie)
+                                .Where(wtarget => Kennen.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health)
+                                .Where(wtarget => wtarget.HasBuff("kennenmarkofstorm")))
                             {
                                 W.Cast();
                             }
@@ -254,7 +259,7 @@ namespace Kennen
         private static
             void SkinChange()
         {
-            var style = SkinMenu["skinid"].DisplayName;
+            var style = _skinMenu["skinid"].DisplayName;
             switch (style)
             {
                 case "Default":

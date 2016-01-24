@@ -19,12 +19,12 @@ namespace Bloodimir_Tryndamere
 
         public static void TrynCombo()
         {
-            var WCHECK = Program.ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue;
-            var ECHECK = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
-            var WREADY = Program.W.IsReady();
-            var EREADY = Program.E.IsReady();
+            var wcheck = Program.ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue;
+            var echeck = Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue;
+            var wready = Program.W.IsReady();
+            var eready = Program.E.IsReady();
 
-            if (ECHECK && EREADY)
+            if (!echeck || !eready) return;
             {
                 var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
                 if (enemy != null)
@@ -34,7 +34,7 @@ namespace Bloodimir_Tryndamere
                     }
             }
 
-            if (!WCHECK || !WREADY) return;
+            if (!wcheck || !wready) return;
             var wenemy = TargetSelector.GetTarget(Program.W.Range, DamageType.Magical);
             {
                 if (!wenemy.IsFacing(Program.Tryndamere))

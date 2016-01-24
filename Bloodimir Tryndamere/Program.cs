@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -7,6 +6,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
+using SharpDX;
 
 namespace Bloodimir_Tryndamere
 {
@@ -16,11 +17,11 @@ namespace Bloodimir_Tryndamere
         public static Spell.Active W;
         public static Spell.Skillshot E;
         private static Spell.Active R;
-        private static Spell.Targeted Ignite;
-        private static Menu TrynMenu;
+        private static Spell.Targeted _ignite;
+        private static Menu _trynMenu;
         public static Menu ComboMenu;
-        private static Menu DrawMenu;
-        private static Menu SkinMenu;
+        private static Menu _drawMenu;
+        private static Menu _skinMenu;
         public static Menu MiscMenu, LaneJungleClear;
         public static Item Tiamat, Hydra, Bilgewater, Youmuu, Botrk;
         public static AIHeroClient Tryndamere = ObjectManager.Player;
@@ -50,7 +51,7 @@ namespace Bloodimir_Tryndamere
             E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, 250, 700, (int) 92.5);
             R = new Spell.Active(SpellSlot.R);
             if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             Botrk = new Item(3153, 550f);
             Bilgewater = new Item(3144, 475f);
@@ -58,12 +59,12 @@ namespace Bloodimir_Tryndamere
             Tiamat = new Item(3077, 250f);
             Youmuu = new Item(3142, 10);
 
-            TrynMenu = MainMenu.AddMenu("BloodimirTryn", "bloodimirtry");
-            TrynMenu.AddGroupLabel("Bloodimir Tryndamere");
-            TrynMenu.AddSeparator();
-            TrynMenu.AddLabel("Bloodimir Tryndamere V1.0.0.0");
+            _trynMenu = MainMenu.AddMenu("BloodimirTryn", "bloodimirtry");
+            _trynMenu.AddGroupLabel("Bloodimir Tryndamere");
+            _trynMenu.AddSeparator();
+            _trynMenu.AddLabel("Bloodimir Tryndamere V1.0.0.0");
 
-            ComboMenu = TrynMenu.AddSubMenu("Combo", "sbtw");
+            ComboMenu = _trynMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
@@ -77,16 +78,16 @@ namespace Bloodimir_Tryndamere
             ComboMenu.Add("qhp", new Slider("Q % HP", 25, 0, 95));
 
 
-            DrawMenu = TrynMenu.AddSubMenu("Drawings", "drawings");
-            DrawMenu.AddGroupLabel("Drawings");
-            DrawMenu.AddSeparator();
-            DrawMenu.Add("drawe", new CheckBox("Draw E"));
+            _drawMenu = _trynMenu.AddSubMenu("Drawings", "drawings");
+            _drawMenu.AddGroupLabel("Drawings");
+            _drawMenu.AddSeparator();
+            _drawMenu.Add("drawe", new CheckBox("Draw E"));
 
-            LaneJungleClear = TrynMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
+            LaneJungleClear = _trynMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCE", new CheckBox("Use E"));
 
-            MiscMenu = TrynMenu.AddSubMenu("Misc Menu", "miscmenu");
+            MiscMenu = _trynMenu.AddSubMenu("Misc Menu", "miscmenu");
             MiscMenu.AddGroupLabel("Misc");
             MiscMenu.AddSeparator();
             MiscMenu.Add("kse", new CheckBox("KS using E"));
@@ -99,11 +100,12 @@ namespace Bloodimir_Tryndamere
             MiscMenu.Add("useyoumuu", new CheckBox("Use Youmuu"));
 
 
-            SkinMenu = TrynMenu.AddSubMenu("Skin Changer", "skin");
-            SkinMenu.AddGroupLabel("Choose the desired skin");
+            _skinMenu = _trynMenu.AddSubMenu("Skin Changer", "skin");
+            _skinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 4, 0, 7));
-            var skinid = new[] { "Default", "Highland", "King", "Viking", "Demon Blade", "Sultan", "Warring Kingdoms", "Nightmare" };
+            var skinchange = _skinMenu.Add("skinid", new Slider("Skin", 4, 0, 7));
+            var skinid = new[]
+            {"Default", "Highland", "King", "Viking", "Demon Blade", "Sultan", "Warring Kingdoms", "Nightmare"};
             skinchange.DisplayName = skinid[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
             {
@@ -143,9 +145,9 @@ namespace Bloodimir_Tryndamere
         private static void OnDraw(EventArgs args)
         {
             if (Tryndamere.IsDead) return;
-            if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+            if (_drawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
             {
-                Drawing.DrawCircle(Tryndamere.Position, E.Range, Color.DarkBlue);
+                Circle.Draw(Color.Green, Q.Range, Player.Instance.Position);
             }
         }
 
@@ -178,16 +180,16 @@ namespace Bloodimir_Tryndamere
                 AutoUlt(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
             }
             if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-              !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
             foreach (
                 var source in
                     ObjectManager.Get<AIHeroClient>()
                         .Where(
                             a =>
-                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                a.Health < 50 + 20 * Tryndamere.Level - (a.HPRegenRate / 5 * 3)))
+                                a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
+                                a.Health < 50 + 20*Tryndamere.Level - (a.HPRegenRate/5*3)))
             {
-                Ignite.Cast(source);
+                _ignite.Cast(source);
                 return;
             }
         }
@@ -198,7 +200,8 @@ namespace Bloodimir_Tryndamere
             try
             {
                 foreach (var etarget in EntityManager.Heroes.Enemies.Where(
-                    hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie).Where(etarget => Tryndamere.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health))
+                    hero => hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie)
+                    .Where(etarget => Tryndamere.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health))
                 {
                     {
                         E.Cast(etarget.ServerPosition);
@@ -211,8 +214,9 @@ namespace Bloodimir_Tryndamere
                             foreach (var itarget in EntityManager.Heroes.Enemies.Where(
                                 hero =>
                                     hero.IsValidTarget(Botrk.Range) && !hero.IsDead &&
-                                    !hero.IsZombie).Where(itarget => Tryndamere.GetItemDamage(itarget, ItemId.Blade_of_the_Ruined_King) >=
-                                                                     itarget.Health))
+                                    !hero.IsZombie)
+                                .Where(itarget => Tryndamere.GetItemDamage(itarget, ItemId.Blade_of_the_Ruined_King) >=
+                                                  itarget.Health))
                             {
                                 {
                                     Botrk.Cast(itarget);
@@ -226,9 +230,10 @@ namespace Bloodimir_Tryndamere
                                         foreach (var htarget in EntityManager.Heroes.Enemies.Where(
                                             hero =>
                                                 hero.IsValidTarget(Hydra.Range) &&
-                                                !hero.IsDead && !hero.IsZombie).Where(htarget => Tryndamere.GetItemDamage(htarget,
-                                                    ItemId.Ravenous_Hydra_Melee_Only) >=
-                                                                                                 htarget.Health))
+                                                !hero.IsDead && !hero.IsZombie)
+                                            .Where(htarget => Tryndamere.GetItemDamage(htarget,
+                                                ItemId.Ravenous_Hydra_Melee_Only) >=
+                                                              htarget.Health))
                                         {
                                             Hydra.Cast();
                                         }
@@ -254,7 +259,7 @@ namespace Bloodimir_Tryndamere
             void SkinChange
             ()
         {
-            var style = SkinMenu["skinid"].DisplayName;
+            var style = _skinMenu["skinid"].DisplayName;
             switch (style)
             {
                 case "Default":

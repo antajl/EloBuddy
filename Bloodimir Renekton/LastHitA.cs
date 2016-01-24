@@ -7,14 +7,6 @@ namespace Bloodimir_Renekton
 {
     internal static class LastHitA
     {
-        private enum AttackSpell
-        {
-            Q,
-            W,
-            Hydra,
-            Tiamat
-        };
-
         private static AIHeroClient Renekton
         {
             get { return ObjectManager.Player; }
@@ -58,26 +50,25 @@ namespace Bloodimir_Renekton
 
         public static void LastHitB()
         {
-            var QCHECK = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
-            var WCHECK = Program.LastHit["LHW"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var WREADY = Program.W.IsReady();
+            var qcheck = Program.LastHit["LHQ"].Cast<CheckBox>().CurrentValue;
+            var wcheck = Program.LastHit["LHW"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var wready = Program.W.IsReady();
 
-            if (!QCHECK || !QREADY) return;
-            var minion = (Obj_AI_Minion)MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+            if (!qcheck || !qready) return;
+            var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
             if (minion != null)
             {
                 Program.Q.Cast();
             }
-            if (!WCHECK || !WREADY) return;
+            if (!wcheck || !wready) return;
             var wminion = (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
             if (wminion != null && Renekton.GetSpellDamage(wminion, SpellSlot.W) >= wminion.Health)
             {
                 Program.W.Cast();
             }
         }
-            
-     
+
         public static
             void Items()
         {
@@ -98,5 +89,10 @@ namespace Bloodimir_Renekton
                 Program.Tiamat.IsInRange(ienemy))
                 Program.Tiamat.Cast();
         }
+
+        private enum AttackSpell
+        {
+            Q
+        };
     }
 }

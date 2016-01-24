@@ -9,3 +9,14 @@ C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir She
 C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.exe
 C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.pdb
 C:\Users\Asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\Bloodimir Shen.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\Bloodimir Shen.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\Bloodimir Shen.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.csprojResolveAssemblyReference.cache

@@ -34,36 +34,35 @@ namespace Bloodimir_Renekton
             }
         }
 
-
         public static void LaneClear()
         {
-            var ECHECK = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
-            var EREADY = Program.E.IsReady();
-            var QCHECK = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
-            var WCHECK = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
-            var QREADY = Program.Q.IsReady();
-            var WREADY = Program.W.IsReady();
+            var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
+            var eready = Program.E.IsReady();
+            var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+            var wcheck = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
+            var qready = Program.Q.IsReady();
+            var wready = Program.W.IsReady();
 
-            if (!ECHECK || !EREADY) return;
+            if (!echeck || !eready) return;
             {
                 var aenemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (aenemy != null)
                     Program.E.Cast(aenemy.ServerPosition);
             }
-            if (!QCHECK || !QREADY) return;
+            if (!qcheck || !qready) return;
             {
                 var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (qenemy != null)
                     Program.Q.Cast();
             }
-            if (!WCHECK || !WREADY) return;
+            if (!wcheck || !wready) return;
             {
                 var wenemy =
                     (Obj_AI_Minion) GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
-                if (wenemy != null &&  Renekton.GetSpellDamage(wenemy, SpellSlot.Q) >= wenemy.Health)
+                if (wenemy != null && Renekton.GetSpellDamage(wenemy, SpellSlot.Q) >= wenemy.Health)
                     Program.W.Cast();
             }
             if (!Orbwalker.CanAutoAttack) return;
@@ -72,6 +71,7 @@ namespace Bloodimir_Renekton
             if (cenemy != null)
                 Orbwalker.ForcedTarget = cenemy;
         }
+
         public static
             void Items()
         {

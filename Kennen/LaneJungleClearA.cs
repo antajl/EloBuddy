@@ -38,7 +38,7 @@ namespace Kennen
             var wcheck = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
             var wready = Program.W.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
                 var enemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
@@ -46,7 +46,7 @@ namespace Kennen
                     Program.Q.Cast(enemy.ServerPosition);
             }
             if (!wcheck || !wready) return;
-            var wminion = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
+            var wminion = (Obj_AI_Minion) GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
             if (wminion == null) return;
             if (wminion.HasBuff("kennenmarkofstorm"))
             {

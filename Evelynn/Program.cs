@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -7,6 +6,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
+using SharpDX;
 
 namespace Evelynn
 {
@@ -14,14 +15,14 @@ namespace Evelynn
     {
         public static Spell.Active Q, W;
         public static Spell.Targeted E;
-        private static Spell.Skillshot R;
-        private static Menu EveMenu;
+        private static Spell.Skillshot _r;
+        private static Menu _eveMenu;
         public static Menu ComboMenu;
-        private static Menu DrawMenu;
-        private static Menu SkinMenu;
-        private static Menu MiscMenu;
+        private static Menu _drawMenu;
+        private static Menu _skinMenu;
+        private static Menu _miscMenu;
         public static Menu LaneJungleClear, LastHitMenu;
-        private static AIHeroClient Eve = ObjectManager.Player;
+        private static readonly AIHeroClient Eve = ObjectManager.Player;
 
         private static void Main(string[] args)
         {
@@ -36,14 +37,14 @@ namespace Evelynn
             Q = new Spell.Active(SpellSlot.Q, 475);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Targeted(SpellSlot.E, 225);
-            R = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, 250, 1200, 150);
+            _r = new Spell.Skillshot(SpellSlot.R, 900, SkillShotType.Circular, 250, 1200, 150);
 
-            EveMenu = MainMenu.AddMenu("BloodimirEve", "bloodimireve");
-            EveMenu.AddGroupLabel("Bloodimir.Evelynn");
-            EveMenu.AddSeparator();
-            EveMenu.AddLabel("Bloodimir Evelynn V1.0.1.0");
+            _eveMenu = MainMenu.AddMenu("BloodimirEve", "bloodimireve");
+            _eveMenu.AddGroupLabel("Bloodimir.Evelynn");
+            _eveMenu.AddSeparator();
+            _eveMenu.AddLabel("Bloodimir Evelynn V1.0.1.0");
 
-            ComboMenu = EveMenu.AddSubMenu("Combo", "sbtw");
+            ComboMenu = _eveMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
@@ -54,34 +55,34 @@ namespace Evelynn
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
 
-            DrawMenu = EveMenu.AddSubMenu("Drawings", "drawings");
-            DrawMenu.AddGroupLabel("Drawings");
-            DrawMenu.AddSeparator();
-            DrawMenu.Add("drawq", new CheckBox("Draw Q"));
-            DrawMenu.Add("drawr", new CheckBox("Draw R"));
-            DrawMenu.Add("drawe", new CheckBox("Draw R"));
+            _drawMenu = _eveMenu.AddSubMenu("Drawings", "drawings");
+            _drawMenu.AddGroupLabel("Drawings");
+            _drawMenu.AddSeparator();
+            _drawMenu.Add("drawq", new CheckBox("Draw Q"));
+            _drawMenu.Add("drawr", new CheckBox("Draw R"));
+            _drawMenu.Add("drawe", new CheckBox("Draw R"));
 
-            LaneJungleClear = EveMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
+            LaneJungleClear = _eveMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCE", new CheckBox("Use E"));
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
 
-            LastHitMenu = EveMenu.AddSubMenu("Last Hit", "lasthit");
+            LastHitMenu = _eveMenu.AddSubMenu("Last Hit", "lasthit");
             LastHitMenu.AddGroupLabel("Last Hit Settings");
             LastHitMenu.Add("LHQ", new CheckBox("Use Q"));
 
-            MiscMenu = EveMenu.AddSubMenu("Misc Menu", "miscmenu");
-            MiscMenu.AddGroupLabel("KS");
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("kse", new CheckBox("KS using E"));
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("ksq", new CheckBox("KS using Q"));
-            MiscMenu.Add("asw", new CheckBox("Auto/Smart W"));
+            _miscMenu = _eveMenu.AddSubMenu("Misc Menu", "miscmenu");
+            _miscMenu.AddGroupLabel("KS");
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("kse", new CheckBox("KS using E"));
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("ksq", new CheckBox("KS using Q"));
+            _miscMenu.Add("asw", new CheckBox("Auto/Smart W"));
 
-            SkinMenu = EveMenu.AddSubMenu("Skin Changer", "skin");
-            SkinMenu.AddGroupLabel("Choose the desired skin");
+            _skinMenu = _eveMenu.AddSubMenu("Skin Changer", "skin");
+            _skinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 2, 0, 4));
+            var skinchange = _skinMenu.Add("sID", new Slider("Skin", 2, 0, 4));
             var sid = new[] {"Default", "Shadow", "Masquerade", "Tango", "Safecracker"};
             skinchange.DisplayName = sid[skinchange.CurrentValue];
             skinchange.OnValueChange +=
@@ -97,17 +98,17 @@ namespace Evelynn
         private static void OnDraw(EventArgs args)
         {
             if (Eve.IsDead) return;
-            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+            if (_drawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                Drawing.DrawCircle(Eve.Position, Q.Range, Color.DarkBlue);
+                Circle.Draw(Color.DarkBlue, Q.Range, Player.Instance.Position);
             }
-            if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+            if (_drawMenu["drawr"].Cast<CheckBox>().CurrentValue && _r.IsLearned)
             {
-                Drawing.DrawCircle(Eve.Position, R.Range, Color.Red);
+                Circle.Draw(Color.Red, _r.Range, Player.Instance.Position);
             }
-            if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
+            if (_drawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
             {
-                Drawing.DrawCircle(Eve.Position, E.Range, Color.Green);
+                Circle.Draw(Color.Green, E.Range, Player.Instance.Position);
             }
         }
 
@@ -119,7 +120,7 @@ namespace Evelynn
 
         private static void AutoW()
         {
-            var useW = MiscMenu["asw"].Cast<CheckBox>().CurrentValue;
+            var useW = _miscMenu["asw"].Cast<CheckBox>().CurrentValue;
 
             if (Player.HasBuffOfType(BuffType.Slow) || Eve.CountEnemiesInRange(550) >= 3 && useW)
             {
@@ -160,15 +161,15 @@ namespace Evelynn
         private static void Rincombo(bool useR)
         {
             if (!ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue) return;
-            if (!useR || !R.IsReady() ||
-                Eve.CountEnemiesInRange(R.Range) < ComboMenu["rslider"].Cast<Slider>().CurrentValue) return;
-            var rtarget = TargetSelector.GetTarget(R.Range, DamageType.Magical);
-            R.Cast(rtarget.ServerPosition);
+            if (!useR || !_r.IsReady() ||
+                Eve.CountEnemiesInRange(_r.Range) < ComboMenu["rslider"].Cast<Slider>().CurrentValue) return;
+            var rtarget = TargetSelector.GetTarget(_r.Range, DamageType.Magical);
+            _r.Cast(rtarget.ServerPosition);
         }
 
         private static void Killsteal()
         {
-            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            if (!_miscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
             try
             {
                 foreach (
@@ -181,15 +182,15 @@ namespace Evelynn
                     {
                         Q.Cast();
                     }
-                    var eenemy = TargetSelector.GetTarget(E.Range, DamageType.Physical);
-                    if (!MiscMenu["kse"].Cast<CheckBox>().CurrentValue || !E.IsReady()) continue;
+                    if (!_miscMenu["kse"].Cast<CheckBox>().CurrentValue || !E.IsReady()) continue;
                     try
                     {
                         foreach (var etarget in EntityManager.Heroes.Enemies.Where(
                             hero =>
-                                hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie).Where(etarget => Eve.GetSpellDamage(qtarget, SpellSlot.E) >= etarget.Health))
+                                hero.IsValidTarget(E.Range) && !hero.IsDead && !hero.IsZombie)
+                            .Where(etarget => Eve.GetSpellDamage(etarget, SpellSlot.E) >= etarget.Health))
                         {
-                            E.Cast(eenemy);
+                            E.Cast(etarget);
                         }
                     }
                     catch
@@ -204,7 +205,7 @@ namespace Evelynn
 
         private static void SkinChange()
         {
-            var style = SkinMenu["sID"].DisplayName;
+            var style = _skinMenu["sID"].DisplayName;
             switch (style)
             {
                 case "Default":

@@ -22,7 +22,7 @@ namespace Evelynn
             var wready = Program.W.IsReady();
             var eready = Program.E.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
                 var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
 
@@ -30,14 +30,14 @@ namespace Evelynn
                     Program.Q.Cast();
             }
 
-            if (echeck && eready)
+            if (!echeck || !eready) return;
             {
                 var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
 
                 if (enemy != null)
                     Program.E.Cast(enemy);
             }
-            if (wcheck && wready)
+            if (!wcheck || !wready) return;
             {
                 Program.W.Cast();
             }

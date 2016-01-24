@@ -38,9 +38,9 @@ namespace Evelynn
             var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
 
-            if (echeck && eready)
+            if (!echeck || !eready) return;
             {
-                var enemy = (Obj_AI_Minion)GetLcEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+                var enemy = (Obj_AI_Minion) GetLcEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (enemy != null)
                     Program.E.Cast(enemy);
@@ -54,26 +54,27 @@ namespace Evelynn
                     Program.Q.Cast();
             }
         }
+
         public static void JungleClearB()
         {
-                      foreach (var minion in EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Monster))
-                      {
-                          var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
-                          var eready = Program.E.IsReady();
-                          var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
-                          var qready = Program.Q.IsReady();
-
-            if (echeck && eready)
+            foreach (
+                var minion in EntityManager.MinionsAndMonsters.Get(EntityManager.MinionsAndMonsters.EntityType.Monster))
             {
+                var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
+                var eready = Program.E.IsReady();
+                var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
+                var qready = Program.Q.IsReady();
 
+                if (!echeck || !eready) return;
+                {
+                    if (minion != null)
+                        Program.E.Cast(minion);
+                }
+
+                if (!qcheck || !qready) continue;
                 if (minion != null)
-                    Program.E.Cast(minion);
+                    Program.Q.Cast();
             }
-
-                          if (!qcheck || !qready) continue;
-                          if (minion != null)
-                              Program.Q.Cast();
-                      }
-    }
+        }
     }
 }

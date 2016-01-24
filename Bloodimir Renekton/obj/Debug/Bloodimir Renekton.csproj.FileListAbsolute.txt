@@ -1,2 +1,13 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Renekton\Bloodimir Renekton\bin\Debug\Bloodimir Renekton.exe.config
 C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Renekton\bin\Debug\Bloodimir Renekton.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\Bloodimir Renekton.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\Bloodimir Renekton.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\Bloodimir Renekton.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\obj\Debug\Bloodimir Renekton.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\obj\Debug\Bloodimir Renekton.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Renekton\obj\Debug\Bloodimir Renekton.pdb

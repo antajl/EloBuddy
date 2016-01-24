@@ -30,6 +30,7 @@ namespace Bloodimir_Ziggs_v2
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
+
         public static void LaneClear()
         {
             var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
@@ -38,7 +39,7 @@ namespace Bloodimir_Ziggs_v2
             var eready = Program.E.IsReady();
 
             if (!qcheck || !qready) return;
-            var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
             if (qenemy != null)
             {
@@ -46,7 +47,7 @@ namespace Bloodimir_Ziggs_v2
                 Program.Q.Cast(predQ);
             }
             if (!echeck || !eready) return;
-            var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+            var eminion = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
             if (eminion == null) return;
             var predE = Program.E.GetPrediction(eminion).CastPosition;
             Program.E.Cast(predE);

@@ -32,7 +32,6 @@ namespace Bloodimir_Renekton
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
-        
 
         public static void RenekCombo()
         {
@@ -96,7 +95,8 @@ namespace Bloodimir_Renekton
             }
             else if (target != null && Player.Instance.Distance(target.Position) < 800 && eenemy != null &&
                      Player.Instance.Distance(eenemy.Position) < Program.E.Range &&
-                     target.Distance(eenemy.Position) < Program.E.Range && (Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue))
+                     target.Distance(eenemy.Position) < Program.E.Range &&
+                     (Program.ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue))
             {
                 Player.CastSpell(SpellSlot.E, eenemy.Position);
                 if (Player.HasBuff(E2BuffName))

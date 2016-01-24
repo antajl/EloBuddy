@@ -1,2 +1,12 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Tryndamere\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.exe.config
 C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\Bloodimir Tryndamere.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\obj\Debug\Bloodimir Tryndamere.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Tryndamere\obj\Debug\Bloodimir Tryndamere.pdb

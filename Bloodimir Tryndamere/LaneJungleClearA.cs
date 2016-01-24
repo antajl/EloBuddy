@@ -35,14 +35,14 @@ namespace Bloodimir_Tryndamere
             var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var eready = Program.E.IsReady();
 
-            if (echeck && eready)
+            if (!echeck || !eready) return;
             {
-                var aenemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+                var aenemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
 
                 if (aenemy != null)
                     Program.E.Cast(aenemy.ServerPosition);
             }
-            var benemy = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
+            var benemy = (Obj_AI_Minion) GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
             if (Program.MiscMenu["usehydra"].Cast<CheckBox>().CurrentValue)
             {
                 if (Program.Hydra.IsOwned() && Program.Hydra.IsReady() &&
@@ -56,7 +56,7 @@ namespace Bloodimir_Tryndamere
                     Program.Tiamat.Cast();
             }
             if (!Orbwalker.CanAutoAttack) return;
-            var cenemy = (Obj_AI_Minion)GetEnemy(Tryndamere.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            var cenemy = (Obj_AI_Minion) GetEnemy(Tryndamere.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
             if (cenemy != null)
                 Orbwalker.ForcedTarget = cenemy;

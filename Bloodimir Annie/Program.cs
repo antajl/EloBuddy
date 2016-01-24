@@ -8,8 +8,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
 using SharpDX;
-using Color = System.Drawing.Color;
 using extend = EloBuddy.SDK.Extensions;
 
 namespace Bloodimir_Annie
@@ -17,26 +17,26 @@ namespace Bloodimir_Annie
     internal static class Program
     {
         public static Spell.Targeted Q;
-        private static Spell.Targeted Ignite;
-        private static Spell.Targeted Exhaust;
+        private static Spell.Targeted _ignite;
+        private static Spell.Targeted _exhaust;
         public static Spell.Skillshot W;
-        private static Spell.Skillshot R;
-        private static Spell.Skillshot Flash;
-        private static Spell.Active E;
-        private static Menu AnnieMenu;
-        private static Menu ComboMenu;
-        private static Menu DrawMenu;
-        private static Menu SkinMenu;
-        private static Menu MiscMenu;
+        private static Spell.Skillshot _r;
+        private static Spell.Skillshot _flash;
+        private static Spell.Active _e;
+        private static Menu _annieMenu;
+        private static Menu _comboMenu;
+        private static Menu _drawMenu;
+        private static Menu _skinMenu;
+        private static Menu _miscMenu;
         public static Menu LaneJungleClear, LastHit;
-        private static Item Zhonia;
+        private static Item _zhonia;
         private static AIHeroClient Annie = ObjectManager.Player;
         public static List<Obj_AI_Turret> Turrets = new List<Obj_AI_Turret>();
-        private static int[] AbilitySequence;
+        private static int[] _abilitySequence;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
         private static GameObject TibbersObject { get; set; }
 
-        private static int GetPassiveBuff
+        public static int GetPassiveBuff
         {
             get
             {
@@ -69,86 +69,88 @@ namespace Bloodimir_Annie
             Bootstrap.Init(null);
             Q = new Spell.Targeted(SpellSlot.Q, 625);
             W = new Spell.Skillshot(SpellSlot.W, 550, SkillShotType.Cone, 500, int.MaxValue, 80);
-            E = new Spell.Active(SpellSlot.E);
-            R = new Spell.Skillshot(SpellSlot.R, 600, SkillShotType.Circular, 200, int.MaxValue, 251);
-            Zhonia = new Item((int)ItemId.Zhonyas_Hourglass);
+            _e = new Spell.Active(SpellSlot.E);
+            _r = new Spell.Skillshot(SpellSlot.R, 600, SkillShotType.Circular, 200, int.MaxValue, 251);
+            _zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
             if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-            AbilitySequence = new[] { 1, 2, 1, 2, 3, 4, 1, 1, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
-            Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
-            var FlashSlot = Annie.GetSpellSlotFromName("summonerflash");
-            Flash = new Spell.Skillshot(FlashSlot, 32767, SkillShotType.Linear);
+                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+            _abilitySequence = new[] {1, 2, 1, 2, 3, 4, 1, 1, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
+            _exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
+            var flashSlot = Annie.GetSpellSlotFromName("summonerflash");
+            _flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
 
-            AnnieMenu = MainMenu.AddMenu("BloodimirAnnie", "bloodimirannie");
-            AnnieMenu.AddGroupLabel("Bloodimir.Annie");
-            AnnieMenu.AddSeparator();
-            AnnieMenu.AddLabel("Bloodimir Annie V1.0.1.0");
+            _annieMenu = MainMenu.AddMenu("BloodimirAnnie", "bloodimirannie");
+            _annieMenu.AddGroupLabel("Bloodimir.Annie");
+            _annieMenu.AddSeparator();
+            _annieMenu.AddLabel("Bloodimir Annie V1.0.1.0");
 
-            ComboMenu = AnnieMenu.AddSubMenu("Combo", "sbtw");
-            ComboMenu.AddGroupLabel("Combo Settings");
-            ComboMenu.AddSeparator();
-            ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
-            ComboMenu.Add("usecombow", new CheckBox("Use W"));
-            ComboMenu.Add("usecomboe", new CheckBox("Use E "));
-            ComboMenu.Add("usecombor", new CheckBox("Use R"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
-            ComboMenu.Add("pilot", new CheckBox("Auto Pilot Tibbers"));
-            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
-            ComboMenu.AddSeparator();
-            ComboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
-            ComboMenu.AddSeparator();
-            ComboMenu.Add("flashr", new KeyBind("Flash R", false, KeyBind.BindTypes.HoldActive, 'Y'));
-            ComboMenu.Add("flasher", new KeyBind("Ninja Flash E+R", false, KeyBind.BindTypes.HoldActive, 'N'));
-            ComboMenu.Add("waitAA", new CheckBox("wait for AA to finish", false));
+            _comboMenu = _annieMenu.AddSubMenu("Combo", "sbtw");
+            _comboMenu.AddGroupLabel("Combo Settings");
+            _comboMenu.AddSeparator();
+            _comboMenu.Add("usecomboq", new CheckBox("Use Q"));
+            _comboMenu.Add("usecombow", new CheckBox("Use W"));
+            _comboMenu.Add("usecomboe", new CheckBox("Use E "));
+            _comboMenu.Add("usecombor", new CheckBox("Use R"));
+            _comboMenu.Add("useignite", new CheckBox("Use Ignite (Auto)"));
+            _comboMenu.Add("pilot", new CheckBox("Auto Pilot Tibbers"));
+            _comboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
+            _comboMenu.AddSeparator();
+            _comboMenu.Add("rslider", new Slider("Minimum people for R", 2, 0, 5));
+            _comboMenu.AddSeparator();
+            _comboMenu.Add("flashr", new KeyBind("Flash R", false, KeyBind.BindTypes.HoldActive, 'Y'));
+            _comboMenu.Add("flasher", new KeyBind("Ninja Flash E+R", false, KeyBind.BindTypes.HoldActive, 'N'));
+            _comboMenu.Add("waitAA", new CheckBox("wait for AA to finish", false));
 
-            DrawMenu = AnnieMenu.AddSubMenu("Drawings", "drawings");
-            DrawMenu.AddGroupLabel("Drawings");
-            DrawMenu.AddSeparator();
-            DrawMenu.Add("drawq", new CheckBox("Draw Q Range"));
-            DrawMenu.Add("draww", new CheckBox("Draw W Range"));
-            DrawMenu.Add("drawr", new CheckBox("Draw R Range"));
-            DrawMenu.Add("drawaa", new CheckBox("Draw AA Range"));
-            DrawMenu.Add("drawtf", new CheckBox("Draw Tibbers Flash Range"));
+            _drawMenu = _annieMenu.AddSubMenu("Drawings", "drawings");
+            _drawMenu.AddGroupLabel("Drawings");
+            _drawMenu.AddSeparator();
+            _drawMenu.Add("drawq", new CheckBox("Draw Q Range"));
+            _drawMenu.Add("draww", new CheckBox("Draw W Range"));
+            _drawMenu.Add("drawr", new CheckBox("Draw R Range"));
+            _drawMenu.Add("drawaa", new CheckBox("Draw AA Range"));
+            _drawMenu.Add("drawtf", new CheckBox("Draw Tibbers Flash Range"));
 
-            LastHit = AnnieMenu.AddSubMenu("Last Hit", "lasthit");
+            LastHit = _annieMenu.AddSubMenu("Last Hit", "lasthit");
             LastHit.AddGroupLabel("Last Hit Settings");
             LastHit.Add("LHQ", new CheckBox("Use Q"));
+            LastHit.Add("PLHQ", new CheckBox("Don't use Q farm if have stun"));
 
-            LaneJungleClear = AnnieMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
+            LaneJungleClear = _annieMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
             LaneJungleClear.Add("LCW", new CheckBox("Use W"));
+            LaneJungleClear.Add("PLCQ", new CheckBox("Don't use Q farm if have stun"));
 
-            MiscMenu = AnnieMenu.AddSubMenu("Misc Menu", "miscmenu");
-            MiscMenu.AddGroupLabel("MISC");
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("ksq", new CheckBox("KS using Q"));
-            MiscMenu.Add("ksw", new CheckBox("KS using W"));
-            MiscMenu.Add("ksr", new CheckBox("KS using R"));
-            MiscMenu.Add("ksignite", new CheckBox("KS using Ignite"));
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("estack", new CheckBox("Stack Passive E", false));
-            MiscMenu.Add("wstack", new CheckBox("Stack Passive W ", false));
-            MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
+            _miscMenu = _annieMenu.AddSubMenu("Misc Menu", "miscmenu");
+            _miscMenu.AddGroupLabel("MISC");
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("ksq", new CheckBox("KS using Q"));
+            _miscMenu.Add("ksw", new CheckBox("KS using W"));
+            _miscMenu.Add("ksr", new CheckBox("KS using R"));
+            _miscMenu.Add("ksignite", new CheckBox("KS using Ignite"));
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("estack", new CheckBox("Stack Passive E", false));
+            _miscMenu.Add("wstack", new CheckBox("Stack Passive W ", false));
+            _miscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
-                MiscMenu.Add(source.ChampionName + "exhaust",
+                _miscMenu.Add(source.ChampionName + "exhaust",
                     new CheckBox("Exhaust " + source.ChampionName, false));
             }
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("zhonias", new CheckBox("Use Zhonia"));
-            MiscMenu.Add("zhealth", new Slider("Auto Zhonia Health %", 8));
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("gapclose", new CheckBox("Gapcloser with Stun"));
-            MiscMenu.Add("eaa", new CheckBox("Auto E on enemy AA's"));
-            MiscMenu.Add("support", new CheckBox("Support Mode", false));
-            MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells"));
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("zhonias", new CheckBox("Use Zhonia"));
+            _miscMenu.Add("zhealth", new Slider("Auto Zhonia Health %", 8));
+            _miscMenu.AddSeparator();
+            _miscMenu.Add("gapclose", new CheckBox("Gapcloser with Stun"));
+            _miscMenu.Add("eaa", new CheckBox("Auto E on enemy AA's"));
+            _miscMenu.Add("support", new CheckBox("Support Mode", false));
+            _miscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells"));
 
 
-            SkinMenu = AnnieMenu.AddSubMenu("Skin Changer", "skin");
-            SkinMenu.AddGroupLabel("Choose the desired skin");
+            _skinMenu = _annieMenu.AddSubMenu("Skin Changer", "skin");
+            _skinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("skinid", new Slider("Skin", 8, 0, 9));
+            var skinchange = _skinMenu.Add("skinid", new Slider("Skin", 8, 0, 9));
             var skinid = new[]
             {
                 "Default", "Goth", "Red Riding", "Annie in Wonderland", "Prom Queen", "Frostfire", "Franken Tibbers",
@@ -176,22 +178,22 @@ namespace Bloodimir_Annie
         {
             var qintTarget = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
             if (!Annie.HasBuff("pyromania_particle")) return;
-            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && MiscMenu["int"].Cast<CheckBox>().CurrentValue)
+            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && _miscMenu["int"].Cast<CheckBox>().CurrentValue)
                 Q.Cast(qintTarget);
             var wintTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
             if (!Annie.HasBuff("pyromania_particle")) return;
             if (!Q.IsReady() && W.IsReady() && sender.IsValidTarget(W.Range) &&
-                MiscMenu["int"].Cast<CheckBox>().CurrentValue)
+                _miscMenu["int"].Cast<CheckBox>().CurrentValue)
                 W.Cast(wintTarget);
         }
 
         private static
             void OnGapClose
-            (AIHeroClient Sender, Gapcloser.GapcloserEventArgs gapcloser)
+            (AIHeroClient sender, Gapcloser.GapcloserEventArgs gapcloser)
         {
             if (!gapcloser.Sender.IsEnemy)
                 return;
-            var gapclose = MiscMenu["gapclose"].Cast<CheckBox>().CurrentValue;
+            var gapclose = _miscMenu["gapclose"].Cast<CheckBox>().CurrentValue;
             if (!gapclose)
                 return;
             if (!Player.HasBuff("pyromania_particle")) return;
@@ -214,10 +216,10 @@ namespace Bloodimir_Annie
             var eL = Annie.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
             var rL = Annie.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
             if (qL + wL + eL + rL >= ObjectManager.Player.Level) return;
-            int[] level = { 0, 0, 0, 0 };
+            int[] level = {0, 0, 0, 0};
             for (var i = 0; i < ObjectManager.Player.Level; i++)
             {
-                level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
+                level[_abilitySequence[i] - 1] = level[_abilitySequence[i] - 1] + 1;
             }
             if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
             if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
@@ -228,38 +230,38 @@ namespace Bloodimir_Annie
         private static void OnDraw(EventArgs args)
         {
             if (Annie.IsDead) return;
-            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
+            if (_drawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
             {
-                Drawing.DrawCircle(Annie.Position, Q.Range, Color.Red);
+                Circle.Draw(Color.Red, Q.Range, Player.Instance.Position);
             }
-            if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
+            if (_drawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
             {
-                Drawing.DrawCircle(Annie.Position, W.Range, Color.DarkGreen);
+                Circle.Draw(Color.DarkGreen, W.Range, Player.Instance.Position);
             }
-            if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+            if (_drawMenu["drawr"].Cast<CheckBox>().CurrentValue && _r.IsLearned)
             {
-                Drawing.DrawCircle(Annie.Position, R.Range, Color.Purple);
+                Circle.Draw(Color.Purple, _r.Range, Player.Instance.Position);
             }
-            if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
+            if (_drawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
             {
-                Drawing.DrawCircle(Annie.Position, 633, Color.DarkSlateGray);
+                Circle.Draw(Color.DarkSlateGray, 653, Player.Instance.Position);
             }
-            if (DrawMenu["drawtf"].Cast<CheckBox>().CurrentValue && R.IsLearned)
+            if (_drawMenu["drawtf"].Cast<CheckBox>().CurrentValue && _r.IsLearned)
             {
-                Drawing.DrawCircle(Annie.Position, R.Range + 425, Color.DarkBlue);
+                Circle.Draw(Color.DarkBlue, _r.Range + 425, Player.Instance.Position);
             }
         }
 
         private static void Pyrostack()
         {
-            var stacke = MiscMenu["estack"].Cast<CheckBox>().CurrentValue;
-            var stackw = MiscMenu["wstack"].Cast<CheckBox>().CurrentValue;
+            var stacke = _miscMenu["estack"].Cast<CheckBox>().CurrentValue;
+            var stackw = _miscMenu["wstack"].Cast<CheckBox>().CurrentValue;
 
             if (Player.HasBuff("pyromania_particle"))
                 return;
-            if (stacke && E.IsReady())
+            if (stacke && _e.IsReady())
             {
-                E.Cast();
+                _e.Cast();
             }
 
             if (stackw && W.IsReady())
@@ -271,7 +273,7 @@ namespace Bloodimir_Annie
         private static void Flee()
         {
             Orbwalker.MoveTo(MousePos);
-            E.Cast();
+            _e.Cast();
         }
 
         private static void Support_Orbwalker(AttackableUnit target, Orbwalker.PreAttackArgs args)
@@ -282,7 +284,7 @@ namespace Bloodimir_Annie
             var t = target as Obj_AI_Minion;
             if (t == null) return;
             {
-                if (MiscMenu["support"].Cast<CheckBox>().CurrentValue)
+                if (_miscMenu["support"].Cast<CheckBox>().CurrentValue)
                     args.Process = false;
             }
         }
@@ -293,7 +295,7 @@ namespace Bloodimir_Annie
             Zhonya();
             Killsteal();
             SkinChange();
-            if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
+            if (_miscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
             {
                 Flee();
@@ -311,95 +313,98 @@ namespace Bloodimir_Annie
             {
                 LastHitA.LastHitB();
             }
-            if (ComboMenu["flashr"].Cast<KeyBind>().CurrentValue
-                || ComboMenu["flasher"].Cast<KeyBind>().CurrentValue)
+            if (_comboMenu["flashr"].Cast<KeyBind>().CurrentValue
+                || _comboMenu["flasher"].Cast<KeyBind>().CurrentValue)
             {
                 TibbersFlash();
             }
-            if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+            if (!_comboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
             foreach (
                 var source in
                     ObjectManager.Get<AIHeroClient>()
                         .Where(
                             a =>
-                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                a.Health < 50 + 20 * Annie.Level - (a.HPRegenRate / 5 * 3)))
+                                a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
+                                a.Health < 50 + 20*Annie.Level - (a.HPRegenRate/5*3)))
             {
-                Ignite.Cast(source);
+                _ignite.Cast(source);
                 return;
             }
-            if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue ||
-                ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
+            if (!_miscMenu["useexhaust"].Cast<CheckBox>().CurrentValue ||
+                _comboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 return;
             foreach (
                 var enemy in
                     ObjectManager.Get<AIHeroClient>()
-                        .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
-                        .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
+                        .Where(a => a.IsEnemy && a.IsValidTarget(_exhaust.Range))
+                        .Where(enemy => _miscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
             {
                 if (enemy.IsFacing(Annie))
                 {
                     if (!(Annie.HealthPercent < 50)) continue;
-                    Exhaust.Cast(enemy);
+                    _exhaust.Cast(enemy);
                     return;
                 }
                 if (!(enemy.HealthPercent < 50)) continue;
-                Exhaust.Cast(enemy);
+                _exhaust.Cast(enemy);
                 return;
             }
         }
 
         private static void Auto_EOnProcessCastSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (MiscMenu["eaa"].Cast<CheckBox>().CurrentValue &&
+            if (_miscMenu["eaa"].Cast<CheckBox>().CurrentValue &&
                 sender.IsEnemy
                 && args.SData.IsAutoAttack()
                 && args.Target.IsMe)
             {
-                E.Cast();
+                _e.Cast();
             }
         }
 
         private static void Killsteal()
         {
-            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
+            if (!_miscMenu["ksq"].Cast<CheckBox>().CurrentValue || !Q.IsReady()) return;
             foreach (var qtarget in EntityManager.Heroes.Enemies.Where(
-                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie).Where(qtarget => Annie.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health))
+                hero => hero.IsValidTarget(Q.Range) && !hero.IsDead && !hero.IsZombie)
+                .Where(qtarget => Annie.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health))
             {
                 {
                     Q.Cast(qtarget);
                 }
-                if (MiscMenu["ksw"].Cast<CheckBox>().CurrentValue && W.IsReady())
+                if (_miscMenu["ksw"].Cast<CheckBox>().CurrentValue && W.IsReady())
                 {
                     foreach (var wtarget in EntityManager.Heroes.Enemies.Where(
                         hero =>
-                            hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie).Where(wtarget => Annie.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health))
+                            hero.IsValidTarget(W.Range) && !hero.IsDead && !hero.IsZombie)
+                        .Where(wtarget => Annie.GetSpellDamage(wtarget, SpellSlot.W) >= wtarget.Health))
                     {
                         W.Cast(wtarget.ServerPosition);
                     }
                 }
 
-                if (!MiscMenu["ksr"].Cast<CheckBox>().CurrentValue || !R.IsReady()) continue;
+                if (!_miscMenu["ksr"].Cast<CheckBox>().CurrentValue || !_r.IsReady()) continue;
                 {
                     foreach (var rtarget in EntityManager.Heroes.Enemies.Where(
                         hero =>
-                            hero.IsValidTarget(R.Range) && !hero.IsDead &&
-                            !hero.IsZombie).Where(rtarget => Annie.GetSpellDamage(rtarget, SpellSlot.R) >= rtarget.Health))
+                            hero.IsValidTarget(_r.Range) && !hero.IsDead &&
+                            !hero.IsZombie)
+                        .Where(rtarget => Annie.GetSpellDamage(rtarget, SpellSlot.R) >= rtarget.Health))
                     {
-                        R.Cast(rtarget.ServerPosition);
+                        _r.Cast(rtarget.ServerPosition);
                     }
-                    if (MiscMenu["ksignite"].Cast<CheckBox>().CurrentValue && Ignite.IsReady())
+                    if (_miscMenu["ksignite"].Cast<CheckBox>().CurrentValue && _ignite.IsReady())
                         foreach (
                             var source in
                                 ObjectManager.Get<AIHeroClient>()
                                     .Where(
                                         a =>
-                                            a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                            a.Health < 50 + 20 * Annie.Level - (a.HPRegenRate / 5 * 3)))
+                                            a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
+                                            a.Health < 50 + 20*Annie.Level - (a.HPRegenRate/5*3)))
                         {
-                            Ignite.Cast(source);
+                            _ignite.Cast(source);
                             return;
                         }
                     {
@@ -410,13 +415,13 @@ namespace Bloodimir_Annie
 
         private static void Zhonya()
         {
-            var zhoniaon = MiscMenu["zhonias"].Cast<CheckBox>().CurrentValue;
-            var zhealth = MiscMenu["zhealth"].Cast<Slider>().CurrentValue;
+            var zhoniaon = _miscMenu["zhonias"].Cast<CheckBox>().CurrentValue;
+            var zhealth = _miscMenu["zhealth"].Cast<Slider>().CurrentValue;
 
-            if (!zhoniaon || !Zhonia.IsReady() || !Zhonia.IsOwned()) return;
+            if (!zhoniaon || !_zhonia.IsReady() || !_zhonia.IsOwned()) return;
             if (Annie.HealthPercent <= zhealth)
             {
-                Zhonia.Cast();
+                _zhonia.Cast();
             }
         }
 
@@ -424,36 +429,36 @@ namespace Bloodimir_Annie
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
 
-            var target = TargetSelector.GetTarget(R.Range + 425, DamageType.Magical);
+            var target = TargetSelector.GetTarget(_r.Range + 425, DamageType.Magical);
             if (target == null) return;
             var xpos = target.Position.Extend(target, 610);
 
-            if (!R.IsReady() || GetPassiveBuff == 1 || GetPassiveBuff == 2)
+            if (!_r.IsReady() || GetPassiveBuff == 1 || GetPassiveBuff == 2)
             {
                 Combo();
             }
 
-            var predrpos = R.GetPrediction(target);
-            if (ComboMenu["flashr"].Cast<KeyBind>().CurrentValue)
+            var predrpos = _r.GetPrediction(target);
+            if (_comboMenu["flashr"].Cast<KeyBind>().CurrentValue)
             {
-                if (GetPassiveBuff == 4 && Flash.IsReady() && R.IsReady() && E.IsReady())
-                    if (target.IsValidTarget(R.Range + 425))
+                if (GetPassiveBuff == 4 && _flash.IsReady() && _r.IsReady() && _e.IsReady())
+                    if (target.IsValidTarget(_r.Range + 425))
                     {
-                        Flash.Cast((Vector3)xpos);
-                        R.Cast(predrpos.CastPosition);
+                        _flash.Cast((Vector3) xpos);
+                        _r.Cast(predrpos.CastPosition);
                     }
             }
 
-            if (!ComboMenu["flasher"].Cast<KeyBind>().CurrentValue) return;
-            if (GetPassiveBuff == 3 && Flash.IsReady() && R.IsReady() && E.IsReady())
+            if (!_comboMenu["flasher"].Cast<KeyBind>().CurrentValue) return;
+            if (GetPassiveBuff == 3 && _flash.IsReady() && _r.IsReady() && _e.IsReady())
             {
-                E.Cast();
+                _e.Cast();
             }
             if (!Annie.HasBuff("pyromania_particle")) return;
-            if (target.IsValidTarget(R.Range + 425))
+            if (target.IsValidTarget(_r.Range + 425))
             {
-                Flash.Cast((Vector3)xpos);
-                R.Cast(predrpos.CastPosition);
+                _flash.Cast((Vector3) xpos);
+                _r.Cast(predrpos.CastPosition);
             }
         }
 
@@ -476,7 +481,7 @@ namespace Bloodimir_Annie
 
         private static void MoveTibbers()
         {
-            if (!ComboMenu["pilot"].Cast<CheckBox>().CurrentValue)
+            if (!_comboMenu["pilot"].Cast<CheckBox>().CurrentValue)
                 return;
 
             var target = TargetSelector.GetTarget(2000, DamageType.Magical);
@@ -498,38 +503,39 @@ namespace Bloodimir_Annie
                 return;
             }
 
-            if (Orbwalker.IsAutoAttacking && ComboMenu["waitAA"].Cast<CheckBox>().CurrentValue)
+            if (Orbwalker.IsAutoAttacking && _comboMenu["waitAA"].Cast<CheckBox>().CurrentValue)
                 return;
-            if (ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue)
+            if (_comboMenu["usecomboq"].Cast<CheckBox>().CurrentValue)
             {
                 Q.Cast(target);
             }
-            if (ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue)
+            if (_comboMenu["usecombow"].Cast<CheckBox>().CurrentValue)
                 if (W.IsReady())
                 {
                     var predW = W.GetPrediction(target).CastPosition;
                     if (target.CountEnemiesInRange(W.Range) >= 1)
                         W.Cast(predW);
                 }
-            if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
-                if (R.IsReady())
+            if (_comboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
+                if (_r.IsReady())
                 {
-                    var predR = R.GetPrediction(target).CastPosition;
-                    if (target.CountEnemiesInRange(R.Width) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
-                        R.Cast(predR);
+                    var predR = _r.GetPrediction(target).CastPosition;
+                    if (target.CountEnemiesInRange(_r.Width) >= _comboMenu["rslider"].Cast<Slider>().CurrentValue)
+                        _r.Cast(predR);
                 }
-            if (!ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue) return;
-            if (E.IsReady())
+            if (!_comboMenu["usecomboe"].Cast<CheckBox>().CurrentValue) return;
+            if (_e.IsReady())
             {
-                if (Annie.CountEnemiesInRange(Q.Range) >= 1)
-                    E.Cast();
+                if (Annie.CountEnemiesInRange(Q.Range) >= 2 ||
+                    Annie.HealthPercent >= 45 && Annie.CountEnemiesInRange(Q.Range) >= 1)
+                    _e.Cast();
             }
         }
 
         private static
             void SkinChange()
         {
-            var style = SkinMenu["skinid"].DisplayName;
+            var style = _skinMenu["skinid"].DisplayName;
             switch (style)
             {
                 case "Default":

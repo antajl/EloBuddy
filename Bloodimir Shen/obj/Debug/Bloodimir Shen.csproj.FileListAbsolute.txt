@@ -1,2 +1,13 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Shen\Bloodimir Shen\bin\Debug\Bloodimir Shen.exe.config
 C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Shen\bin\Debug\Bloodimir Shen.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\Bloodimir Shen.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\Bloodimir Shen.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\Bloodimir Shen.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\Debug\Bloodimir Shen.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\Debug\Bloodimir Shen.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\Debug\Bloodimir Shen.pdb

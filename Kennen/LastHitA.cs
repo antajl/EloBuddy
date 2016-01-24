@@ -19,33 +19,58 @@ namespace Kennen
             get { return ObjectManager.Player; }
         }
 
-        public static Obj_AI_Base GetEnemy(float range, GameObjectType t)
-        {
-            switch (t)
-            {
-                case GameObjectType.AIHeroClient:
-                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-                default:
-                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
-            }
-        }
-
         private static Obj_AI_Base MinionLh(GameObjectType type, AttackSpell spell)
         {
             return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
-                                                                                               && a.Type == type
-                                                                                               &&
-                                                                                               a.Distance(Kennen) <=
-                                                                                               Program.Q.Range
-                                                                                               && !a.IsDead
-                                                                                               && !a.IsInvulnerable
-                                                                                               &&
-                                                                                               a.IsValidTarget(
-                                                                                                   Program.Q.Range)
-                                                                                               &&
-                                                                                               a.Health <= Misc.Qcalc(a));
+                                                                                                            &&
+                                                                                                            a.Type ==
+                                                                                                            type
+                                                                                                            &&
+                                                                                                            a.Distance(
+                                                                                                                Kennen) <=
+                                                                                                            Program.Q
+                                                                                                                .Range
+                                                                                                            && !a.IsDead
+                                                                                                            &&
+                                                                                                            !a
+                                                                                                                .IsInvulnerable
+                                                                                                            &&
+                                                                                                            a
+                                                                                                                .IsValidTarget
+                                                                                                                (
+                                                                                                                    Program
+                                                                                                                        .Q
+                                                                                                                        .Range)
+                                                                                                            &&
+                                                                                                            a.Health <=
+                                                                                                            Misc.Qcalc(a));
+        }
+
+        private static Obj_AI_Base MinionWlh(GameObjectType type, AttackSpell spell)
+        {
+            return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(a => a.IsEnemy
+                                                                                                            &&
+                                                                                                            a.Type ==
+                                                                                                            type
+                                                                                                            &&
+                                                                                                            a.Distance(
+                                                                                                                Kennen) <=
+                                                                                                            Program.W
+                                                                                                                .Range
+                                                                                                            && !a.IsDead
+                                                                                                            &&
+                                                                                                            !a
+                                                                                                                .IsInvulnerable
+                                                                                                            &&
+                                                                                                            a
+                                                                                                                .IsValidTarget
+                                                                                                                (
+                                                                                                                    Program
+                                                                                                                        .W
+                                                                                                                        .Range)
+                                                                                                            &&
+                                                                                                            a.Health <=
+                                                                                                            Misc.Wcalc(a));
         }
 
         public static void LastHitB()
@@ -55,28 +80,29 @@ namespace Kennen
             var wcheck = Program.LastHit["LHW"].Cast<CheckBox>().CurrentValue;
             var wready = Program.W.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
-            var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
-            if (minion != null)
-            {
-                if (Program.Q.MinimumHitChance >= HitChance.Low)
+                var minion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.Q);
+                if (minion != null)
                 {
-                    Program.Q.Cast(minion.ServerPosition);
-                }
-                
-                if (wcheck && wready)
-                {
-                var wminion = (Obj_AI_Minion) MinionLh(GameObjectType.obj_AI_Minion, AttackSpell.W);
-                if (wminion != null)
-                {
-                    if (wminion.HasBuff("kennenmarkofstorm"))
+                    if (Program.Q.MinimumHitChance >= HitChance.Low)
                     {
-                        Program.W.Cast();
+                        Program.Q.Cast(minion.ServerPosition);
+                    }
+
+                    if (!wcheck || !wready) return;
+                    {
+                        var wminion = (Obj_AI_Minion) MinionWlh(GameObjectType.obj_AI_Minion, AttackSpell.W);
+                        if (wminion != null)
+                        {
+                            if (wminion.HasBuff("kennenmarkofstorm"))
+                            {
+                                Program.W.Cast();
+                            }
+                        }
                     }
                 }
             }
         }
     }
-    }
-}}
+}

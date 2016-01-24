@@ -583,7 +583,7 @@ namespace Morgana
 
         private static void UseW(bool useW)
         {
-            if (useW && W.IsReady())
+            if (useW && W.IsReady() && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 var wenemy =
                     (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);

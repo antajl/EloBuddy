@@ -90,7 +90,7 @@ namespace Morgana
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
             {
-                QMenu.Add("Bind" + obj.ChampionName.ToLower(), new CheckBox("Bind" + obj.ChampionName));
+                QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));
             }
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction", false));
             QMenu.AddSeparator();
@@ -183,7 +183,7 @@ namespace Morgana
                     foreach (
                         var enemy in
                             EntityManager.Heroes.Enemies.Where(
-                                enemy => QMenu["Bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue &&
+                                enemy => QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue &&
                                          enemy.IsValidTarget(Q.Range + 150) &&
                                          !enemy.HasBuffOfType(BuffType.SpellShield)))
                     {
@@ -370,7 +370,15 @@ namespace Morgana
 
         private static void OnUpdate(EventArgs args)
         {
-          
+            QHitChance = QMenu["mediumpred"].Cast<CheckBox>().CurrentValue ? HitChance.Medium : HitChance.High;
+            Killsteal();
+            SkinChange();
+            Ascension();
+            RanduinU();
+            ZhonyaU();
+            if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
+            AutoCast(immobile: AutoCastMenu["qi"].Cast<CheckBox>().CurrentValue,
+                dashing: AutoCastMenu["qd"].Cast<CheckBox>().CurrentValue);
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo(ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
@@ -384,9 +392,40 @@ namespace Morgana
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
             {
                 LastHitA.LastHitB();
-            }  
             }
-        
+            {
+                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                    !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+                foreach (
+                    var source in
+                        ObjectManager.Get<AIHeroClient>()
+                            .Where(
+                                a =>
+                                    a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                    a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
+                {
+                    Ignite.Cast(source);
+                    return;
+                }
+                if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
+                    foreach (
+                        var enemy in
+                            ObjectManager.Get<AIHeroClient>()
+                                .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
+                                .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
+                    {
+                        if (enemy.IsFacing(Me))
+                        {
+                            if (!(Me.HealthPercent < 50)) continue;
+                            Exhaust.Cast(enemy);
+                            return;
+                        }
+                        if (!(enemy.HealthPercent < 50)) continue;
+                        Exhaust.Cast(enemy);
+                        return;
+                    }
+            }
+        }
 
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
@@ -531,7 +570,7 @@ namespace Morgana
                     {
                         if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
                         {
-                            if (QMenu["Bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
+                            if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                             {
                                 Q.Cast(bindTarget);
                             }

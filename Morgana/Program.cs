@@ -65,7 +65,7 @@ namespace Morgana
             MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Morgana v2.0.1.1");
+            MorgMenu.AddLabel("Bloodimir Morgana v2.0.2.3");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -85,14 +85,13 @@ namespace Morgana
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
-            QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int) Q.Range));
-            QMenu.Add("qmax", new Slider("Max Range", (int) Q.Range, 0, (int) Q.Range));
+            QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int)Q.Range));
+            QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
             {
                 QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));
             }
-            QMenu.AddSeparator();
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction", false));
             QMenu.AddSeparator();
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));

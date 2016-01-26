@@ -160,10 +160,10 @@ namespace Evelynn
 
         private static void Rincombo(bool useR)
         {
+            var rtarget = TargetSelector.GetTarget(_r.Range, DamageType.Magical);
             if (!ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue) return;
             if (!useR || !_r.IsReady() ||
-                Eve.CountEnemiesInRange(_r.Range) < ComboMenu["rslider"].Cast<Slider>().CurrentValue) return;
-            var rtarget = TargetSelector.GetTarget(_r.Range, DamageType.Magical);
+                rtarget.CountEnemiesInRange(_r.Width) < ComboMenu["rslider"].Cast<Slider>().CurrentValue) return;
             _r.Cast(rtarget.ServerPosition);
         }
 

@@ -7,12 +7,6 @@ namespace Evelynn
 {
     internal static class LastHitA
     {
-        public enum AttackSpell
-        {
-            Q,
-            E
-        };
-
         private static AIHeroClient Evelynn
         {
             get { return ObjectManager.Player; }

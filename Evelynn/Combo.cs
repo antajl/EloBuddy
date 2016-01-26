@@ -1,4 +1,5 @@
-﻿using EloBuddy;
+﻿using System.Linq;
+using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
 
@@ -6,12 +7,18 @@ namespace Evelynn
 {
     internal static class Combo
     {
-        public enum AttackSpell
+        private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
-            Q,
-            W,
-            E
-        };
+            switch (t)
+            {
+                case GameObjectType.AIHeroClient:
+                    return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+                default:
+                    return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
+            }
+        }
 
         public static void EveCombo()
         {
@@ -22,22 +29,23 @@ namespace Evelynn
             var wready = Program.W.IsReady();
             var eready = Program.E.IsReady();
 
-            if (!qcheck || !qready) return;
+
+            if (qcheck && qready)
             {
-                var enemy = TargetSelector.GetTarget(Program.Q.Range, DamageType.Magical);
+                var enemy = GetEnemy(Program.Q.Range, GameObjectType.AIHeroClient);
 
                 if (enemy != null)
                     Program.Q.Cast();
             }
 
-            if (!echeck || !eready) return;
+            if (echeck && eready) 
             {
-                var enemy = TargetSelector.GetTarget(Program.E.Range, DamageType.Physical);
+                var enemy = GetEnemy(Program.E.Range, GameObjectType.AIHeroClient);
 
                 if (enemy != null)
                     Program.E.Cast(enemy);
             }
-            if (!wcheck || !wready) return;
+            if (wcheck && wready) 
             {
                 Program.W.Cast();
             }

@@ -10,4 +10,3 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Debug\SharpDX.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\obj\Debug\Evelynn.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\obj\Debug\Evelynn.pdb
-C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\obj\Debug\Evelynn.csprojResolveAssemblyReference.cache

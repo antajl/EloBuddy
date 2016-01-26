@@ -83,7 +83,7 @@ namespace Morgana
             AutoCastMenu.Add("rslider", new Slider("Minimum people for Auto R", 2, 0, 5));
 
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
-            QMenu.AddGroupLabel("Q Settings");
+            QMenu.AddGroupLabel("Q Setting");
             QMenu.AddSeparator();
             QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int)Q.Range));
             QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));

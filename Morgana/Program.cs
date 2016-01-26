@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
@@ -62,7 +62,7 @@ namespace Morgana
             Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
             AbilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
 
-            MorgMenu = MainMenu.AddMenu("BMorgana", "morgana");
+            MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
             MorgMenu.AddLabel("Bloodimir Morgana v2.0.2.3");
@@ -82,12 +82,16 @@ namespace Morgana
             AutoCastMenu.Add("ar", new CheckBox("Auto R"));
             AutoCastMenu.Add("rslider", new Slider("Minimum people for Auto R", 2, 0, 5));
 
-            QMenu = MorgMenu.AddSubMenu("Q Settings", "qsetting");
-            QMenu.AddGroupLabel("Q Setting");
+            QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
+            QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
             QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int)Q.Range));
             QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
             QMenu.AddSeparator();
+            foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
+            {
+                QMenu.Add("Bind" + obj.ChampionName.ToLower(), new CheckBox("Bind" + obj.ChampionName));
+            }
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction", false));
             QMenu.AddSeparator();
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));
@@ -179,7 +183,7 @@ namespace Morgana
                     foreach (
                         var enemy in
                             EntityManager.Heroes.Enemies.Where(
-                                enemy => QMenu["bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue &&
+                                enemy => QMenu["Bind" + enemy.ChampionName].Cast<CheckBox>().CurrentValue &&
                                          enemy.IsValidTarget(Q.Range + 150) &&
                                          !enemy.HasBuffOfType(BuffType.SpellShield)))
                     {
@@ -566,7 +570,7 @@ namespace Morgana
                     {
                         if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
                         {
-                            if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
+                            if (QMenu["Bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                             {
                                 Q.Cast(bindTarget);
                             }

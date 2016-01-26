@@ -280,11 +280,12 @@ namespace BloodimirVladimir
                 if (Vlad.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health ||
                     (Vlad.GetSpellDamage(qtarget, SpellSlot.E) >= qtarget.Health))
                     return;
+                  var rtarget = TargetSelector.GetTarget(1250, DamageType.Magical);
                 if (ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue)
                     if (useR && R.IsReady() &&
-                        Vlad.CountEnemiesInRange(R.Width) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
+                        rtarget.CountEnemiesInRange(R.Width) >= ComboMenu["rslider"].Cast<Slider>().CurrentValue)
                     {
-                        var rtarget = TargetSelector.GetTarget(1250, DamageType.Magical);
+
                         R.Cast(rtarget.ServerPosition);
                     }
             }

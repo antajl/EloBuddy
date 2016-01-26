@@ -62,7 +62,7 @@ namespace Morgana
             Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
             AbilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
 
-            MorgMenu = MainMenu.AddMenu("Morgana", "morgana");
+            MorgMenu = MainMenu.AddMenu("BMorgana", "morgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
             MorgMenu.AddLabel("Bloodimir Morgana v2.0.2.3");
@@ -82,7 +82,7 @@ namespace Morgana
             AutoCastMenu.Add("ar", new CheckBox("Auto R"));
             AutoCastMenu.Add("rslider", new Slider("Minimum people for Auto R", 2, 0, 5));
 
-            QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
+            QMenu = MorgMenu.AddSubMenu("Q Settings", "qsetting");
             QMenu.AddGroupLabel("Q Setting");
             QMenu.AddSeparator();
             QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int)Q.Range));

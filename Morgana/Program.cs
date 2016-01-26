@@ -62,7 +62,7 @@ namespace Morgana
             Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
             AbilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
 
-            MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
+            MorgMenu = MainMenu.AddMenu("Morgana", "morgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
             MorgMenu.AddLabel("Bloodimir Morgana v2.0.2.3");

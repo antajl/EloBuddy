@@ -99,9 +99,9 @@ namespace Morgana
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 6));
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 7));
             var sid = new[]
-            {"Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
+            {"Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius", "Lunar Wraith"};
             skinchange.DisplayName = sid[skinchange.CurrentValue];
             skinchange.OnValueChange +=
                 delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
@@ -518,6 +518,9 @@ namespace Morgana
                     break;
                 case "Victorius":
                     Player.SetSkinId(6);
+                    break;
+                case "Lunar Wraith":
+                    Player.SetSkinId(7);
                     break;
             }
         }

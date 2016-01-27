@@ -57,10 +57,10 @@ namespace Morgana
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-            Talisman = new Item((int) ItemId.Talisman_of_Ascension);
-            Randuin = new Item((int) ItemId.Randuins_Omen);
-            Zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
-            AbilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
+            Talisman = new Item((int)ItemId.Talisman_of_Ascension);
+            Randuin = new Item((int)ItemId.Randuins_Omen);
+            Zhonia = new Item((int)ItemId.Zhonyas_Hourglass);
+            AbilitySequence = new[] { 1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3 };
 
             MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
@@ -99,9 +99,8 @@ namespace Morgana
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 6));
-            var sid = new[]
-            {"Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius"};
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 7, 0, 7));
+            var sid = new[] { "Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius", "Lunar Wraith" };
             skinchange.DisplayName = sid[skinchange.CurrentValue];
             skinchange.OnValueChange +=
                 delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
@@ -271,7 +270,7 @@ namespace Morgana
             foreach (var ally in EntityManager.Heroes.Allies.Where(x => x.IsValidTarget(E.Range)))
             {
                 var detectRange = ally.ServerPosition +
-                                  (args.End - ally.ServerPosition).Normalized()*ally.Distance(args.End);
+                                  (args.End - ally.ServerPosition).Normalized() * ally.Distance(args.End);
                 if (detectRange.Distance(ally.ServerPosition) > ally.AttackRange - ally.BoundingRadius)
                     continue;
                 {
@@ -356,7 +355,7 @@ namespace Morgana
             var rL = Me.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
             if (qL + wL + eL + rL < ObjectManager.Player.Level)
             {
-                int[] level = {0, 0, 0, 0};
+                int[] level = { 0, 0, 0, 0 };
                 for (var i = 0; i < ObjectManager.Player.Level; i++)
                 {
                     level[AbilitySequence[i] - 1] = level[AbilitySequence[i] - 1] + 1;
@@ -402,7 +401,7 @@ namespace Morgana
                             .Where(
                                 a =>
                                     a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                    a.Health < 50 + 20*Me.Level - (a.HPRegenRate/5*3)))
+                                    a.Health < 50 + 20 * Me.Level - (a.HPRegenRate / 5 * 3)))
                 {
                     Ignite.Cast(source);
                     return;
@@ -519,6 +518,9 @@ namespace Morgana
                 case "Victorius":
                     Player.SetSkinId(6);
                     break;
+                case "Lunar Wraith":
+                    Player.SetSkinId(7);
+                    break;
             }
         }
 
@@ -585,7 +587,7 @@ namespace Morgana
             if (useW && W.IsReady() && Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
             {
                 var wenemy =
-                    (AIHeroClient) GetEnemy(W.Range, GameObjectType.AIHeroClient);
+                    (AIHeroClient)GetEnemy(W.Range, GameObjectType.AIHeroClient);
                 if (wenemy != null && W.GetPrediction(wenemy).HitChance >= HitChance.Medium && Immobile(wenemy))
                 {
                     W.Cast(wenemy);

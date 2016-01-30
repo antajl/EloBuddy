@@ -88,10 +88,11 @@ namespace Morgana
             QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int)Q.Range));
             QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
             QMenu.AddSeparator();
-            foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))
-            {
-                QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));
-            }
+            foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))		
+            {		
+              QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind" + obj.ChampionName));		
+           }
+            QMenu.AddSeparator();
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction", false));
             QMenu.AddSeparator();
             QMenu.Add("intq", new CheckBox("Q to Interrupt"));

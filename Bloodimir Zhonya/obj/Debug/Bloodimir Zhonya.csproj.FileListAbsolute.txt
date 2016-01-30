@@ -1,2 +1,12 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Zhonya\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.exe.config
 C:\Users\iljak\Downloads\EloBuddy-master\EloBuddy-master\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\Bloodimir Zhonya.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\obj\Debug\Bloodimir Zhonya.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Zhonya\obj\Debug\Bloodimir Zhonya.pdb

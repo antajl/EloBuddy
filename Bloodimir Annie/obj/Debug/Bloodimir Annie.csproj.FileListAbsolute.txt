@@ -10,3 +10,4 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\SharpDX.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Debug\Bloodimir Annie.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Debug\Bloodimir Annie.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Debug\Bloodimir Annie.csprojResolveAssemblyReference.cache

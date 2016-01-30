@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
@@ -15,10 +16,9 @@ namespace Bloodimir_Shen
     internal static class Program
     {
         private static readonly AIHeroClient Shen = ObjectManager.Player;
-        private static Spell.Targeted _q;
         public static Spell.Targeted R, Ignite, Exhaust;
         private static Spell.Active _w;
-        private static Spell.Skillshot _e;
+        private static Spell.Skillshot _e, _q;
         private static Spell.Skillshot _flash;
         private static Item _randuin;
         public static Menu ShenMenu;
@@ -27,8 +27,20 @@ namespace Bloodimir_Shen
         public static Menu MiscMenu;
         private static Menu _eMenu;
         public static Menu DrawMenu;
+        public static Item Hydra;
+        public static Item Tiamat;
+        public static Item Titan;
         private static Menu _skinMenu;
         private static int[] _abilitySequence;
+        public static List<Obj_AI_Turret> Turrets = new List<Obj_AI_Turret>();
+        public static Vector3 ShenBlade, ShenBladeCast;
+        private static readonly float BladeCevre = 335f;
+
+        public static Vector3 PosEflash(Vector3 fetarget)
+        {
+            return fetarget + (Shen.Position - fetarget) / 2;
+        }
+
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
 
         private static Vector3 MousePos
@@ -51,10 +63,14 @@ namespace Bloodimir_Shen
             if (Player.Instance.ChampionName != "Shen")
                 return;
             Bootstrap.Init(null);
-            _q = new Spell.Targeted(SpellSlot.Q, 475);
+            Tiamat = new Item((int)ItemId.Tiamat_Melee_Only, Player.Instance.GetAutoAttackRange());
+            Hydra = new Item((int)ItemId.Ravenous_Hydra_Melee_Only, Player.Instance.GetAutoAttackRange());
+            Titan = new Item((int)ItemId.Titanic_Hydra, Player.Instance.GetAutoAttackRange());
+            _q = new Spell.Skillshot(SpellSlot.Q, 2000, SkillShotType.Linear, 500, 2500, 150);
             _w = new Spell.Active(SpellSlot.W);
-            _e = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Linear, 250, 1600, 50);
-            R = new Spell.Targeted(SpellSlot.R, 31000);
+            _e = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Linear, 500, 1600, 50);
+            R = new Spell.Targeted(SpellSlot.R, 50000);
+           
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
@@ -66,7 +82,7 @@ namespace Bloodimir_Shen
             ShenMenu = MainMenu.AddMenu("BloodimirShen", "bloodimirshen");
             ShenMenu.AddGroupLabel("Bloodimir Shen");
             ShenMenu.AddSeparator();
-            ShenMenu.AddLabel("Bloodimir Shen v1.0.0.0");
+            ShenMenu.AddLabel("Bloodimir Shen Reworked");
 
             _comboMenu = ShenMenu.AddSubMenu("Combo", "sbtw");
             _comboMenu.AddGroupLabel("Combo Settings");
@@ -114,17 +130,14 @@ namespace Bloodimir_Shen
             MiscMenu = ShenMenu.AddSubMenu("Misc", "misc");
             MiscMenu.AddGroupLabel("Misc");
             MiscMenu.AddSeparator();
-            MiscMenu.Add("ksq", new CheckBox("KS with Q"));
-            MiscMenu.Add("LHQ", new CheckBox("Last Hit Q"));
-            MiscMenu.Add("LCQ", new CheckBox("LaneClear Q"));
-            MiscMenu.Add("int", new CheckBox("Interrupt Spells"));
+            MiscMenu.Add("LCQ", new CheckBox("Smart LaneClear"));
+            MiscMenu.Add("inte", new CheckBox("Interrupt Spells"));
+            MiscMenu.Add("TUT", new CheckBox("Auto Taunt Under Turret"));
             MiscMenu.AddSeparator();
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
             MiscMenu.Add("randuin", new CheckBox("Use Randuin"));
             MiscMenu.Add("autow", new CheckBox("Auto W"));
-            MiscMenu.AddSeparator();
-            MiscMenu.Add("WHPPercent", new Slider("Auto W HP %", 45));
             MiscMenu.AddSeparator();
             MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells", false));
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
@@ -137,51 +150,41 @@ namespace Bloodimir_Shen
             DrawMenu = ShenMenu.AddSubMenu("Drawings", "drawings");
             DrawMenu.AddGroupLabel("Drawings");
             DrawMenu.AddSeparator();
-            DrawMenu.Add("drawq", new CheckBox("Draw Q"));
+            DrawMenu.Add("drawb", new CheckBox("Draw Blade"));
             DrawMenu.Add("drawe", new CheckBox("Draw E"));
-            DrawMenu.Add("drawfq", new CheckBox("Draw FlashQ"));
+            DrawMenu.Add("drawfe", new CheckBox("Draw FlashE"));
+
 
             Interrupter.OnInterruptableSpell += Interrupter_OnInterruptableSpell;
             Game.OnUpdate += OnUpdate;
             Drawing.OnDraw += OnDraw;
+            AttackableUnit.OnDamage += OnDamage;
             Orbwalker.OnPreAttack += Orbwalker_OnPreAttack;
-            Obj_AI_Base.OnProcessSpellCast += Auto_WOnProcessSpell;
-            Core.DelayAction(FlashE, 60);
+            Orbwalker.OnPostAttack += Orbwalker_OnPostAttack;
+            Obj_AI_Base.OnProcessSpellCast += Game_ProcessSpell;
+            Core.DelayAction(FlashE, 1);
         }
 
         private static void Interrupter_OnInterruptableSpell(Obj_AI_Base sender,
             Interrupter.InterruptableSpellEventArgs args)
-        {
-            var intTarget = TargetSelector.GetTarget(_q.Range, DamageType.Magical);
             {
                 if (_e.IsReady() && sender.IsValidTarget(_e.Range) && MiscMenu["inte"].Cast<CheckBox>().CurrentValue)
-                    _e.Cast(intTarget.ServerPosition);
+                    _e.Cast(sender);
             }
-        }
-
-        private static void Auto_WOnProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            var shieldHealthPercent = MiscMenu["WHPPercent"].Cast<Slider>().CurrentValue;
-            var shieldSelf = MiscMenu["autow"].Cast<CheckBox>().CurrentValue;
-            if (!shieldSelf) return;
-            if (Shen.CountEnemiesInRange(850) >= 1 && Shen.HealthPercent < shieldHealthPercent)
-            {
-                _w.Cast();
-            }
-        }
+        
 
         private static void OnDraw(EventArgs args)
         {
             if (Shen.IsDead) return;
-            if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && _q.IsLearned)
+            if (DrawMenu["drawb"].Cast<CheckBox>().CurrentValue)
             {
-                Circle.Draw(Color.Red, _q.Range, Player.Instance.Position);
+                Circle.Draw(Color.Red, BladeCevre, ShenBlade);
             }
             if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && R.IsLearned)
             {
                 Circle.Draw(Color.LightBlue, _e.Range, Player.Instance.Position);
             }
-            if (DrawMenu["drawfq"].Cast<CheckBox>().CurrentValue && _e.IsLearned && _flash.IsReady() && _e.IsReady())
+            if (DrawMenu["drawfe"].Cast<CheckBox>().CurrentValue && _e.IsLearned && _flash.IsReady() && _e.IsReady())
             {
                 Circle.Draw(Color.DarkBlue, _e.Range + 425, Player.Instance.Position);
             }
@@ -206,8 +209,9 @@ namespace Bloodimir_Shen
         {
             var autoult = _ultMenu["autoult"].Cast<CheckBox>().CurrentValue;
             if (!autoult) return;
+            if (Shen.CountEnemiesInRange(800) < 1 && Shen.HealthPercent >= 30)
             foreach (var ally in EntityManager.Heroes.Allies.Where(
-                x => x.IsValidTarget(R.Range) && x.HealthPercent < 7)
+                x => x.IsValidTarget(R.Range) && x.HealthPercent < 10)
                 .Where(ally => R.IsReady() && ally.CountEnemiesInRange(650) >= 1))
                 R.Cast(ally);
         }
@@ -219,19 +223,12 @@ namespace Bloodimir_Shen
                 FlashE();
             }
             SkinChange();
-            Killsteal();
             if (MiscMenu["randuin"].Cast<CheckBox>().CurrentValue) RanduinU();
             HighestAuthority();
             if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                    Combo(useW: _comboMenu["usecombow"].Cast<CheckBox>().CurrentValue,
-                        useE: _comboMenu["usecomboe"].Cast<CheckBox>().CurrentValue,
-                        useQ: _comboMenu["usecomboq"].Cast<CheckBox>().CurrentValue);
-            }
-            if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))
-            {
-                LastHit();
+                    Combo();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
@@ -248,6 +245,104 @@ namespace Bloodimir_Shen
             if (_ultMenu["ult"].Cast<KeyBind>().CurrentValue)
             {
                 Ult();
+            }
+            if (!_comboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
+                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
+            foreach (
+                var source in
+                    ObjectManager.Get<AIHeroClient>()
+                        .Where(
+                            a =>
+                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
+                                a.Health < 50 + 20*Shen.Level - (a.HPRegenRate/5*3)))
+            {
+                Ignite.Cast(source);
+                return;
+            }
+            {
+               var blade =
+            ObjectManager.Get<Obj_AI_Minion>()
+                .Where(
+                    o => (o.Name == "ShenThingUnit" || o.Name == "ShenArrowVfxHostMinion") && o.Team == Shen.Team)
+                .OrderBy(o => o.Distance(ShenBladeCast))
+                .FirstOrDefault();
+                if (MiscMenu["autow"].Cast<CheckBox>().CurrentValue && blade != null && _w.IsReady() &&
+                    ShenBlade.IsValid())
+                {
+                    ShenBlade = blade.Position;
+                    foreach (var ally in EntityManager.Heroes.Allies.Where(a => a.Distance(ShenBlade) < BladeCevre))
+                        if (ally.Distance(ShenBlade) < BladeCevre)
+                            _w.Cast();
+
+                    if (ShenBlade.CountAlliesInRange(BladeCevre) >= 2 && ShenBlade.CountEnemiesInRange(750) >= 1)
+                    {
+                        _w.Cast();
+                    }
+                    
+                }
+            }
+        }
+        private static void Orbwalker_OnPostAttack(AttackableUnit target, EventArgs args)
+        {
+            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
+                (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
+                 (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))) return;
+            var e = target as Obj_AI_Base;
+            if (target == null) return;
+            if (e.IsValidTarget() && Hydra.IsReady())
+            {
+                Hydra.Cast();
+            }
+            if (e.IsValidTarget() && Tiamat.IsReady())
+            {
+                Tiamat.Cast();
+            }
+            if (e.IsValidTarget() && Titan.IsReady())
+            {
+                Titan.Cast();
+            }
+        }
+
+        public static Geometry.Polygon GetPoly(Vector3 pos, float range, float width)
+        {
+            var poss = Shen.ServerPosition.Extend(pos, range);
+            var direction = (poss.Normalized() - Shen.ServerPosition.To2D()).Normalized();
+
+            var pos1 = (Shen.ServerPosition.To2D() - direction.Perpendicular()*width/2f).To3D();
+
+            var pos2 =
+                (poss.Normalized() + (poss.Normalized() - Shen.ServerPosition.To2D()).Normalized() +
+                 direction.Perpendicular()*width/2f).To3D();
+
+            var pos3 = (Shen.ServerPosition.To2D() + direction.Perpendicular()*width/2f).To3D();
+
+            var pos4 =
+                (poss.Normalized() + (poss.Normalized() - Shen.ServerPosition.To2D()).Normalized() -
+                 direction.Perpendicular()*width/2f).To3D();
+            var poly = new Geometry.Polygon();
+            poly.Add(pos1);
+            poly.Add(pos3);
+            poly.Add(pos2);
+            poly.Add(pos4);
+            return poly;
+        }
+        private static void Game_ProcessSpell(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe && (args.SData.Name == "ShenQ" || args.SData.Name == "ShenR"))
+            {
+                ShenBladeCast = args.End;
+            }
+        }
+        private static void HandleQ(Obj_AI_Base target)
+        {
+            var poly = GetPoly(ShenBlade, Shen.Distance(ShenBlade), 150);
+            {
+                if (((target.Distance(Shen) < 100) ||
+                     (target.Distance(ShenBlade) < 500 && poly.IsInside(target.Position)) ||
+                     Shen.Distance(target) < Player.Instance.GetAutoAttackRange(target)))
+                {
+                    _q.Cast(target);
+                }
             }
         }
 
@@ -292,23 +387,23 @@ namespace Bloodimir_Shen
                     args.Process = false;
             }
         }
-
         private static void FlashE()
         {
-            Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
-            var fetarget = TargetSelector.GetTarget(_e.Range + 425, DamageType.Magical);
+             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
+            var fetarget = TargetSelector.GetTarget(1025, DamageType.Magical);
             if (fetarget == null) return;
             var xpos = fetarget.Position.Extend(fetarget, _e.Range);
             var predepos = _e.GetPrediction(fetarget).CastPosition;
             {
                 if (!_e.IsReady() || !_flash.IsReady()) return;
-                if (fetarget.IsValidTarget(_e.Range + 425))
+                if (fetarget.IsValidTarget(1025))
                 {
                     _flash.Cast((Vector3) xpos);
                     _e.Cast(predepos);
                 }
             }
         }
+       
 
         private static void Ee()
         {
@@ -416,17 +511,6 @@ namespace Bloodimir_Shen
             }
         }
 
-        private static void Killsteal()
-        {
-            if (!MiscMenu["ksq"].Cast<CheckBox>().CurrentValue || !_q.IsReady()) return;
-            foreach (var qtarget in EntityManager.Heroes.Enemies.Where(
-                hero => hero.IsValidTarget(_q.Range) && !hero.IsDead && !hero.IsZombie)
-                .Where(qtarget => Shen.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health))
-            {
-                _q.Cast(qtarget);
-            }
-        }
-
         private static Obj_AI_Base GetEnemy(float range, GameObjectType t)
         {
             switch (t)
@@ -443,64 +527,58 @@ namespace Bloodimir_Shen
         }
 
         private static
-            void LastHit()
-        {
-            var qcheck = MiscMenu["LHQ"].Cast<CheckBox>().CurrentValue;
-            var qready = _q.IsReady();
-            if (!qcheck || !qready) return;
-            var qminion = (Obj_AI_Minion) GetEnemy(_q.Range, GameObjectType.obj_AI_Minion);
-            if (qminion != null)
-            {
-                _q.Cast(qminion);
-            }
-        }
-
-        private static
             void LaneClear()
         {
+            var minionsHp = EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsValidTarget(400)).Sum(m => m.Health);
             var qcheck = MiscMenu["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = _q.IsReady();
             if (!qcheck || !qready) return;
-            var qminion = (Obj_AI_Minion) GetEnemy(_q.Range, GameObjectType.obj_AI_Minion);
-            if (qminion != null)
+            if (minionsHp > 300)
             {
-                _q.Cast(qminion);
+                _q.Cast(Shen);
             }
         }
 
         private static
-            void Combo(bool useE, bool useW, bool useQ)
+            void Combo()
         {
-            if (useQ && _q.IsReady())
+            if (_q.IsReady())
             {
                 var qtarget = GetEnemy(_q.Range, GameObjectType.AIHeroClient);
                 if (qtarget.IsValidTarget(_q.Range))
                 {
-                    _q.Cast(qtarget);
+                    HandleQ(qtarget);
                 }
             }
-            if (!useE || !_e.IsReady()) return;
+            if (!_e.IsReady()) return;
             var eTarget = TargetSelector.GetTarget(_e.Range, DamageType.Magical);
-            var predE = _e.GetPrediction(eTarget).CastPosition;
             if (eTarget.IsValidTarget(_e.Range))
                 if (_eMenu["taunt" + eTarget.ChampionName].Cast<CheckBox>().CurrentValue)
-                    if (Shen.CountEnemiesInRange(_e.Range) <= 1)
+                    if (eTarget.CountEnemiesInRange(_e.Width) <= 1)
                         if (_e.GetPrediction(eTarget).HitChance >= HitChance.High)
                         {
                             _e.Cast(eTarget);
                         }
-                        else if (Shen.CountEnemiesInRange(_e.Width) >=
+                        else if (eTarget.CountEnemiesInRange(_e.Width) >=
                                  _eMenu["eslider"].Cast<Slider>().CurrentValue)
                         {
-                            _e.Cast(predE);
+                            _e.Cast(eTarget.ServerPosition);
                         }
-            if (!useW || !_w.IsReady()) return;
-            var target = TargetSelector.GetTarget(_q.Range, DamageType.Physical);
-            if (!target.IsValidTarget(_q.Range)) return;
-            if (target.Distance(Shen) < _q.Range)
+        }
 
+        private static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            var valcheck = MiscMenu["TUT"].Cast<CheckBox>().CurrentValue;
+            var t = EntityManager.Heroes.AllHeroes.FirstOrDefault(h => h.NetworkId == args.Source.NetworkId);
+            var s = EntityManager.Heroes.Enemies.FirstOrDefault(h => h.NetworkId == args.Target.NetworkId);
+            if (valcheck && t != null && s != null &&
+                (t.IsMe &&
+                 ObjectManager.Get<Obj_AI_Turret>()
+                     .FirstOrDefault(x => x.Distance(t) < 750 && x.Distance(s) < 750 && x.IsAlly) != null))
             {
-                _w.Cast();
+                {
+                    _e.Cast(s);
+                }
             }
         }
 

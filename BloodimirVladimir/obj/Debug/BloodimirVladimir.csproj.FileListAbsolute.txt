@@ -1,1 +1,11 @@
 c:\users\asus\documents\visual studio 2013\Projects\BloodimirVladimir\BloodimirVladimir\bin\Debug\BloodimirVladimir.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\BloodimirVladimir.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\BloodimirVladimir.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\BloodimirVladimir.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\obj\Debug\BloodimirVladimir.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\obj\Debug\BloodimirVladimir.pdb

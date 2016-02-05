@@ -13,10 +13,12 @@ namespace Bloodimir_Kassadin
 {
     internal class Program
     {
-        public static Spell.Skillshot E, R;
-        public static Spell.Targeted Q, Flash, Ignite;
+        public static Spell.Skillshot E, R, Flash;
+        public static Spell.Targeted Q, Ignite;
         public static Spell.Active W;
         private static readonly AIHeroClient Kassawin = ObjectManager.Player;
+        private static int[] _abilitySequence;
+        public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
 
         public static Menu KassaMenu,
             ComboMenu,
@@ -35,12 +37,12 @@ namespace Bloodimir_Kassadin
 
         private static AIHeroClient SelectedHero { get; set; }
 
-        private static int ECount
+        public static int ECount
         {
             get { return Kassawin.GetBuffCount("forcepulsecounter"); }
         }
 
-        private static float RMana
+        public static float RMana
         {
             get { return Kassawin.Spellbook.GetSpell(SpellSlot.R).SData.Mana; }
         }
@@ -64,9 +66,11 @@ namespace Bloodimir_Kassadin
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Skillshot(SpellSlot.E, 400, SkillShotType.Cone, 500, int.MaxValue, 10);
             R = new Spell.Skillshot(SpellSlot.R, 700, SkillShotType.Circular, 500, int.MaxValue, 150);
-
+            _abilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+            var flashSlot = Kassawin.GetSpellSlotFromName("summonerflash");
+            Flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
 
             KassaMenu = MainMenu.AddMenu("BloodimirKassadin", "bloodimirkassa");
             KassaMenu.AddGroupLabel("Bloodimir Kassadin v1.0.0.1");
@@ -83,6 +87,7 @@ namespace Bloodimir_Kassadin
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Maximum enemy to R", 2, 0, 5));
+            ComboMenu.Add("koroshite", new KeyBind("Assasinate w/Flash", false, KeyBind.BindTypes.HoldActive, 'Y'));
 
             HarassMenu = KassaMenu.AddSubMenu("HarassMenu", "Harass");
             HarassMenu.Add("useQHarass", new CheckBox("Use Q"));
@@ -91,8 +96,8 @@ namespace Bloodimir_Kassadin
             LaneJungleClear = KassaMenu.AddSubMenu("Lane Jungle Clear", "lanejungleclear");
             LaneJungleClear.AddGroupLabel("Lane Jungle Clear Settings");
             LaneJungleClear.Add("LCQ", new CheckBox("Use Q"));
-            LaneJungleClear.Add("LCW", new CheckBox("Use W"));
             LaneJungleClear.Add("LCE", new CheckBox("Use E"));
+            LaneJungleClear.Add("LCR", new CheckBox("Use R"));
 
             LastHitMenu = KassaMenu.AddSubMenu("Last Hit", "lasthit");
             LastHitMenu.AddGroupLabel("Last Hit Settings");
@@ -112,7 +117,10 @@ namespace Bloodimir_Kassadin
             MiscMenu.Add("ksq", new CheckBox("KS using Q"));
             MiscMenu.Add("int", new CheckBox("TRY to Interrupt Channeled Spells"));
             MiscMenu.Add("gape", new CheckBox("Anti Gapcloser E"));
-
+            MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells"));
+            MiscMenu.Add("resetaa", new CheckBox("Auto Reset AA with W"));
+            
+            
             FleeMenu = KassaMenu.AddSubMenu("Flee", "Flee");
             FleeMenu.Add("fleer", new CheckBox("Use R to Mouse Pos"));
 
@@ -138,6 +146,7 @@ namespace Bloodimir_Kassadin
         {
             SkinChange();
             Killsteal();
+            if (MiscMenu["lvlup"].Cast<CheckBox>().CurrentValue) LevelUpSpells();
             { 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 Combo();
@@ -149,6 +158,10 @@ namespace Bloodimir_Kassadin
                 LastHitA.LastHitB();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                 Flee();
+            if (ComboMenu["koroshite"].Cast<KeyBind>().CurrentValue)
+            {
+                Assasinate();
+            }
             {
                 {
                     if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
@@ -214,7 +227,46 @@ namespace Bloodimir_Kassadin
                 }
             }
         }
+        private static void LevelUpSpells()
+        {
+            var qL = Kassawin.Spellbook.GetSpell(SpellSlot.Q).Level + QOff;
+            var wL = Kassawin.Spellbook.GetSpell(SpellSlot.W).Level + WOff;
+            var eL = Kassawin.Spellbook.GetSpell(SpellSlot.E).Level + EOff;
+            var rL = Kassawin.Spellbook.GetSpell(SpellSlot.R).Level + ROff;
+            if (qL + wL + eL + rL >= ObjectManager.Player.Level) return;
+            int[] level = { 0, 0, 0, 0 };
+            for (var i = 0; i < ObjectManager.Player.Level; i++)
+            {
+                level[_abilitySequence[i] - 1] = level[_abilitySequence[i] - 1] + 1;
+            }
+            if (qL < level[0]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.Q);
+            if (wL < level[1]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.W);
+            if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
+            if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
+        }
+        private static void Assasinate()
+        {
+            Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
 
+            var target = TargetSelector.GetTarget(R.Range + 425, DamageType.Magical);
+            if (target == null) return;
+            var xpos = target.Position.Extend(target, 610);
+            var predr = R.GetPrediction(target).CastPosition;
+
+            if (!R.IsReady())
+            {
+                Combo();
+            }
+            if (ComboMenu["koroshite"].Cast<KeyBind>().CurrentValue)
+            {
+                if (Flash.IsReady() && R.IsReady() && E.IsReady())
+                    if (target.IsValidTarget(R.Range + 425))
+                    {
+                        Flash.Cast((Vector3)xpos);
+                        R.Cast(predr);
+                    }
+            }  
+        }
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
@@ -256,7 +308,7 @@ namespace Bloodimir_Kassadin
                     {
                         W.Cast();
                     }
-                    if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue && E.IsReady())
+                    if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue && E.IsReady() && target.IsValidTarget(E.Range))
                     {
                         E.Cast(target.ServerPosition);
                     }
@@ -289,18 +341,25 @@ namespace Bloodimir_Kassadin
 
         private static void Reset(AttackableUnit target, EventArgs args)
         {
-            if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
-                (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
-                (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) &&
-                 (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))))) return;
-            var e = target as Obj_AI_Base;
-            if (!ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue || !W.IsReady() || !e.IsEnemy) return;
-            if (target == null) return;
-            if (e.IsValidTarget() && W.IsReady())
-            {
-                W.Cast();
-            }
-        }
+            if (!MiscMenu["resetaa"].Cast<CheckBox>().CurrentValue) return;
+                if (target != null &&
+               target.IsEnemy &&
+               !target.IsInvulnerable &&
+               !target.IsDead &&
+               target is AIHeroClient &&
+               target.Distance(Kassawin) <= W.Range)
+                if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
+                    (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
+                     (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))) return;
+                var e = target as Obj_AI_Base;
+                if (!ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue || !e.IsEnemy) return;
+                if (target == null) return;
+                if (e.IsValidTarget() && W.IsReady())
+                {
+                    W.Cast();
+                }
+        }      
+        
 
         private static
             void Flee

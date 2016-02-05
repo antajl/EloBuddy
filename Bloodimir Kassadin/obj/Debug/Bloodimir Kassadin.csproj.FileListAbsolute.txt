@@ -8,3 +8,4 @@ c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\bin\Debug\Newtonsoft.Json.dll
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\obj\Debug\Bloodimir Kassadin.exe
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\obj\Debug\Bloodimir Kassadin.pdb
+C:\Users\Asus\Documents\Visual Studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\obj\Debug\Bloodimir Kassadin.csprojResolveAssemblyReference.cache

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using EloBuddy;
 using EloBuddy.SDK;
 using EloBuddy.SDK.Menu.Values;
@@ -31,6 +32,8 @@ namespace Bloodimir_Kassadin
             var qready = Program.Q.IsReady();
             var echeck = Program.LaneJungleClear["LCE"].Cast<CheckBox>().CurrentValue;
             var eready = Program.E.IsReady();
+            var rcheck = Program.LaneJungleClear["LCR"].Cast<CheckBox>().CurrentValue;
+            var rready = Program.R.IsReady();
 
             if (!qcheck || !qready) return;
             var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
@@ -39,11 +42,19 @@ namespace Bloodimir_Kassadin
             {
                 Program.Q.Cast(qenemy);
             }
+
+            {
             if (!echeck || !eready) return;
             var eminion = (Obj_AI_Minion)GetEnemy(Program.E.Range, GameObjectType.obj_AI_Minion);
-            if (eminion == null) return;
-            var predE = Program.E.GetPrediction(eminion).CastPosition;
-            Program.E.Cast(predE);
-        }
+                    Program.E.Cast(eminion.Position);
+                 }
+    {
+        if (!rcheck || !rready) return;
+            var renemy = (Obj_AI_Minion)GetEnemy(Program.R.Range, GameObjectType.obj_AI_Minion);
+            if (renemy != null && Program.RMana < 400)
+            {
+                Program.R.Cast(renemy.ServerPosition);
+            }}
+    }
     }
 }

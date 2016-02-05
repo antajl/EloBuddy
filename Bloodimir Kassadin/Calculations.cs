@@ -10,14 +10,14 @@ namespace Bloodimir_Kassadin
         public static float QCalc(Obj_AI_Base target)
         {
             return Kassawin.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 0, 80, 105, 130, 155, 180 }[Program.Q.Level] + 0.7 * Kassawin.FlatMagicDamageMod
+                (float)(new[] { 0, 70, 95, 120, 145, 170 }[Program.Q.Level] + 0.7 * Kassawin.FlatMagicDamageMod
                     ));
         }
 
         public static float WCalc(Obj_AI_Base target)
         {
             return Kassawin.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 0, 40, 65, 90, 115, 140 }[Program.W.Level] + 0.6 * Kassawin.FlatMagicDamageMod
+                (float)(new[] { 0, 20, 45, 70, 95, 120 }[Program.W.Level] + 0.6 * Kassawin.FlatMagicDamageMod
                     ));
         }
 
@@ -31,7 +31,7 @@ namespace Bloodimir_Kassadin
         public static float RCalc(Obj_AI_Base target)
         {
             return Kassawin.CalculateDamageOnUnit(target, DamageType.Magical,
-                (float)(new[] { 0, 80, 100, 120 }[Program.R.Level] + 0.2 * Kassawin.MaxMana
+                (float)(new[] { 0, 80, 100, 120 }[Program.R.Level] + 0.2 * Kassawin.MaxMana + 0.1 * Kassawin.FlatMagicDamageMod
                     ));
         }
 

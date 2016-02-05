@@ -7,7 +7,7 @@ namespace Bloodimir_Kassadin
 {
     internal static class LastHitA
     {
-        public static AIHeroClient Ziggs
+        public static AIHeroClient Kassawin
         {
             get { return ObjectManager.Player; }
         }
@@ -30,7 +30,7 @@ namespace Bloodimir_Kassadin
             var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
             var wcheck = Program.LastHitMenu["LHW"].Cast<CheckBox>().CurrentValue;
-            var wready = Program.W.IsReady();
+            var wready = Program.E.IsReady();
             if (!qcheck || !qready) return;
             var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy == null) return;
@@ -39,11 +39,12 @@ namespace Bloodimir_Kassadin
                 Program.Q.Cast(qenemy);
             }
             if (!wcheck || !wready) return;
-            var wenemy = (Obj_AI_Minion)GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            var wenemy = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
+            if (wenemy == null) return;
             {
                 if (wenemy.Health < Calcs.WCalc(wenemy))
-                Program.W.Cast();
+                    Program.W.Cast();
             }
+                 }
         }
     }
-}

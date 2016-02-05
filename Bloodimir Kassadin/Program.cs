@@ -87,7 +87,6 @@ namespace Bloodimir_Kassadin
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Maximum enemy to R", 2, 0, 5));
-            ComboMenu.Add("koroshite", new KeyBind("Assasinate w/Flash", false, KeyBind.BindTypes.HoldActive, 'Y'));
 
             HarassMenu = KassaMenu.AddSubMenu("HarassMenu", "Harass");
             HarassMenu.Add("useQHarass", new CheckBox("Use Q"));
@@ -158,10 +157,6 @@ namespace Bloodimir_Kassadin
                 LastHitA.LastHitB();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                 Flee();
-            if (ComboMenu["koroshite"].Cast<KeyBind>().CurrentValue)
-            {
-                Assasinate();
-            }
             {
                 {
                     if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
@@ -244,29 +239,7 @@ namespace Bloodimir_Kassadin
             if (eL < level[2]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.E);
             if (rL < level[3]) ObjectManager.Player.Spellbook.LevelSpell(SpellSlot.R);
         }
-        private static void Assasinate()
-        {
-            Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
 
-            var target = TargetSelector.GetTarget(R.Range + 425, DamageType.Magical);
-            if (target == null) return;
-            var xpos = target.Position.Extend(target, 610);
-            var predr = R.GetPrediction(target).CastPosition;
-
-            if (!R.IsReady())
-            {
-                Combo();
-            }
-            if (ComboMenu["koroshite"].Cast<KeyBind>().CurrentValue)
-            {
-                if (Flash.IsReady() && R.IsReady() && E.IsReady())
-                    if (target.IsValidTarget(R.Range + 425))
-                    {
-                        Flash.Cast((Vector3)xpos);
-                        R.Cast(predr);
-                    }
-            }  
-        }
         private static void Harass()
         {
             var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);

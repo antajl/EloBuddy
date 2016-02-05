@@ -7,11 +7,6 @@ namespace Bloodimir_Ziggs_v2
 {
     internal static class LastHitA
     {
-        public enum AttackSpell
-        {
-            Q
-        };
-
         public static AIHeroClient Ziggs
         {
             get { return ObjectManager.Player; }

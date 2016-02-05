@@ -6,6 +6,5 @@ c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\bin\Debug\SharpDX.Direct3D9.dll
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\bin\Debug\SharpDX.dll
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\bin\Debug\Newtonsoft.Json.dll
-c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\obj\Debug\Bloodimir Kassadin.csprojResolveAssemblyReference.cache
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\obj\Debug\Bloodimir Kassadin.exe
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Kassadin\Bloodimir Kassadin\obj\Debug\Bloodimir Kassadin.pdb

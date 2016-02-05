@@ -29,7 +29,7 @@ namespace Bloodimir_Kassadin
         {
             var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
-            var wcheck = Program.LastHitMenu["LCQ"].Cast<CheckBox>().CurrentValue;
+            var wcheck = Program.LastHitMenu["LHW"].Cast<CheckBox>().CurrentValue;
             var wready = Program.W.IsReady();
             if (!qcheck || !qready) return;
             var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);

@@ -69,9 +69,9 @@ namespace Bloodimir_Kassadin
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             KassaMenu = MainMenu.AddMenu("BloodimirKassadin", "bloodimirkassa");
-            KassaMenu.AddGroupLabel("Bloodimir Kassadin v1.0.0.0");
+            KassaMenu.AddGroupLabel("Bloodimir Kassadin v1.0.0.1");
             KassaMenu.AddSeparator();
-            KassaMenu.AddLabel("Bloodimir Kassadin v1.0.0.0");
+            KassaMenu.AddLabel("Bloodimir Kassadin v1.0.0.1");
 
             ComboMenu = KassaMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
@@ -291,8 +291,9 @@ namespace Bloodimir_Kassadin
         {
             if (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo) &&
                 (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear) &&
-                 (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit)))) return;
-            var e = target as AIHeroClient;
+                (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass) &&
+                 (!Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LastHit))))) return;
+            var e = target as Obj_AI_Base;
             if (!ComboMenu["usecombow"].Cast<CheckBox>().CurrentValue || !W.IsReady() || !e.IsEnemy) return;
             if (target == null) return;
             if (e.IsValidTarget() && W.IsReady())

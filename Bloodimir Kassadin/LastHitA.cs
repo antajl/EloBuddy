@@ -18,12 +18,10 @@ namespace Bloodimir_Kassadin
             {
                 case GameObjectType.AIHeroClient:
                     return EntityManager.Heroes.Enemies.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable &&
-                             a.Health <= Calcs.QCalc(a));
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
                 default:
                     return EntityManager.MinionsAndMonsters.EnemyMinions.OrderBy(a => a.Health).FirstOrDefault(
-                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable &&
-                             a.Health <= Calcs.QCalc(a));
+                        a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
 
@@ -31,11 +29,20 @@ namespace Bloodimir_Kassadin
         {
             var qcheck = Program.LastHitMenu["LHQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
+            var wcheck = Program.LastHitMenu["LCQ"].Cast<CheckBox>().CurrentValue;
+            var wready = Program.W.IsReady();
             if (!qcheck || !qready) return;
             var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy == null) return;
             {
+                if (qenemy.Health < Calcs.QCalc(qenemy))
                 Program.Q.Cast(qenemy);
+            }
+            if (!wcheck || !wready) return;
+            var wenemy = (Obj_AI_Minion)GetEnemy(Player.Instance.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+            {
+                if (wenemy.Health < Calcs.WCalc(wenemy))
+                Program.W.Cast();
             }
         }
     }

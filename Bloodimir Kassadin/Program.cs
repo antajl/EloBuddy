@@ -138,6 +138,7 @@ namespace Bloodimir_Kassadin
         {
             SkinChange();
             Killsteal();
+            { 
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                 Combo();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Harass))
@@ -164,6 +165,7 @@ namespace Bloodimir_Kassadin
                         return;
                     }
                 }
+            }
             }
         }
 
@@ -236,12 +238,12 @@ namespace Bloodimir_Kassadin
             void Combo
             ()
         {
-            var target = TargetSelector.GetTarget(700, DamageType.Magical);
+            var target = TargetSelector.GetTarget(750, DamageType.Magical);
             if (target == null || !target.IsValid())
             {
                 return;
             }
-            if (ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue && Q.IsReady())
+            if (ComboMenu["usecomboq"].Cast<CheckBox>().CurrentValue && Q.IsReady() && target.IsValidTarget(Q.Range))
             {
                 Q.Cast(target);
             }
@@ -254,7 +256,7 @@ namespace Bloodimir_Kassadin
                     {
                         W.Cast();
                     }
-                    if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue && E.IsReady() && ECount == 4)
+                    if (ComboMenu["usecomboe"].Cast<CheckBox>().CurrentValue && E.IsReady())
                     {
                         E.Cast(target.ServerPosition);
                     }

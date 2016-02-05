@@ -7,12 +7,6 @@ namespace Bloodimir_Ziggs_v2
 {
     internal static class LaneJungleClearA
     {
-        public enum AttackSpell
-        {
-            Q,
-            E
-        };
-
         public static AIHeroClient Ziggs
         {
             get { return ObjectManager.Player; }

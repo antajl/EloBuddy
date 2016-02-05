@@ -4,10 +4,10 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\Bloodimir Blit
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\Bloodimir Blitz.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\Bloodimir Blitz.pdb
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\EloBuddy.dll
-C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\EloBuddy.SDK.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\SharpDX.Direct3D9.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\SharpDX.dll
-C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\obj\Debug\Bloodimir Blitz.csprojResolveAssemblyReference.cache
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\obj\Debug\Bloodimir Blitz.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\obj\Debug\Bloodimir Blitz.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Debug\Newtonsoft.Json.dll

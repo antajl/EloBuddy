@@ -38,7 +38,7 @@ namespace Bloodimir_Annie
             var wcheck = Program.LaneJungleClear["LCW"].Cast<CheckBox>().CurrentValue;
             var wready = Program.W.IsReady();
 
-            if (!qcheck || !qready || Program.LaneJungleClear["PLCQ"].Cast<CheckBox>().CurrentValue && Annie.HasBuff("pyromania_particle")) return;
+            if (!qcheck || !qready || Annie.HasBuff("pyromania_particle")) return;
             var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy != null)
             {

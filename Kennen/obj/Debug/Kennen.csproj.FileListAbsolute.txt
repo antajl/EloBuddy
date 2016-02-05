@@ -5,10 +5,10 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\Kennen.exe.config
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\Kennen.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\Kennen.pdb
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\EloBuddy.dll
-C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\EloBuddy.SDK.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\SharpDX.Direct3D9.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\SharpDX.dll
-C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\obj\Debug\Kennen.csprojResolveAssemblyReference.cache
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\obj\Debug\Kennen.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\obj\Debug\Kennen.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Debug\Newtonsoft.Json.dll

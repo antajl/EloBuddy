@@ -4,10 +4,10 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\Bloodimir Anni
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\Bloodimir Annie.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\Bloodimir Annie.pdb
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\EloBuddy.dll
-C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\EloBuddy.SDK.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\SharpDX.Direct3D9.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\SharpDX.dll
-C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\Newtonsoft.Json.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Debug\Bloodimir Annie.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Debug\Bloodimir Annie.pdb
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Debug\Bloodimir Annie.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Debug\Newtonsoft.Json.dll

@@ -7,12 +7,6 @@ namespace Bloodimir_Annie
 {
     internal static class LaneJungleClearA
     {
-        public enum AttackSpell
-        {
-            Q,
-            W
-        };
-
         public static AIHeroClient Annie
         {
             get { return ObjectManager.Player; }
@@ -39,13 +33,13 @@ namespace Bloodimir_Annie
             var wready = Program.W.IsReady();
 
             if (!qcheck || !qready || Annie.HasBuff("pyromania_particle")) return;
-            var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+            var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
             if (qenemy != null)
             {
                 Program.Q.Cast(qenemy);
             }
             if (!wcheck || !wready) return;
-            var wminion = (Obj_AI_Minion)GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
+            var wminion = (Obj_AI_Minion) GetEnemy(Program.W.Range, GameObjectType.obj_AI_Minion);
             if (wminion != null)
             {
                 Program.W.Cast(wminion.ServerPosition);

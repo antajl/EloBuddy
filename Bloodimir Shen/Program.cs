@@ -67,7 +67,7 @@ namespace Bloodimir_Shen
             Titan = new Item((int) ItemId.Titanic_Hydra, Player.Instance.GetAutoAttackRange());
             _q = new Spell.Skillshot(SpellSlot.Q, 2000, SkillShotType.Linear, 500, 2500, 150);
             _w = new Spell.Active(SpellSlot.W);
-            _e = new Spell.Skillshot(SpellSlot.E, 600, SkillShotType.Linear, 500, 1600, 50);
+            _e = new Spell.Skillshot(SpellSlot.E, 610, SkillShotType.Linear, 500, 1600, 50);
             R = new Spell.Targeted(SpellSlot.R, 50000);
 
             if (HasSpell("summonerdot"))
@@ -571,7 +571,7 @@ namespace Bloodimir_Shen
                 }
             }
             if (!_e.IsReady()) return;
-            var eTarget = TargetSelector.GetTarget(_e.Range, DamageType.Magical);
+            var eTarget = TargetSelector.GetTarget(900, DamageType.Magical);
             if (eTarget.IsValidTarget(_e.Range))
                 if (_eMenu["taunt" + eTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                     if (eTarget.CountEnemiesInRange(_e.Width) <= 1)

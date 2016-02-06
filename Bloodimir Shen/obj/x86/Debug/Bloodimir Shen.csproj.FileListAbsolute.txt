@@ -19,3 +19,4 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\EloBuddy.SD
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\SharpDX.Direct3D9.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\SharpDX.dll
 C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\bin\x86\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Shen\obj\x86\Debug\Bloodimir Shen.csprojResolveAssemblyReference.cache

@@ -6,8 +6,8 @@ using EloBuddy.SDK.Enumerations;
 using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
+using EloBuddy.SDK.Rendering;
 using SharpDX;
-using Color = System.Drawing.Color;
 
 namespace Bloodimir_Sona
 {
@@ -33,7 +33,7 @@ namespace Bloodimir_Sona
 
         public static AIHeroClient SelectedHero { get; set; }
 
-        private static Vector3 mousePos
+        private static Vector3 MousePos
         {
             get { return Game.CursorPos; }
         }
@@ -73,7 +73,7 @@ namespace Bloodimir_Sona
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
-            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));f
+            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
@@ -118,12 +118,12 @@ namespace Bloodimir_Sona
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
             var skinchange = SkinMenu.Add("sID", new Slider("Skin", 3, 0, 5));
-            var sID = new[] {"Default", "Muse", "Pentakill", "Silent Night", "Guqin", "Arcade"};
-            skinchange.DisplayName = sID[skinchange.CurrentValue];
+            var sid = new[] {"Default", "Muse", "Pentakill", "Silent Night", "Guqin", "Arcade"};
+            skinchange.DisplayName = sid[skinchange.CurrentValue];
             skinchange.OnValueChange +=
                 delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
                 {
-                    sender.DisplayName = sID[changeArgs.NewValue];
+                    sender.DisplayName = sid[changeArgs.NewValue];
                 };
             Game.OnUpdate += Game_OnTick;
             Interrupter.OnInterruptableSpell += Interruptererer;
@@ -165,30 +165,33 @@ namespace Bloodimir_Sona
                                             a.Health < 50 + 20*Sona.Level - (a.HPRegenRate/5*3)))
                         {
                             Ignite.Cast(source);
-            if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue || ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                return;
-            foreach (
-                var enemy in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
-                        .Where(enemy => MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
-            {
-                if (enemy.IsFacing(Sona))
-                {
-                    if (!(Sona.HealthPercent < 50)) continue;
-                    Exhaust.Cast(enemy);
-                    return;
-                }
-                if (!(enemy.HealthPercent < 50)) continue;
-                Exhaust.Cast(enemy);
-                return;
-            }
-        }
+                            if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue ||
+                                ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
+                                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
+                                return;
+                            foreach (
+                                var enemy in
+                                    ObjectManager.Get<AIHeroClient>()
+                                        .Where(a => a.IsEnemy && a.IsValidTarget(Exhaust.Range))
+                                        .Where(
+                                            enemy =>
+                                                MiscMenu[enemy.ChampionName + "exhaust"].Cast<CheckBox>().CurrentValue))
+                            {
+                                if (enemy.IsFacing(Sona))
+                                {
+                                    if (!(Sona.HealthPercent < 50)) continue;
+                                    Exhaust.Cast(enemy);
+                                    return;
+                                }
+                                if (!(enemy.HealthPercent < 50)) continue;
+                                Exhaust.Cast(enemy);
+                                return;
+                            }
                         }
                     }
                 }
             }
+        }
 
         private static
             void Interruptererer
@@ -209,24 +212,24 @@ namespace Bloodimir_Sona
             {
                 if (DrawMenu["drawq"].Cast<CheckBox>().CurrentValue && Q.IsLearned)
                 {
-                    Drawing.DrawCircle(Sona.Position, Q.Range, Color.Blue);
+                    Circle.Draw(Color.Blue, Q.Range, Player.Instance.Position);
                 }
                 {
                     if (DrawMenu["drawe"].Cast<CheckBox>().CurrentValue && E.IsLearned)
                     {
-                        Drawing.DrawCircle(Sona.Position, E.Range, Color.MediumVioletRed);
+                        Circle.Draw(Color.MediumVioletRed, E.Range, Player.Instance.Position);
                     }
                     if (DrawMenu["draww"].Cast<CheckBox>().CurrentValue && W.IsLearned)
                     {
-                        Drawing.DrawCircle(Sona.Position, W.Range, Color.Green);
+                        Circle.Draw(Color.Green, W.Range, Player.Instance.Position);
                     }
                     if (DrawMenu["drawr"].Cast<CheckBox>().CurrentValue && W.IsLearned)
                     {
-                        Drawing.DrawCircle(Sona.Position, R.Range, Color.Yellow);
+                        Circle.Draw(Color.Yellow, R.Range, Player.Instance.Position);
                     }
                     if (DrawMenu["drawaa"].Cast<CheckBox>().CurrentValue)
                     {
-                        Drawing.DrawCircle(Sona.Position, Player.Instance.AttackRange, Color.DimGray);
+                        Circle.Draw(Color.DimGray, 550, Player.Instance.Position);
                     }
                 }
             }
@@ -255,7 +258,7 @@ namespace Bloodimir_Sona
             ()
         {
             var target = TargetSelector.GetTarget(650, DamageType.Magical);
-            Orbwalker.OrbwalkTo(mousePos);
+            Orbwalker.OrbwalkTo(MousePos);
             if (HarassMenu["useQHarass"].Cast<CheckBox>().CurrentValue && Q.IsReady())
             {
                 if (Q.IsInRange(target))
@@ -306,7 +309,7 @@ namespace Bloodimir_Sona
                 }
             if (ComboMenu["useitems"].Cast<CheckBox>().CurrentValue)
             {
-                if (Sona.CountEnemiesInRange(1300) > 2) && FrostQueen.IsOwned() && FrostQueen.IsReady())
+                if (FrostQueen.IsOwned() && FrostQueen.IsReady())
                     FrostQueen.Cast();
             }
         }
@@ -335,22 +338,23 @@ namespace Bloodimir_Sona
             }
         }
 
-        static int GetPassiveCount()
+        private static int GetPassiveCount()
         {
-            foreach (BuffInstance buff in Sona.Buffs)
+            foreach (var buff in Sona.Buffs)
                 if (buff.Name == "sonapassivecount") return buff.Count;
             return 0;
         }
 
-          static void Passive()
+        private static void Passive()
         {
-              var unit = TargetSelector.GetTarget(550, DamageType.Magical);
+            var unit = TargetSelector.GetTarget(550, DamageType.Magical);
             if ((Q.IsReady() && GetPassiveCount() == 2 && unit.Distance(Sona) <= 550))
             {
                 if (Q.IsReady()) Q.Cast();
                 Player.IssueOrder(GameObjectOrder.AttackUnit, unit);
             }
         }
+
         private static void AutoW()
         {
             var healAllies = MiscMenu["HPLowAllies"].Cast<CheckBox>().CurrentValue;
@@ -386,10 +390,10 @@ namespace Bloodimir_Sona
                         if (Sona.GetSpellDamage(qtarget, SpellSlot.Q) >= qtarget.Health)
                         {
                             {
-                                if (Q.IsInRange(qtarget) && (Q.IsReady() || GetPassiveCount() == 2 ))
+                                if (Q.IsInRange(qtarget) && (Q.IsReady() || GetPassiveCount() == 2))
                                 {
                                     Q.Cast();
-                Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
+                                    Player.IssueOrder(GameObjectOrder.AttackUnit, qtarget);
                                 }
                             }
                             {

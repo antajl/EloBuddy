@@ -7,11 +7,6 @@ namespace Bloodimir_Sona
 {
     internal class LaneJungleClearA
     {
-        public enum AttackSpell
-        {
-            Q
-        };
-
         public static AIHeroClient Sona
         {
             get { return ObjectManager.Player; }
@@ -29,22 +24,23 @@ namespace Bloodimir_Sona
                         a => a.Distance(Player.Instance) < range && !a.IsDead && !a.IsInvulnerable);
             }
         }
+
         public static void LaneClear()
         {
             var qcheck = Program.LaneJungleClear["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = Program.Q.IsReady();
 
-            if (qcheck && qready)
+            if (!qcheck || !qready) return;
             {
-                var qenemy = (Obj_AI_Minion)GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
+                var qenemy = (Obj_AI_Minion) GetEnemy(Program.Q.Range, GameObjectType.obj_AI_Minion);
 
                 if (qenemy != null)
-                    {
-                        Program.Q.Cast();
-                    }
+                {
+                    Program.Q.Cast();
+                }
                 if (Orbwalker.CanAutoAttack)
                 {
-                    var enemy = (Obj_AI_Minion)GetEnemy(Sona.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
+                    var enemy = (Obj_AI_Minion) GetEnemy(Sona.GetAutoAttackRange(), GameObjectType.obj_AI_Minion);
 
                     if (enemy != null)
                         Orbwalker.ForcedTarget = enemy;

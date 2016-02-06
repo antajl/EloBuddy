@@ -11,14 +11,13 @@
     <AssemblyName>Bloodimir Sona</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <OutputPath>bin\Debug\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,17 +52,21 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EloBuddy">
-      <HintPath>C:\Users\Asus\AppData\Roaming\EloBuddy\Addons\Libraries\EloBuddy.dll</HintPath>
+    <Reference Include="EloBuddy, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7339047cb10f6e86, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Programs\EloBuddy\System\EloBuddy.dll</HintPath>
     </Reference>
-    <Reference Include="EloBuddy.SDK">
-      <HintPath>C:\Users\Asus\AppData\Roaming\EloBuddy\Addons\Libraries\EloBuddy.SDK.dll</HintPath>
+    <Reference Include="EloBuddy.SDK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6b574a82b1ea937e, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Programs\EloBuddy\System\EloBuddy.SDK.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX">
-      <HintPath>C:\Users\Asus\AppData\Roaming\EloBuddy\Addons\Libraries\SharpDX.dll</HintPath>
+    <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Programs\EloBuddy\System\SharpDX.dll</HintPath>
     </Reference>
-    <Reference Include="SharpDX.Direct3D9">
-      <HintPath>C:\Users\Asus\AppData\Roaming\EloBuddy\Addons\Libraries\SharpDX.Direct3D9.dll</HintPath>
+    <Reference Include="SharpDX.Direct3D9, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\Programs\EloBuddy\System\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

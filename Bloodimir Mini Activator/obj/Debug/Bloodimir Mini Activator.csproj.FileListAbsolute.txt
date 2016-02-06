@@ -1,0 +1,10 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\Bloodimir Zhonya.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\Bloodimir Zhonya.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\Bloodimir Zhonya.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\obj\Debug\Bloodimir Zhonya.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Mini Activator\obj\Debug\Bloodimir Zhonya.pdb

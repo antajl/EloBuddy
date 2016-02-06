@@ -73,7 +73,7 @@ namespace Bloodimir_Sona
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
             ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
-            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
+            ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));f
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
@@ -306,8 +306,8 @@ namespace Bloodimir_Sona
                 }
             if (ComboMenu["useitems"].Cast<CheckBox>().CurrentValue)
             {
-                if (FrostQueen.IsOwned() && FrostQueen.IsReady())
-                    FrostQueen.Cast(target.ServerPosition);
+                if (Sona.CountEnemiesInRange(1300) > 2) && FrostQueen.IsOwned() && FrostQueen.IsReady())
+                    FrostQueen.Cast();
             }
         }
 

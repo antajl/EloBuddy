@@ -6,7 +6,7 @@ using EloBuddy.SDK.Events;
 using EloBuddy.SDK.Menu;
 using EloBuddy.SDK.Menu.Values;
 
-namespace Bloodimir_Zhonya
+namespace Bloodimir_Mini_Activator
 {
     internal static class Program
 
@@ -43,7 +43,7 @@ namespace Bloodimir_Zhonya
             Locket = new Item((int)ItemId.Locket_of_the_Iron_Solari);
 
             ConfigMenu = MainMenu.AddMenu("Config Menu", "configmenu");
-            ConfigMenu.AddLabel("Bloodimir Zhonya 1.0.1.0");
+            ConfigMenu.AddLabel("Bloodimir Mini Activator 1.0.1.0");
             ConfigMenu.Add("zhonya", new CheckBox("Use Zhonya"));
             ConfigMenu.Add("zhealth", new Slider("Auto Zhonia Health %", 25));
             ConfigMenu.Add("seraph", new CheckBox("Use Seraph"));

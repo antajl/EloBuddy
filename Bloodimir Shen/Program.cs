@@ -352,7 +352,7 @@ namespace Bloodimir_Shen
                             (o.Name == "ShenThingUnit" || o.Name == "ShenArrowVfxHostMinion") && o.Team == Shen.Team)
                     .OrderBy(o => o.Distance(ShenBladeCast))
                     .FirstOrDefault();
-            if (_comboMenu["usecombow"].Cast<CheckBox>().CurrentValue && blade != null && _w.IsReady() &&
+            if (_comboMenu["autow"].Cast<CheckBox>().CurrentValue && blade != null && _w.IsReady() &&
                 ShenBlade.IsValid())
             {
                 ShenBlade = blade.Position;

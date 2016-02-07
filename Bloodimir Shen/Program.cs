@@ -563,9 +563,6 @@ namespace Bloodimir_Shen
                 {
                     HandleQ(qtarget);
 
-                  if (!_w.IsReady()) return;
-                    _w.Cast();
-                }
             }
             if (!_e.IsReady()) return;
             var eTarget = TargetSelector.GetTarget(900, DamageType.Magical);
@@ -581,6 +578,7 @@ namespace Bloodimir_Shen
                         {
                             _e.Cast(eTarget.ServerPosition);
                         }
+            }
         }
 
         private static void OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)

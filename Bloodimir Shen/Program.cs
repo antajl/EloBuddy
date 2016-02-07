@@ -87,7 +87,7 @@ namespace Bloodimir_Shen
             _comboMenu.AddGroupLabel("Combo Settings");
             _comboMenu.AddSeparator();
             _comboMenu.Add("usecomboq", new CheckBox("Use Q"));
-            _comboMenu.Add("usecombow", new CheckBox("Use W"));
+            _comboMenu.Add("autow", new CheckBox("Auto W"));
             _comboMenu.Add("usecomboe", new CheckBox("Use E"));
             _comboMenu.Add("useignite", new CheckBox("Use Ignite"));
 
@@ -221,6 +221,7 @@ namespace Bloodimir_Shen
 
         private static void OnUpdate(EventArgs args)
         {
+            if (_comboMenu["autow"].Cast<CheckBox>().CurrentValue) W();
             if (_eMenu["flashe"].Cast<KeyBind>().CurrentValue)
             {
                 FlashE();
@@ -232,7 +233,6 @@ namespace Bloodimir_Shen
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo();
-                W();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {

@@ -410,12 +410,11 @@ namespace Bloodimir_Shen
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
             var fetarget = TargetSelector.GetTarget(1025, DamageType.Magical);
-            if (fetarget.Distance(Shen) > 1025) return;
             if (fetarget == null) return;
             var xpos = fetarget.Position.Extend(fetarget, _e.Range);
             var predepos = _e.GetPrediction(fetarget).CastPosition;
             {
-                if (!_e.IsReady() || !_flash.IsReady()) return;
+                if (!_e.IsReady() || !_flash.IsReady() && fetarget.Distance(Shen) > 1025)  return;
                 if (fetarget.IsValidTarget(1025))
                 {
                     _flash.Cast((Vector3) xpos);

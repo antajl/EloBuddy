@@ -544,12 +544,10 @@ namespace Bloodimir_Shen
         private static
             void LaneClear()
         {
-            var minionsHp =
-                EntityManager.MinionsAndMonsters.EnemyMinions.Where(m => m.IsValidTarget(400)).Sum(m => m.Health);
+
             var qcheck = MiscMenu["LCQ"].Cast<CheckBox>().CurrentValue;
             var qready = _q.IsReady();
             if (!qcheck || !qready) return;
-            if (minionsHp > 250)
             {
                 _q.Cast(Shen);
             }

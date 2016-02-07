@@ -81,7 +81,7 @@ namespace Bloodimir_Shen
             ShenMenu = MainMenu.AddMenu("BloodimirShen", "bloodimirshen");
             ShenMenu.AddGroupLabel("Bloodimir Shen");
             ShenMenu.AddSeparator();
-            ShenMenu.AddLabel("Bloodimir Shen Reworked v2.0.1.0");
+            ShenMenu.AddLabel("Bloodimir Shen Reworked v2.0.1.1");
 
             _comboMenu = ShenMenu.AddSubMenu("Combo", "sbtw");
             _comboMenu.AddGroupLabel("Combo Settings");
@@ -410,6 +410,7 @@ namespace Bloodimir_Shen
         {
             Player.IssueOrder(GameObjectOrder.MoveTo, MousePos);
             var fetarget = TargetSelector.GetTarget(1025, DamageType.Magical);
+            if (fetarget.Distance(Shen) > 1025) return;
             if (fetarget == null) return;
             var xpos = fetarget.Position.Extend(fetarget, _e.Range);
             var predepos = _e.GetPrediction(fetarget).CastPosition;
@@ -562,6 +563,10 @@ namespace Bloodimir_Shen
                 if (qtarget.IsValidTarget(_q.Range))
                 {
                     HandleQ(qtarget);
+
+                  if (_w.IsReady() && _w.IsLearned && ShenBlade.Distance(Shen) < 400)
+                    _w.Cast();
+                    Chat.Print("Cant cast this stupid shit");
                 }
             }
             if (!_e.IsReady()) return;

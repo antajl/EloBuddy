@@ -141,9 +141,8 @@ namespace Bloodimir_Shen
             MiscMenu.Add("support", new CheckBox("Support Mode", false));
             MiscMenu.Add("useexhaust", new CheckBox("Use Exhaust"));
             MiscMenu.Add("randuin", new CheckBox("Use Randuin"));
-            MiscMenu.Add("autow", new CheckBox("Auto W"));
-            MiscMenu.AddSeparator();
             MiscMenu.Add("lvlup", new CheckBox("Auto Level Up Spells", false));
+            MiscMenu.AddSeparator();
             foreach (var source in ObjectManager.Get<AIHeroClient>().Where(a => a.IsEnemy))
             {
                 MiscMenu.Add(source.ChampionName + "exhaust",
@@ -234,6 +233,7 @@ namespace Bloodimir_Shen
             {
                 if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
                     Combo();
+                W();
             }
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.LaneClear))
             {
@@ -263,37 +263,6 @@ namespace Bloodimir_Shen
             {
                 Ignite.Cast(source);
                 return;
-            }
-            {
-                var target = TargetSelector.GetTarget(650, DamageType.Magical);
-                var blade =
-                    ObjectManager.Get<Obj_AI_Minion>()
-                        .Where(
-                            o =>
-                                (o.Name == "ShenThingUnit" || o.Name == "ShenArrowVfxHostMinion") && o.Team == Shen.Team)
-                        .OrderBy(o => o.Distance(ShenBladeCast))
-                        .FirstOrDefault();
-                if (MiscMenu["autow"].Cast<CheckBox>().CurrentValue && blade != null && _w.IsReady() &&
-                    ShenBlade.IsValid())
-                {
-                    ShenBlade = blade.Position;
-                    foreach (var ally in EntityManager.Heroes.Allies.Where(a => a.Distance(ShenBlade) < BladeCevre))
-                        if (ally.Distance(ShenBlade) < BladeCevre)
-                            _w.Cast();
-
-                    if (ShenBlade.CountAlliesInRange(400) >= 2 && ShenBlade.CountEnemiesInRange(750) >= 1)
-                    {
-                        _w.Cast();
-                    }
-                    if (target.Distance(Shen) < 350 && Shen.CountAlliesInRange(650) > 1)
-                    {
-                        _w.Cast();
-                    }
-                    else if (!_e.IsReady() && target.Distance(Shen) < 350)
-                    {
-                        _w.Cast();
-                    }
-                }
             }
         }
 
@@ -374,6 +343,39 @@ namespace Bloodimir_Shen
             }
         }
 
+        private static void W()
+        {
+            var target = TargetSelector.GetTarget(650, DamageType.Magical);
+            var blade =
+                ObjectManager.Get<Obj_AI_Minion>()
+                    .Where(
+                        o =>
+                            (o.Name == "ShenThingUnit" || o.Name == "ShenArrowVfxHostMinion") && o.Team == Shen.Team)
+                    .OrderBy(o => o.Distance(ShenBladeCast))
+                    .FirstOrDefault();
+            if (_comboMenu["usecombow"].Cast<CheckBox>().CurrentValue && blade != null && _w.IsReady() &&
+                ShenBlade.IsValid())
+            {
+                ShenBlade = blade.Position;
+                foreach (var ally in EntityManager.Heroes.Allies.Where(a => a.Distance(ShenBlade) < BladeCevre))
+                    if (ally.Distance(ShenBlade) < BladeCevre)
+                        _w.Cast();
+
+                if (ShenBlade.CountAlliesInRange(400) >= 2 && ShenBlade.CountEnemiesInRange(750) >= 1)
+                {
+                    _w.Cast();
+                }
+                if (target.Distance(Shen) < 350 && Shen.CountAlliesInRange(650) > 1)
+                {
+                    _w.Cast();
+                }
+                else if (!_e.IsReady() && target.Distance(Shen) < 350)
+                {
+                    _w.Cast();
+                }
+            }
+        }
+
         private static void LevelUpSpells()
         {
             var qL = Shen.Spellbook.GetSpell(SpellSlot.Q).Level + QOff;
@@ -444,9 +446,9 @@ namespace Bloodimir_Shen
             foreach (var ally in EntityManager.Heroes.Allies.Where(
                 x =>
                     _ultMenu["bind" + x.ChampionName].Cast<CheckBox>().CurrentValue && x.IsValidTarget(R.Range) &&
-                    x.HealthPercent < rslider)
-                .Where(ally => R.IsReady() && ally.CountEnemiesInRange(600) >= 1))
-                R.Cast(ally);
+                    x.HealthPercent < rslider))
+                if (R.IsReady() && ally.CountEnemiesInRange(600) >= 1)
+                    R.Cast(ally);
         }
 
         private static void DrawAllyHealths()
@@ -456,11 +458,6 @@ namespace Bloodimir_Shen
                 foreach (
                     var hero in EntityManager.Heroes.Allies.Where(hero => hero.IsAlly && !hero.IsMe && !hero.IsDead))
                 {
-                    var playername = hero.Name;
-                    if (playername.Length > 13)
-                    {
-                        playername = playername.Remove(9) + "..";
-                    }
                     var champion = hero.ChampionName;
                     if (champion.Length > 12)
                     {
@@ -481,7 +478,7 @@ namespace Bloodimir_Shen
                         color = System.Drawing.Color.LimeGreen;
                     }
                     Drawing.DrawText(
-                        Drawing.Width*0.8f, Drawing.Height*0.1f + i, color, playername + " (" + champion + ") ");
+                        Drawing.Width*0.8f, Drawing.Height*0.1f + i, color, " (" + champion + ") ");
                     Drawing.DrawText(
                         Drawing.Width*0.9f, Drawing.Height*0.1f + i, color,
                         ((int) hero.Health) + " (" + percent + "%)");

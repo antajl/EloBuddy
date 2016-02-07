@@ -1,1 +1,12 @@
 c:\users\asus\documents\visual studio 2013\Projects\Bloodimir Sona\Bloodimir Sona\bin\Debug\Bloodimir Sona.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\Bloodimir Sona.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\Bloodimir Sona.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\Bloodimir Sona.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\obj\Debug\Bloodimir Sona.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\obj\Debug\Bloodimir Sona.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\obj\Debug\Bloodimir Sona.pdb

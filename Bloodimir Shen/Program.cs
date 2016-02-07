@@ -68,7 +68,7 @@ namespace Bloodimir_Shen
             _q = new Spell.Skillshot(SpellSlot.Q, 2000, SkillShotType.Linear, 500, 2500, 150);
             _w = new Spell.Active(SpellSlot.W);
             _e = new Spell.Skillshot(SpellSlot.E, 610, SkillShotType.Linear, 500, 1600, 50);
-            R = new Spell.Targeted(SpellSlot.R, 50000);
+            R = new Spell.Targeted(SpellSlot.R, 31000);
 
             if (HasSpell("summonerdot"))
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
@@ -76,7 +76,7 @@ namespace Bloodimir_Shen
             var flashSlot = Shen.GetSpellSlotFromName("summonerflash");
             _flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
             _randuin = new Item((int) ItemId.Randuins_Omen);
-            _abilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 2, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
+            _abilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2};
 
             ShenMenu = MainMenu.AddMenu("BloodimirShen", "bloodimirshen");
             ShenMenu.AddGroupLabel("Bloodimir Shen");

@@ -214,7 +214,7 @@ namespace Bloodimir_Shen
             if (Shen.CountEnemiesInRange(800) < 1 && Shen.HealthPercent >= 25)
                 foreach (var ally in EntityManager.Heroes.Allies.Where(
                     x =>
-                        _ultMenu["bind" + x.ChampionName].Cast<CheckBox>().CurrentValue && x.IsValidTarget(R.Range) &&
+                        _ultMenu["ult" + x.ChampionName].Cast<CheckBox>().CurrentValue && x.IsValidTarget(R.Range) &&
                         x.HealthPercent < 9)) if (R.IsReady() && ally.CountEnemiesInRange(650) >= 1)
                     R.Cast(ally);
         }
@@ -444,7 +444,7 @@ namespace Bloodimir_Shen
             if (!autoult || (!_ultMenu["ult"].Cast<KeyBind>().CurrentValue)) return;
             foreach (var ally in EntityManager.Heroes.Allies.Where(
                 x =>
-                    _ultMenu["bind" + x.ChampionName].Cast<CheckBox>().CurrentValue && x.IsValidTarget(R.Range) &&
+                    _ultMenu["ult" + x.ChampionName].Cast<CheckBox>().CurrentValue && x.IsValidTarget(R.Range) &&
                     x.HealthPercent < rslider))
                 if (R.IsReady() && ally.CountEnemiesInRange(600) >= 1)
                     R.Cast(ally);
@@ -467,7 +467,7 @@ namespace Bloodimir_Shen
                     if (percent > 25)
                     {
                         color = System.Drawing.Color.Orange;
-                    }
+                    }   
                     if (percent > 50)
                     {
                         color = System.Drawing.Color.Yellow;

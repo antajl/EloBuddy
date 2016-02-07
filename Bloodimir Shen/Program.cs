@@ -211,12 +211,11 @@ namespace Bloodimir_Shen
         {
             var autoult = _ultMenu["autoult"].Cast<CheckBox>().CurrentValue;
             if (!autoult) return;
-            if (Shen.CountEnemiesInRange(800) < 1 && Shen.HealthPercent >= 30)
+            if (Shen.CountEnemiesInRange(800) < 1 && Shen.HealthPercent >= 25)
                 foreach (var ally in EntityManager.Heroes.Allies.Where(
                     x =>
                         _ultMenu["bind" + x.ChampionName].Cast<CheckBox>().CurrentValue && x.IsValidTarget(R.Range) &&
-                        x.HealthPercent < 10)
-                    .Where(ally => R.IsReady() && ally.CountEnemiesInRange(650) >= 1))
+                        x.HealthPercent < 9)) if (R.IsReady() && ally.CountEnemiesInRange(650) >= 1)
                     R.Cast(ally);
         }
 

@@ -564,7 +564,7 @@ namespace Bloodimir_Shen
                     HandleQ(qtarget);
 
                   if (_w.IsReady())
-                    _w.Cast();
+                    _w.Cast(qtarget);
                 }
             }
             if (!_e.IsReady()) return;

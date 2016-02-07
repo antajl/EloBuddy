@@ -522,16 +522,21 @@ namespace Bloodimir_Shen
         private static
             void Combo()
         {
-            var target = TargetSelector.GetTarget(650, DamageType.Magical);
-                     if (target.Distance(Shen) < 350 && Shen.CountAlliesInRange(650) > 1)
+            var target = TargetSelector.GetTarget(750, DamageType.Magical);
+           
+            if (_comboMenu["autow"].Cast<CheckBox>().CurrentValue && W.IsReady())
+            {               
+                if (target.Distance(Shen) < 400 && Shen.CountAlliesInRange(650) > 1)
                 {
                     W.Cast();
                 }
-                     else if (!E.IsReady() && target.Distance(Shen) < 350)
+                if (!E.IsReady() && target.Distance(Shen) < 350)
                 {
                     W.Cast();
                 }
-        
+
+               
+            }
             if (Q.IsReady())
             {
                 var qtarget = GetEnemy(Q.Range, GameObjectType.AIHeroClient);

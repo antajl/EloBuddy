@@ -17,9 +17,9 @@ namespace Bloodimir_Shen
     {
         private static readonly AIHeroClient Shen = ObjectManager.Player;
         public static Spell.Targeted R, Ignite, Exhaust;
-        private static Spell.Active _w;
-        private static Spell.Skillshot _e, _q;
-        private static Spell.Skillshot _flash;
+        public static Spell.Active _w;
+        public static Spell.Skillshot _e, _q;
+        public static Spell.Skillshot _flash;
         private static Item _randuin;
         public static Menu ShenMenu;
         private static Menu _comboMenu;

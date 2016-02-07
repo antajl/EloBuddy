@@ -563,9 +563,8 @@ namespace Bloodimir_Shen
                 {
                     HandleQ(qtarget);
 
-                  if (_w.IsReady() && _w.IsLearned && ShenBlade.Distance(Shen) < 400)
+                  if (_w.IsReady())
                     _w.Cast();
-                    Chat.Print("Cant cast this stupid shit");
                 }
             }
             if (!_e.IsReady()) return;

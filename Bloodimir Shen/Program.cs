@@ -321,8 +321,8 @@ namespace Bloodimir_Shen
         {
             var poly = GetPoly(ShenBlade, Shen.Distance(ShenBlade), 150);
             {
-                if (((target.Distance(Shen) < 151) ||
-                     (target.Distance(ShenBlade) < 500 && poly.IsInside(target.Position)) ||
+                if (((target.Distance(Shen) < 176) ||
+                     (target.Distance(ShenBlade) < 450 && poly.IsInside(target.Position)) ||
                      Shen.Distance(target) < Player.Instance.GetAutoAttackRange(target)))
                 {
                     Q.Cast(target);
@@ -523,34 +523,15 @@ namespace Bloodimir_Shen
             void Combo()
         {
             var target = TargetSelector.GetTarget(650, DamageType.Magical);
-            var blade =
-                ObjectManager.Get<Obj_AI_Minion>()
-                    .Where(
-                        o =>
-                            (o.Name == "ShenThingUnit" || o.Name == "ShenArrowVfxHostMinion") && o.Team == Shen.Team)
-                    .OrderBy(o => o.Distance(ShenBladeCast))
-                    .FirstOrDefault();
-            if (_comboMenu["autow"].Cast<CheckBox>().CurrentValue && blade != null && W.IsReady() &&
-                ShenBlade.IsValid())
-            {
-                ShenBlade = blade.Position;
-                foreach (var ally in EntityManager.Heroes.Allies.Where(a => a.Distance(ShenBlade) < BladeCevre))
-                    if (ally.Distance(ShenBlade) < BladeCevre)
-                        W.Cast();
-
-                    else if (ShenBlade.CountAlliesInRange(400) >= 2 && ShenBlade.CountEnemiesInRange(750) >= 1)
+                     if (target.Distance(Shen) < 350 && Shen.CountAlliesInRange(650) > 1)
                 {
                     W.Cast();
                 }
-                else if (target.Distance(Shen) < 350 && Shen.CountAlliesInRange(650) > 1)
+                     else if (!E.IsReady() && target.Distance(Shen) < 350)
                 {
                     W.Cast();
                 }
-                else if (!E.IsReady() && target.Distance(Shen) < 350)
-                {
-                    W.Cast();
-                }
-            }
+        
             if (Q.IsReady())
             {
                 var qtarget = GetEnemy(Q.Range, GameObjectType.AIHeroClient);

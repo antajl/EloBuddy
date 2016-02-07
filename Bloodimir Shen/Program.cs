@@ -19,7 +19,7 @@ namespace Bloodimir_Shen
         public static Spell.Targeted R, Ignite, Exhaust;
         public static Spell.Active W;
         public static Spell.Skillshot E, Q;
-        public static Spell.Skillshot _flash;
+        public static Spell.Skillshot Flash;
         private static Item _randuin;
         public static Menu ShenMenu;
         private static Menu _comboMenu;
@@ -34,7 +34,7 @@ namespace Bloodimir_Shen
         private static int[] _abilitySequence;
         public static List<Obj_AI_Turret> Turrets = new List<Obj_AI_Turret>();
         public static Vector3 ShenBlade, ShenBladeCast;
-        private static readonly float BladeCevre = 335f;
+        public static float BladeCevre = 335f;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
 
         private static Vector3 MousePos
@@ -74,7 +74,7 @@ namespace Bloodimir_Shen
                 Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             var flashSlot = Shen.GetSpellSlotFromName("summonerflash");
-            _flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
+            Flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
             _randuin = new Item((int) ItemId.Randuins_Omen);
             _abilitySequence = new[] {1, 3, 2, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2};
 
@@ -186,7 +186,7 @@ namespace Bloodimir_Shen
             {
                 Circle.Draw(Color.LightBlue, E.Range, Player.Instance.Position);
             }
-            if (DrawMenu["drawfe"].Cast<CheckBox>().CurrentValue && E.IsLearned && _flash.IsReady() && E.IsReady())
+            if (DrawMenu["drawfe"].Cast<CheckBox>().CurrentValue && E.IsLearned && Flash.IsReady() && E.IsReady())
             {
                 Circle.Draw(Color.DarkBlue, E.Range + 425, Player.Instance.Position);
             }
@@ -380,10 +380,10 @@ namespace Bloodimir_Shen
             var xpos = fetarget.Position.Extend(fetarget, E.Range);
             var predepos = E.GetPrediction(fetarget).CastPosition;
             {
-                if (!E.IsReady() || !_flash.IsReady() && fetarget.Distance(Shen) > 1025)  return;
+                if (!E.IsReady() || !Flash.IsReady() && fetarget.Distance(Shen) > 1025)  return;
                 if (fetarget.IsValidTarget(1025))
                 {
-                    _flash.Cast((Vector3) xpos);
+                    Flash.Cast((Vector3) xpos);
                     E.Cast(predepos);
                 }
             }

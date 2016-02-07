@@ -563,8 +563,8 @@ namespace Bloodimir_Shen
                 {
                     HandleQ(qtarget);
 
-                  if (_w.IsReady())
-                    _w.Cast(qtarget);
+                  if (!_w.IsReady()) return;
+                    _w.Cast();
                 }
             }
             if (!_e.IsReady()) return;

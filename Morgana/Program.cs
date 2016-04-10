@@ -90,7 +90,7 @@ namespace Morgana
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))		
             {		
-              QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind" + obj.ChampionName));		
+              QMenu.Add("bind" + obj.ChampionName.ToLower(), new CheckBox("Bind " + obj.ChampionName));		
            }
             QMenu.AddSeparator();
             QMenu.Add("mediumpred", new CheckBox("MEDIUM Bind Hitchance Prediction", false));

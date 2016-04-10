@@ -92,13 +92,12 @@ namespace Kennen
             _miscMenu.AddSeparator();
             _miscMenu.Add("ksq", new CheckBox("KS using Q"));
             _miscMenu.Add("ksw", new CheckBox("KS using W"));
-            _miscMenu.Add("int", new CheckBox("TRY to Interrupt spells"));
 
             _skinMenu = _kennenMenu.AddSubMenu("Skin Changer", "skin");
             _skinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = _skinMenu.Add("skinid", new Slider("Skin", 1, 0, 5));
-            var skinid = new[] {"Default", "Deadly", "Swamp Master", "Karate", "Doctor", "Arctic Ops"};
+            var skinchange = _skinMenu.Add("skinid", new Slider("Skin", 1, 0, 6));
+            var skinid = new[] {"Default", "Deadly", "Swamp Master", "Karate", "Doctor", "Arctic Ops, Blood Moon"};
             skinchange.DisplayName = skinid[skinchange.CurrentValue];
             skinchange.OnValueChange += delegate(ValueBase<int> sender, ValueBase<int>.ValueChangeArgs changeArgs)
             {
@@ -108,24 +107,8 @@ namespace Kennen
                     Chat.Print("skin-changed");
                 }
             };
-            Interrupter.OnInterruptableSpell += Interruptererer;
             Game.OnUpdate += Tick;
             Drawing.OnDraw += OnDraw;
-        }
-
-        private static void Interruptererer(Obj_AI_Base sender,
-            Interrupter.InterruptableSpellEventArgs args)
-        {
-            var intTarget = TargetSelector.GetTarget(W.Range, DamageType.Magical);
-            if (!intTarget.HasBuff("kennenmarkofstorm") && intTarget.CountEnemiesInRange(500) >= 2) return;
-            if (Q.IsReady() && sender.IsValidTarget(Q.Range) && _miscMenu["int"].Cast<CheckBox>().CurrentValue)
-                Q.Cast(intTarget.ServerPosition);
-            if (W.IsReady() && sender.IsValidTarget(W.Range))
-                W.Cast();
-            if (E.IsReady() && sender.IsValidTarget(E.Range))
-                E.Cast();
-            Orbwalker.DisableMovement = Kennen.HasBuff("KennenLightningRush");
-            Player.IssueOrder(GameObjectOrder.MoveTo, intTarget);
         }
 
         private static void OnDraw(EventArgs args)
@@ -279,6 +262,9 @@ namespace Kennen
                     break;
                 case "Arctic Ops":
                     Player.SetSkinId(5);
+                    break;
+                case "Blood Moon":
+                    Player.SetSkinId(6);
                     break;
             }
         }

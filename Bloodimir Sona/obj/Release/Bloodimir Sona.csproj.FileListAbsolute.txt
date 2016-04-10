@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\Bloodimir Sona.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\Bloodimir Sona.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\Bloodimir Sona.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\obj\Release\Bloodimir Sona.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\obj\Release\Bloodimir Sona.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Sona\obj\Release\Bloodimir Sona.csprojResolveAssemblyReference.cache

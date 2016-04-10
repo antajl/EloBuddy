@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\BloodimirVladimir.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\BloodimirVladimir.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\BloodimirVladimir.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\obj\Release\BloodimirVladimir.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\obj\Release\BloodimirVladimir.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\BloodimirVladimir\obj\Release\BloodimirVladimir.csprojResolveAssemblyReference.cache

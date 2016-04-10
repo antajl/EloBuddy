@@ -1,0 +1,11 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\Morgana.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\Morgana.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\Morgana.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\x86\Release\Morgana.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\x86\Release\Morgana.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\x86\Release\Morgana.pdb

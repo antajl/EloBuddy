@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\Bloodimir Ziggs v2.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\Bloodimir Ziggs v2.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\Bloodimir Ziggs v2.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\obj\Release\Bloodimir Ziggs v2.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\obj\Release\Bloodimir Ziggs v2.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Ziggs v2\obj\Release\Bloodimir Ziggs v2.csprojResolveAssemblyReference.cache

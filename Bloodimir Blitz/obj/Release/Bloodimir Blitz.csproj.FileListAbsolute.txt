@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\Bloodimir Blitz.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\Bloodimir Blitz.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\Bloodimir Blitz.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\obj\Release\Bloodimir Blitz.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\obj\Release\Bloodimir Blitz.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Blitz\obj\Release\Bloodimir Blitz.csprojResolveAssemblyReference.cache

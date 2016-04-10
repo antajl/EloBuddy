@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\Bloodimir Annie.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\Bloodimir Annie.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\Bloodimir Annie.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Release\Bloodimir Annie.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Release\Bloodimir Annie.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\obj\Release\Bloodimir Annie.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Bloodimir Annie\bin\Release\EloBuddy.Sandbox.dll

@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\Kennen.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\Kennen.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\Kennen.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\obj\Release\Kennen.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\obj\Release\Kennen.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Kennen\obj\Release\Kennen.csprojResolveAssemblyReference.cache

@@ -1,0 +1,12 @@
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\Evelynn.exe.config
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\Evelynn.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\Evelynn.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\obj\Release\Evelynn.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\obj\Release\Evelynn.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\bin\Release\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Evelynn\obj\Release\Evelynn.csprojResolveAssemblyReference.cache

@@ -17,7 +17,6 @@ namespace Kennen
         public static Spell.Active W;
         public static Spell.Active E;
         private static Spell.Active _r;
-        private static Spell.Targeted _ignite;
         private static Menu _kennenMenu;
         public static Menu ComboMenu;
         private static Menu _drawMenu;
@@ -51,8 +50,6 @@ namespace Kennen
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Active(SpellSlot.E);
             _r = new Spell.Active(SpellSlot.R, 565);
-            if (HasSpell("summonerdot"))
-                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
 
             _kennenMenu = MainMenu.AddMenu("BloodimirKennen", "bloodimirkennen");
             _kennenMenu.AddGroupLabel("Bloodimir.Kennen");
@@ -160,21 +157,6 @@ namespace Kennen
                     LastHitA.LastHitB();
                 }
                 SkinChange();
-                {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
-                                        a.Health < 50 + 20*Kennen.Level - (a.HPRegenRate/5*3)))
-                    {
-                        _ignite.Cast(source);
-                        return;
-                    }
-                }
             }
         }
 

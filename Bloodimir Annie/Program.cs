@@ -17,7 +17,6 @@ namespace Bloodimir_Annie
     internal static class Program
     {
         public static Spell.Targeted Q;
-        private static Spell.Targeted _ignite;
         private static Spell.Targeted _exhaust;
         public static Spell.Skillshot W;
         private static Spell.Skillshot _r;
@@ -72,8 +71,6 @@ namespace Bloodimir_Annie
             _e = new Spell.Active(SpellSlot.E);
             _r = new Spell.Skillshot(SpellSlot.R, 600, SkillShotType.Circular, 200, int.MaxValue, 251);
             _zhonia = new Item((int) ItemId.Zhonyas_Hourglass);
-            if (HasSpell("summonerdot"))
-                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             _abilitySequence = new[] {1, 2, 1, 2, 3, 4, 1, 1, 1, 2, 4, 2, 2, 3, 3, 4, 3, 3};
             _exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             var flashSlot = Annie.GetSpellSlotFromName("summonerflash");
@@ -91,7 +88,6 @@ namespace Bloodimir_Annie
             _comboMenu.Add("usecombow", new CheckBox("Use W"));
             _comboMenu.Add("usecomboe", new CheckBox("Use E "));
             _comboMenu.Add("usecombor", new CheckBox("Use R"));
-            _comboMenu.Add("useignite", new CheckBox("Use Ignite (Auto)"));
             _comboMenu.Add("pilot", new CheckBox("Auto Pilot Tibbers"));
             _comboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
             _comboMenu.AddSeparator();
@@ -127,7 +123,6 @@ namespace Bloodimir_Annie
             _miscMenu.Add("ksq", new CheckBox("KS using Q"));
             _miscMenu.Add("ksw", new CheckBox("KS using W"));
             _miscMenu.Add("ksr", new CheckBox("KS using R"));
-            _miscMenu.Add("ksignite", new CheckBox("KS using Ignite"));
             _miscMenu.AddSeparator();
             _miscMenu.Add("estack", new CheckBox("Stack Passive E", false));
             _miscMenu.Add("wstack", new CheckBox("Stack Passive W ", false));
@@ -318,19 +313,6 @@ namespace Bloodimir_Annie
             {
                 TibbersFlash();
             }
-            if (!_comboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-            foreach (
-                var source in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(
-                            a =>
-                                a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
-                                a.Health < 50 + 20*Annie.Level - (a.HPRegenRate/5*3)))
-            {
-                _ignite.Cast(source);
-                return;
-            }
             if (!_miscMenu["useexhaust"].Cast<CheckBox>().CurrentValue ||
                 _comboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
@@ -351,7 +333,7 @@ namespace Bloodimir_Annie
                 _exhaust.Cast(enemy);
                 return;
             }
-        }
+        
 
         private static void Auto_EOnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
@@ -395,23 +377,9 @@ namespace Bloodimir_Annie
                     {
                         _r.Cast(rtarget.ServerPosition);
                     }
-                    if (_miscMenu["ksignite"].Cast<CheckBox>().CurrentValue && _ignite.IsReady())
-                        foreach (
-                            var source in
-                                ObjectManager.Get<AIHeroClient>()
-                                    .Where(
-                                        a =>
-                                            a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
-                                            a.Health < 50 + 20*Annie.Level - (a.HPRegenRate/5*3)))
-                        {
-                            _ignite.Cast(source);
-                            return;
-                        }
-                    {
-                    }
                 }
             }
-        }
+        
 
         private static void Zhonya()
         {

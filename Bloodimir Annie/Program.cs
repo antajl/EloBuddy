@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EloBuddy;
@@ -332,7 +332,7 @@ namespace Bloodimir_Annie
                 if (!(enemy.HealthPercent < 50)) continue;
                 _exhaust.Cast(enemy);
                 return;
-            }
+            } }
         
 
         private static void Auto_EOnBasicAttack(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -379,7 +379,7 @@ namespace Bloodimir_Annie
                     }
                 }
             }
-        
+        }
 
         private static void Zhonya()
         {

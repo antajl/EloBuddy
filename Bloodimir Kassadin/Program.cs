@@ -14,7 +14,7 @@ namespace Bloodimir_Kassadin
     internal class Program
     {
         public static Spell.Skillshot E, R, Flash;
-        public static Spell.Targeted Q, Ignite;
+        public static Spell.Targeted Q;
         public static Spell.Active W;
         private static readonly AIHeroClient Kassawin = ObjectManager.Player;
         private static int[] _abilitySequence;
@@ -67,8 +67,6 @@ namespace Bloodimir_Kassadin
             E = new Spell.Skillshot(SpellSlot.E, 400, SkillShotType.Cone, 500, int.MaxValue, 10);
             R = new Spell.Skillshot(SpellSlot.R, 700, SkillShotType.Circular, 500, int.MaxValue, 150);
             _abilitySequence = new[] { 1, 2, 3, 1, 1, 4, 1, 3, 1, 3, 4, 3, 3, 2, 2, 4, 2, 2 };
-            if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             var flashSlot = Kassawin.GetSpellSlotFromName("summonerflash");
             Flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
 
@@ -84,7 +82,6 @@ namespace Bloodimir_Kassadin
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Maximum enemy to R", 2, 0, 5));
 
@@ -158,20 +155,6 @@ namespace Bloodimir_Kassadin
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                 Flee();
             {
-                {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                        a.Health < 50 + 20*Kassawin.Level - a.HPRegenRate/5*3))
-                    {
-                        Ignite.Cast(source);
-                        return;
-                    }
                 }
             }
             }

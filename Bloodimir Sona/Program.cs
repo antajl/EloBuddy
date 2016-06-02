@@ -170,7 +170,7 @@ namespace Bloodimir_Sona
                                 if (!(enemy.HealthPercent < 50)) continue;
                                 Exhaust.Cast(enemy);
                                 return;
-                            }
+                            } } }
                         }
                     
 

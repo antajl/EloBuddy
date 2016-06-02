@@ -9,3 +9,4 @@ C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\Newtonsoft.Json.
 C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\x86\Release\Morgana.csprojResolveAssemblyReference.cache
 C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\x86\Release\Morgana.exe
 C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\x86\Release\Morgana.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\x86\Release\EloBuddy.Sandbox.dll

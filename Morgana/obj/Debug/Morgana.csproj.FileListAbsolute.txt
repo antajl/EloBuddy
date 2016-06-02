@@ -11,3 +11,13 @@ c:\users\asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\Debug\Mo
 C:\Users\Asus\documents\visual studio 2013\Projects\Morgana\Morgana\obj\Debug\Morgana.csprojResolveAssemblyReference.cache
 C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\Morgana.exe.config
 C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\Debug\Morgana.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\Morgana.exe
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\Morgana.pdb
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\EloBuddy.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\EloBuddy.SDK.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\SharpDX.Direct3D9.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\SharpDX.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\bin\Debug\EloBuddy.Sandbox.dll
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\Debug\Morgana.csprojResolveAssemblyReference.cache
+C:\Users\Asus\Documents\GitHub\EloBuddy\Morgana\obj\Debug\Morgana.pdb

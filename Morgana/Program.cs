@@ -15,9 +15,10 @@ namespace Morgana
 {
     internal class Program
     {
+        public const string Hero = "Morgana";
         public static Spell.Skillshot Q, W;
         public static Spell.Active R;
-        public static Spell.Targeted E, Ignite, Exhaust;
+        public static Spell.Targeted E, Exhaust;
         public static Item Talisman, Zhonia, Randuin;
         public static int[] AbilitySequence;
         public static int QOff = 0, WOff = 0, EOff = 0, ROff = 0;
@@ -47,16 +48,15 @@ namespace Morgana
 
         private static void OnLoaded(EventArgs args)
         {
-            if (Player.Instance.ChampionName != "Morgana")
+            if (Player.Instance.ChampionName != Hero)
                 return;
             Bootstrap.Init(null);
             Q = new Spell.Skillshot(SpellSlot.Q, 1200, SkillShotType.Linear, 250, 1200, 80);
-            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 250, 2200, 400);
+            W = new Spell.Skillshot(SpellSlot.W, 900, SkillShotType.Circular, 250, 2200, 350);
             E = new Spell.Targeted(SpellSlot.E, 750);
-            R = new Spell.Active(SpellSlot.R, 600);
+            R = new Spell.Active(SpellSlot.R, 620);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
-            if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
+            
             Talisman = new Item((int)ItemId.Talisman_of_Ascension);
             Randuin = new Item((int)ItemId.Randuins_Omen);
             Zhonia = new Item((int)ItemId.Zhonyas_Hourglass);
@@ -65,14 +65,13 @@ namespace Morgana
             MorgMenu = MainMenu.AddMenu("Bloodimir Morgana", "bmorgana");
             MorgMenu.AddGroupLabel("Bloodimir Morgana");
             MorgMenu.AddSeparator();
-            MorgMenu.AddLabel("Bloodimir Morgana v2.0.2.3");
+            MorgMenu.AddLabel("Bloodimir Morgana v2.1.0.0");
 
             ComboMenu = MorgMenu.AddSubMenu("Combo", "sbtw");
             ComboMenu.AddGroupLabel("Combo Settings");
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
 
             AutoCastMenu = MorgMenu.AddSubMenu("Auto Cast", "ac");
             AutoCastMenu.AddGroupLabel("Auto Cast");
@@ -85,7 +84,7 @@ namespace Morgana
             QMenu = MorgMenu.AddSubMenu("Q Settings", "qsettings");
             QMenu.AddGroupLabel("Q Settings");
             QMenu.AddSeparator();
-            QMenu.Add("qmin", new Slider("Min Range", 165, 0, (int)Q.Range));
+            QMenu.Add("qmin", new Slider("Min Range", 150, 0, (int)Q.Range));
             QMenu.Add("qmax", new Slider("Max Range", (int)Q.Range, 0, (int)Q.Range));
             QMenu.AddSeparator();
             foreach (var obj in ObjectManager.Get<AIHeroClient>().Where(obj => obj.Team != Me.Team))		
@@ -100,7 +99,7 @@ namespace Morgana
             SkinMenu = MorgMenu.AddSubMenu("Skin Changer", "skin");
             SkinMenu.AddGroupLabel("Choose the desired skin");
 
-            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 7, 0, 7));
+            var skinchange = SkinMenu.Add("sID", new Slider("Skin", 5, 0, 7));
             var sid = new[] { "Default", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorius", "Lunar Wraith" };
             skinchange.DisplayName = sid[skinchange.CurrentValue];
             skinchange.OnValueChange +=
@@ -280,7 +279,7 @@ namespace Morgana
                         foreach (var item in skillShots)
                         {
                             if (args.SData.Name == item &&
-                                (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                                (MiscMenu["Shield " + ally.ChampionName].Cast<CheckBox>().CurrentValue))
                             {
                                 E.Cast(ally);
                             }
@@ -291,7 +290,7 @@ namespace Morgana
                         if (args.SData.Name == nonskillshots[i])
                         {
                             if (ally.Distance(args.End) < 325 &&
-                                (MiscMenu["Shield" + ally.ChampionName].Cast<CheckBox>().CurrentValue))
+                                (MiscMenu["Shield " + ally.ChampionName].Cast<CheckBox>().CurrentValue))
                             {
                                 E.Cast(ally);
                             }
@@ -393,20 +392,7 @@ namespace Morgana
             {
                 LastHitA.LastHitB();
             }
-            {
-                if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                    !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                foreach (
-                    var source in
-                        ObjectManager.Get<AIHeroClient>()
-                            .Where(
-                                a =>
-                                    a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                    a.Health < 50 + 20 * Me.Level - (a.HPRegenRate / 5 * 3)))
-                {
-                    Ignite.Cast(source);
-                    return;
-                }
+
                 if (MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue)
                     foreach (
                         var enemy in
@@ -425,7 +411,7 @@ namespace Morgana
                         return;
                     }
             }
-        }
+        
 
         private static void Orbwalker_OnPreAttack(AttackableUnit target, Orbwalker.PreAttackArgs args)
         {
@@ -558,6 +544,9 @@ namespace Morgana
                     R.Cast();
                     if (E.IsReady())
                         E.Cast(Me);
+                    else if (Zhonia.IsReady() && !E.IsReady() && Me.CountEnemiesInRange(425) >= 3)
+                    Zhonia.Cast();
+
                 }
             }
         }
@@ -571,7 +560,7 @@ namespace Morgana
                 {
                     if (Q.GetPrediction(bindTarget).HitChance >= QHitChance)
                     {
-                        if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue)
+                        if (bindTarget.Distance(Me.ServerPosition) > QMenu["qmin"].Cast<Slider>().CurrentValue && bindTarget.Distance(Me.ServerPosition) < QMenu["qmax"].Cast<Slider>().CurrentValue)
                         {
                             if (QMenu["bind" + bindTarget.ChampionName].Cast<CheckBox>().CurrentValue)
                             {
@@ -589,7 +578,7 @@ namespace Morgana
             {
                 var wenemy =
                     (AIHeroClient)GetEnemy(W.Range, GameObjectType.AIHeroClient);
-                if (wenemy != null && W.GetPrediction(wenemy).HitChance >= HitChance.Medium && Immobile(wenemy))
+                if (wenemy != null && Immobile(wenemy))
                 {
                     W.Cast(wenemy);
                 }

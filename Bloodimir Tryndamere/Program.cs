@@ -17,7 +17,6 @@ namespace Bloodimir_Tryndamere
         public static Spell.Active W;
         public static Spell.Skillshot E;
         private static Spell.Active R;
-        private static Spell.Targeted _ignite;
         private static Menu _trynMenu;
         public static Menu ComboMenu;
         private static Menu _drawMenu;
@@ -50,9 +49,6 @@ namespace Bloodimir_Tryndamere
             W = new Spell.Active(SpellSlot.W, 400);
             E = new Spell.Skillshot(SpellSlot.E, 660, SkillShotType.Linear, 250, 700, (int) 92.5);
             R = new Spell.Active(SpellSlot.R);
-            if (HasSpell("summonerdot"))
-                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-
             Botrk = new Item(3153, 550f);
             Bilgewater = new Item(3144, 475f);
             Hydra = new Item(3074, 250f);
@@ -71,7 +67,6 @@ namespace Bloodimir_Tryndamere
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum HP% for Ult", 20, 0, 95));
             ComboMenu.AddSeparator();
@@ -179,20 +174,6 @@ namespace Bloodimir_Tryndamere
                 }
                 AutoUlt(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
             }
-            if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-            foreach (
-                var source in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(
-                            a =>
-                                a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
-                                a.Health < 50 + 20*Tryndamere.Level - (a.HPRegenRate/5*3)))
-            {
-                _ignite.Cast(source);
-                return;
-            }
-        }
 
         private static void Killsteal()
         {

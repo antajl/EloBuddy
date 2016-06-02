@@ -155,7 +155,6 @@ namespace Bloodimir_Kassadin
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                 Flee();
             }
-        }}
         }
 
         private static

@@ -17,7 +17,6 @@ namespace Bloodimir_Sona
         public static Spell.Active W;
         public static Spell.Active E;
         public static Spell.Skillshot R;
-        public static Spell.Targeted Ignite;
         public static Spell.Targeted Exhaust;
         public static AIHeroClient Sona = ObjectManager.Player;
         public static Item FrostQueen;
@@ -57,8 +56,6 @@ namespace Bloodimir_Sona
             W = new Spell.Active(SpellSlot.W, 1000);
             E = new Spell.Active(SpellSlot.E, 350);
             R = new Spell.Skillshot(SpellSlot.R, 1000, SkillShotType.Circular, 250, 2400, 140);
-            if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             FrostQueen = new Item(3092, 850f);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
 
@@ -72,7 +69,6 @@ namespace Bloodimir_Sona
             ComboMenu.AddSeparator();
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.Add("comboOnlyExhaust", new CheckBox("Use Exhaust (Combo Only)"));
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.AddSeparator();
@@ -153,18 +149,6 @@ namespace Bloodimir_Sona
                 else if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                     Flee();
                 {
-                    {
-                        if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                            !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                        foreach (
-                            var source in
-                                ObjectManager.Get<AIHeroClient>()
-                                    .Where(
-                                        a =>
-                                            a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                            a.Health < 50 + 20*Sona.Level - (a.HPRegenRate/5*3)))
-                        {
-                            Ignite.Cast(source);
                             if (!MiscMenu["useexhaust"].Cast<CheckBox>().CurrentValue ||
                                 ComboMenu["comboOnlyExhaust"].Cast<CheckBox>().CurrentValue &&
                                 !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
@@ -189,9 +173,6 @@ namespace Bloodimir_Sona
                             }
                         }
                     }
-                }
-            }
-        }
 
         private static
             void Interruptererer

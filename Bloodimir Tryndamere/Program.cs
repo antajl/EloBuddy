@@ -173,7 +173,7 @@ namespace Bloodimir_Tryndamere
                     LaneJungleClearA.LaneClearA();
                 }
                 AutoUlt(ComboMenu["usecombor"].Cast<CheckBox>().CurrentValue);
-            }
+            } }
 
         private static void Killsteal()
         {

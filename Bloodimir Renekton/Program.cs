@@ -56,8 +56,6 @@ namespace Bloodimir_Renekton
             Q = new Spell.Active(SpellSlot.Q, 225);
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Skillshot(SpellSlot.E, 450, SkillShotType.Linear);
-            if (HasSpell("summonerdot"))
-                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             _r = new Spell.Active(SpellSlot.R);
             Tiamat = new Item((int) ItemId.Tiamat_Melee_Only, 420);
             Hydra = new Item((int) ItemId.Ravenous_Hydra_Melee_Only, 420);
@@ -77,7 +75,6 @@ namespace Bloodimir_Renekton
             ComboMenu.Add("usecomboq", new CheckBox("Use Q"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.Add("useitems", new CheckBox("Use Items"));
             ComboMenu.Add("autoult", new CheckBox("Auto Ult"));
             ComboMenu.AddSeparator();
@@ -223,21 +220,6 @@ namespace Bloodimir_Renekton
                 {
                     LastHitA.LastHitB();
                     LastHitA.Items();
-                }
-                {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
-                                        a.Health < 50 + 20*Renek.Level - (a.HPRegenRate/5*3)))
-                    {
-                        _ignite.Cast(source);
-                        return;
-                    }
                 }
             }
         }

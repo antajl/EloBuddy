@@ -154,8 +154,6 @@ namespace Bloodimir_Kassadin
                 LastHitA.LastHitB();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                 Flee();
-            {
-                }
             }
             }
         }

@@ -19,7 +19,6 @@ namespace Bloodimir_Ziggs_v2
         public static Spell.Skillshot W;
         public static Spell.Skillshot E;
         public static Spell.Skillshot R;
-        private static Spell.Targeted _ignite;
         private static readonly AIHeroClient Ziggs = ObjectManager.Player;
         private static int _useSecondWTime;
 
@@ -62,10 +61,6 @@ namespace Bloodimir_Ziggs_v2
             W = new Spell.Skillshot(SpellSlot.W, 1000, SkillShotType.Circular, 250, 1750, 275);
             E = new Spell.Skillshot(SpellSlot.E, 900, SkillShotType.Circular, 500, 1750, 100);
             R = new Spell.Skillshot(SpellSlot.R, 5300, SkillShotType.Circular, 2000, 1500, 500);
-
-            if (HasSpell("summonerdot"))
-                _ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
-
             ZiggsMenu = MainMenu.AddMenu("BloodimirZiggs", "bloodimirziggs");
             ZiggsMenu.AddGroupLabel("Bloodimir Ziggs v2.0.2.0");
             ZiggsMenu.AddSeparator();
@@ -78,7 +73,6 @@ namespace Bloodimir_Ziggs_v2
             ComboMenu.Add("usecomboe", new CheckBox("Use E"));
             ComboMenu.Add("usecombow", new CheckBox("Use W"));
             ComboMenu.Add("usecombor", new CheckBox("Use R"));
-            ComboMenu.Add("useignite", new CheckBox("Use Ignite"));
             ComboMenu.AddSeparator();
             ComboMenu.Add("rslider", new Slider("Minimum people for R", 1, 0, 5));
             ComboMenu.Add("wslider", new Slider("Enemy Health Percentage to use W", 15));
@@ -187,23 +181,6 @@ namespace Bloodimir_Ziggs_v2
                 LastHitA.LastHitB();
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Flee))
                 Flee();
-            {
-                {
-                    if (!ComboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                        !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-                    foreach (
-                        var source in
-                            ObjectManager.Get<AIHeroClient>()
-                                .Where(
-                                    a =>
-                                        a.IsEnemy && a.IsValidTarget(_ignite.Range) &&
-                                        a.Health < 50 + 20*Ziggs.Level - a.HPRegenRate/5*3))
-                    {
-                        _ignite.Cast(source);
-                        return;
-                    }
-                }
-            }
         }
 
         private static

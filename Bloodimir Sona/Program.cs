@@ -172,7 +172,7 @@ namespace Bloodimir_Sona
                                 return;
                             }
                         }
-                    }
+                    
 
         private static
             void Interruptererer

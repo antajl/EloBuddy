@@ -16,7 +16,7 @@ namespace Bloodimir_Shen
     internal static class Program
     {
         private static readonly AIHeroClient Shen = ObjectManager.Player;
-        public static Spell.Targeted R, Ignite, Exhaust;
+        public static Spell.Targeted R, Exhaust;
         public static Spell.Active W;
         public static Spell.Skillshot E, Q;
         public static Spell.Skillshot Flash;
@@ -69,9 +69,6 @@ namespace Bloodimir_Shen
             W = new Spell.Active(SpellSlot.W);
             E = new Spell.Skillshot(SpellSlot.E, 610, SkillShotType.Linear, 500, 1600, 50);
             R = new Spell.Targeted(SpellSlot.R, 31000);
-
-            if (HasSpell("summonerdot"))
-                Ignite = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerdot"), 600);
             Exhaust = new Spell.Targeted(ObjectManager.Player.GetSpellSlotFromName("summonerexhaust"), 650);
             var flashSlot = Shen.GetSpellSlotFromName("summonerflash");
             Flash = new Spell.Skillshot(flashSlot, 32767, SkillShotType.Linear);
@@ -89,7 +86,6 @@ namespace Bloodimir_Shen
             _comboMenu.Add("usecomboq", new CheckBox("Use Q"));
             _comboMenu.Add("autow", new CheckBox("Auto W"));
             _comboMenu.Add("usecomboe", new CheckBox("Use E"));
-            _comboMenu.Add("useignite", new CheckBox("Use Ignite"));
 
             _skinMenu = ShenMenu.AddSubMenu("Skin Changer", "skin");
             _skinMenu.AddGroupLabel("Choose the desired skin");
@@ -248,19 +244,6 @@ namespace Bloodimir_Shen
             if (_ultMenu["ult"].Cast<KeyBind>().CurrentValue)
             {
                 Ult();
-            }
-            if (!_comboMenu["useignite"].Cast<CheckBox>().CurrentValue ||
-                !Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo)) return;
-            foreach (
-                var source in
-                    ObjectManager.Get<AIHeroClient>()
-                        .Where(
-                            a =>
-                                a.IsEnemy && a.IsValidTarget(Ignite.Range) &&
-                                a.Health < 50 + 20*Shen.Level - (a.HPRegenRate/5*3)))
-            {
-                Ignite.Cast(source);
-                return;
             }
         }
 
